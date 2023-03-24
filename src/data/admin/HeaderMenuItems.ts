@@ -6,7 +6,7 @@ import {
     IconPoint
  } from "@tabler/icons-react";
 
-import { MenuitemsType, helpers } from "../../layouts/full/vertical/sidebar/MenuItems";
+import { MenuitemsType, helpers } from "../../layouts/theme/full/vertical/sidebar/MenuItems";
 
 
 const { NavLabel, NavItem,

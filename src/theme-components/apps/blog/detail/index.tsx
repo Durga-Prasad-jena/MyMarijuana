@@ -19,7 +19,7 @@ import {
   Button,
   Skeleton,
 } from "@mui/material";
-import Breadcrumb from "../../../../layouts/full/shared/breadcrumb/Breadcrumb";
+import Breadcrumb from "../../../../layouts/theme/full/shared/breadcrumb/Breadcrumb";
 import {
   IconEye,
   IconMessage2,

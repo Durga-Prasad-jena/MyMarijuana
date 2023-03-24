@@ -1,5 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit';
-import CustomizerReducer from './customizer/CustomizerSlice';
+import CustomizerReducer from './theme.slice';
 import EcommerceReducer from './apps/eCommerce/ECommerceSlice';
 import ChatsReducer from './apps/chat/ChatSlice';
 import NotesReducer from './apps/notes/NotesSlice';

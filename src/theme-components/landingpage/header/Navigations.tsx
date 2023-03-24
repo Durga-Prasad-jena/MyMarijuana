@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Box, Button, Divider, Grid, styled, Paper } from '@mui/material';
 import { IconChevronDown } from '@tabler/icons-react';
-import AppLinks from '../../../layouts/full/vertical/header/AppLinks';
-import QuickLinks from '../../../layouts/full/vertical/header/QuickLinks';
+import AppLinks from '../../../layouts/theme/full/vertical/header/AppLinks';
+import QuickLinks from '../../../layouts/theme/full/vertical/header/QuickLinks';
 import DemosDD from './DemosDD';
 
 const Navigations = () => {

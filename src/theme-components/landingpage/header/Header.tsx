@@ -11,7 +11,7 @@ import {
   Drawer,
   Theme,
 } from "@mui/material";
-import Logo from "../../../layouts/full/shared/logo/Logo";
+import Logo from "../../../layouts/theme/full/shared/logo/Logo";
 import Navigations from "./Navigations";
 import MobileSidebar from "./MobileSidebar";
 import { IconMenu2 } from "@tabler/icons-react";

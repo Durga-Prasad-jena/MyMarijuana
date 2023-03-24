@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { Button, Box, Collapse, Stack } from '@mui/material';
 import { IconChevronDown } from '@tabler/icons-react';
-import Logo from "../../../layouts/full/shared/logo/Logo"
+import Logo from "../../../layouts/theme/full/shared/logo/Logo"
 import DemosDD from './DemosDD';
-import AppLinks from '../../../layouts/full/vertical/header/AppLinks';
-import QuickLinks from '../../../layouts/full/vertical/header/QuickLinks';
+import AppLinks from '../../../layouts/theme/full/vertical/header/AppLinks';
+import QuickLinks from '../../../layouts/theme/full/vertical/header/QuickLinks';
 
 const MobileSidebar = () => {
     const [toggle, setToggle] = useState(false)
