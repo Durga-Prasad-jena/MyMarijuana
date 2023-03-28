@@ -1,5 +1,7 @@
 # Admin Panel
 
+# Theme Demo Link: [https://modernize-nextjs.adminmart.com/dashboards/modern](https://modernize-nextjs.adminmart.com/dashboards/modern)
+
 ## Warning
 Code completion might be very slow if you have Gitlens plugin in vs code enabled. Keep it disabled for this project!
 
