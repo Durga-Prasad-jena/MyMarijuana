@@ -8,7 +8,7 @@ import {
   FbLeftIconForm,
   FbRightIconForm,
   FbInputVariants,
-} from '../../../src/components/forms/form-layouts/index';
+} from '../../../src/theme-components/forms/form-layouts/index';
 import PageContainer from '../../../src/theme-components/container/PageContainer';
 import Breadcrumb from '../../../src/layouts/theme/full/shared/breadcrumb/Breadcrumb';
 

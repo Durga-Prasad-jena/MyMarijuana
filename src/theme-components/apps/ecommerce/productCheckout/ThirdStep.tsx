@@ -1,8 +1,5 @@
 import React from "react";
 import { Box, Grid, Paper, Radio, Stack, Typography } from "@mui/material";
-import Paypal from "public/images/svgs/paypal.svg";
-import payment from "public/images/products/payment.svg";
-import mastercard from "public/images/svgs/mastercard.svg";
 import Image from "next/image";
 
 interface deliveryType {
@@ -37,13 +34,13 @@ const Payment: paymentType[] = [
     title: "Pay with Paypal",
     description:
       "You will be redirected to PayPal website to complete your purchase securely.",
-    icons: Paypal,
+    icons: "/images/svgs/paypal.svg",
   },
   {
     value: "credit_card",
     title: "Credit / Debit Card",
     description: "We support Mastercard, Visa, Discover and Stripe.",
-    icons: mastercard,
+    icons: "/images/svgs/mastercard.svg",
   },
   {
     value: "cash",
@@ -141,7 +138,7 @@ const ThirdStep = () => {
                       </Box>
                       <Box ml="auto">
                         {option.icons ? (
-                          <Image src={option.icons} alt="payment" />
+                          <Image src={option.icons} alt="payment" width={60} height={40} />
                         ) : (
                           ""
                         )}
@@ -154,8 +151,10 @@ const ThirdStep = () => {
           </Grid>
           <Grid lg={4} xs={12} item>
             <Image
-              src={payment}
+              src="/images/products/payment.svg"
               alt="payment"
+              width={265}
+              height={265}
               style={{ height: "265px", width: "265px" }}
             />
           </Grid>

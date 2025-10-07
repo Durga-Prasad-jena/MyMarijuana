@@ -17,7 +17,6 @@ import { EmailType } from '../../../types/apps/email';
 import { IconStar, IconAlertCircle, IconTrash } from '@tabler/icons-react';
 import { useSelector, useDispatch } from '../../../store/Store';
 import { starEmail, importantEmail, deleteEmail } from '../../../store/apps/email/EmailSlice';
-import emailIcon from 'public/images/breadcrumb/emailSv.png';
 import dynamic from "next/dynamic";
 const ReactQuill = dynamic(import('react-quill'), { ssr: false })
 // import 'react-quill/dist/quill.snow.css';
@@ -183,7 +182,7 @@ const EmailContent = () => {
       <Box>
         <Typography variant="h4">Please Select a Mail</Typography>
         <br />
-        <Image src={emailIcon} alt={"emailIcon"} style={{width: '250px', height: '250px'}} />
+        <Image src="/images/breadcrumb/emailSv.png" alt={"emailIcon"} width={250} height={250} />
       </Box>
     </Box>
   );

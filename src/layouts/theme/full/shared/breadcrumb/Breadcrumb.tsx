@@ -1,8 +1,6 @@
 import React from "react";
 import { Grid, Typography, Box, Breadcrumbs, Theme } from "@mui/material";
 import NextLink from "next/link";
-
-import breadcrumbImg from "public/images/breadcrumb/ChatBc.png";
 import { IconCircle } from "@tabler/icons-react";
 import Image from "next/image";
 
@@ -78,9 +76,10 @@ const Breadcrumb = ({ subtitle, items, title, children }: BreadCrumbType) => (
           <>
             <Box sx={{ top: "0px", position: "absolute" }}>
               <Image
-                src={breadcrumbImg}
+                src="/images/breadcrumb/ChatBc.png"
                 alt={"breadcrumbImg"}
-                style={{ width: "165px", height: "165px" }}
+                width={165}
+                height={165}
                 priority
               />
             </Box>

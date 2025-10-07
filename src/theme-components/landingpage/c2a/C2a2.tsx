@@ -1,6 +1,5 @@
 import React from 'react';
 import { Grid, Typography, Box, Button, styled, Container, Stack } from '@mui/material';
-import c2aImg from 'public/images/landingpage/background/c2a.png';
 import GuaranteeCard from './GuaranteeCard';
 import Image from 'next/image';
 
@@ -63,7 +62,7 @@ const C2a2 = () => {
                   },
                 }}
               >
-                <Image src={c2aImg} alt="img" width="330" />
+                <Image src="/images/landingpage/background/c2a.png" alt="img" width={330} height={300} />
               </Box>
             </Grid>
           </Grid>

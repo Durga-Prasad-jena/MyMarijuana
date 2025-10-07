@@ -8,7 +8,6 @@ import {
   LinearProgress,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import SavingsImg from "public/images/backgrounds/piggy.png";
 import Image from "next/image";
 
 const sells: any = [
@@ -48,7 +47,7 @@ const SellingProducts = () => {
         </Typography>
 
         <Box textAlign="center" mt={2} mb="-40px">
-          <Image src={SavingsImg} alt={"SavingsImg"} width="300" />
+          <Image src="/images/backgrounds/piggy.png" alt={"SavingsImg"} width={300} height={250} />
         </Box>
       </CardContent>
       <Paper

@@ -1,7 +1,6 @@
 import React from 'react';
 import { Typography, Box, Button, styled, CardContent, Stack } from '@mui/material';
 import BlankCard from '../../shared/BlankCard';
-import badgeImg from 'public/images/landingpage/shape/badge.svg';
 import Image from 'next/image';
 
 const ImgCard = styled(BlankCard)(() => ({
@@ -27,7 +26,7 @@ const GuaranteeCard = () => {
         >
           <Stack direction="row" alignItems="center">
             <Box pl={2}>
-              <Image src={badgeImg} alt="bagde" />
+              <Image src="/images/landingpage/shape/badge.svg" alt="bagde" width={60} height={60} />
             </Box>
             <Box pl={3}>
               <Typography variant="h4">100% moneyback guarantee</Typography>

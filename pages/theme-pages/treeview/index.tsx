@@ -1,7 +1,7 @@
 import { SvgIconProps } from '@mui/material/SvgIcon';
 import { alpha, styled } from '@mui/material/styles';
-import TreeView from '@mui/lab/TreeView';
-import TreeItem, { TreeItemProps, treeItemClasses } from '@mui/lab/TreeItem';
+import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
+import { TreeItem } from '@mui/x-tree-view/TreeItem';
 import { useSpring, animated } from 'react-spring';
 import { Collapse } from '@mui/material';
 import { TransitionProps } from '@mui/material/transitions';
@@ -64,15 +64,13 @@ function TransitionComponent(props: TransitionProps) {
   );
 }
 
-const StyledTreeItem = styled((props: TreeItemProps) => (
-  <TreeItem {...props} TransitionComponent={TransitionComponent} />
-))(({ theme }) => ({
-  [`& .${treeItemClasses.iconContainer}`]: {
+const StyledTreeItem = styled(TreeItem)(({ theme }) => ({
+  '& .MuiTreeItem-iconContainer': {
     '& .close': {
       opacity: 0.3,
     },
   },
-  [`& .${treeItemClasses.group}`]: {
+  '& .MuiTreeItem-group': {
     marginLeft: 15,
     paddingLeft: 18,
     borderLeft: `1px dashed ${alpha(theme.palette.text.primary, 0.4)}`,
@@ -87,29 +85,31 @@ const Treeview = () => {
       {/* end breadcrumb */}
       <ParentCard title="Treeview">
         <ChildCard>
-          <TreeView
+          <SimpleTreeView
             aria-label="customized"
-            defaultExpanded={['1']}
-            defaultCollapseIcon={<MinusSquare />}
-            defaultExpandIcon={<PlusSquare />}
-            defaultEndIcon={<CloseSquare />}
+            defaultExpandedItems={['1']}
+            slots={{
+              collapseIcon: MinusSquare,
+              expandIcon: PlusSquare,
+              endIcon: CloseSquare,
+            }}
             sx={{ height: 200, flexGrow: 1, overflowY: 'auto' }}
           >
-            <StyledTreeItem nodeId="1" label="Main">
-              <StyledTreeItem nodeId="2" label="Hello" />
-              <StyledTreeItem nodeId="3" label="Subtree with children">
-                <StyledTreeItem nodeId="6" label="Hello" />
-                <StyledTreeItem nodeId="7" label="Sub-subtree with children">
-                  <StyledTreeItem nodeId="9" label="Child 1" />
-                  <StyledTreeItem nodeId="10" label="Child 2" />
-                  <StyledTreeItem nodeId="11" label="Child 3" />
+            <StyledTreeItem itemId="1" label="Main">
+              <StyledTreeItem itemId="2" label="Hello" />
+              <StyledTreeItem itemId="3" label="Subtree with children">
+                <StyledTreeItem itemId="6" label="Hello" />
+                <StyledTreeItem itemId="7" label="Sub-subtree with children">
+                  <StyledTreeItem itemId="9" label="Child 1" />
+                  <StyledTreeItem itemId="10" label="Child 2" />
+                  <StyledTreeItem itemId="11" label="Child 3" />
                 </StyledTreeItem>
-                <StyledTreeItem nodeId="8" label="Hello" />
+                <StyledTreeItem itemId="8" label="Hello" />
               </StyledTreeItem>
-              <StyledTreeItem nodeId="4" label="World" />
-              <StyledTreeItem nodeId="5" label="Something something" />
+              <StyledTreeItem itemId="4" label="World" />
+              <StyledTreeItem itemId="5" label="Something something" />
             </StyledTreeItem>
-          </TreeView>
+          </SimpleTreeView>
         </ChildCard>
       </ParentCard>
     </PageContainer>

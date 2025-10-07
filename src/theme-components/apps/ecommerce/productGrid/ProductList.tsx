@@ -24,7 +24,6 @@ import {
 import ProductSearch from "./ProductSearch";
 import { IconBasket, IconMenu2 } from "@tabler/icons-react";
 import AlertCart from "../productCart/AlertCart";
-import emptyCart from "public/images/products/empty-shopping-cart.svg";
 import BlankCard from "../../../shared/BlankCard";
 import { ProductType } from "../../../../types/apps/eCommerce";
 import Image from "next/image";
@@ -253,7 +252,7 @@ const ProductList = ({ onClick }: Props) => {
           <>
             <Grid item xs={12} lg={12} md={12} sm={12}>
               <Box textAlign="center" mt={6}>
-                <Image src={emptyCart} alt="cart" width={200} />
+                <Image src="/images/products/empty-shopping-cart.svg" alt="cart" width={200} height={200} />
                 <Typography variant="h2">There is no Product</Typography>
                 <Typography variant="h6" mb={3}>
                   The Product you are searching is no longer available.

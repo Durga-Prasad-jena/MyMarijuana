@@ -3,14 +3,14 @@ import Breadcrumb from '../../../src/layouts/theme/full/shared/breadcrumb/Breadc
 import PageContainer from '../../../src/theme-components/container/PageContainer';
 import ParentCard from '../../../src/theme-components/shared/ParentCard';
 import ChildCard from '../../../src/theme-components/shared/ChildCard';
-import SimpleDialog from '../../../src/components/ui-theme-components/dialog/SimpleDialog';
-import AlertDialog from '../../../src/components/ui-theme-components/dialog/AlertDialog';
-import TransitionDialog from '../../../src/components/ui-theme-components/dialog/TransitionDialog';
-import FormDialog from '../../../src/components/ui-theme-components/dialog/FormDialog';
-import FullscreenDialog from '../../../src/components/ui-theme-components/dialog/FullscreenDialog';
-import MaxWidthDialog from '../../../src/components/ui-theme-components/dialog/MaxWidthDialog';
-import ScrollContentDialog from '../../../src/components/ui-theme-components/dialog/ScrollContentDialog';
-import ResponsiveDialog from '../../../src/components/ui-theme-components/dialog/ResponsiveDialog';
+import SimpleDialog from '../../../src/theme-components/ui-components/dialog/SimpleDialog';
+import AlertDialog from '../../../src/theme-components/ui-components/dialog/AlertDialog';
+import TransitionDialog from '../../../src/theme-components/ui-components/dialog/TransitionDialog';
+import FormDialog from '../../../src/theme-components/ui-components/dialog/FormDialog';
+import FullscreenDialog from '../../../src/theme-components/ui-components/dialog/FullscreenDialog';
+import MaxWidthDialog from '../../../src/theme-components/ui-components/dialog/MaxWidthDialog';
+import ScrollContentDialog from '../../../src/theme-components/ui-components/dialog/ScrollContentDialog';
+import ResponsiveDialog from '../../../src/theme-components/ui-components/dialog/ResponsiveDialog';
 
 const BCrumb = [
   {

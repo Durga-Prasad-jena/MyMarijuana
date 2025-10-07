@@ -12,7 +12,6 @@ import {
 } from '@mui/material';
 import { useSelector, useDispatch } from '../../../store/Store';
 import { addContact } from '../../../store/apps/contacts/ContactSlice';
-import user1 from 'public/images/profile/user-1.jpg';
 
 const ContactAdd = () => {
   const dispatch = useDispatch();
@@ -41,7 +40,7 @@ const ContactAdd = () => {
         id,
         values.firstname,
         values.lastname,
-        user1,
+        '/images/profile/user-1.jpg',
         values.department,
         values.company,
         values.phone,

@@ -211,25 +211,22 @@ const BigCalendar = () => {
             <LocalizationProvider dateAdapter={AdapterDateFns}>
               <DatePicker
                 label="Start Date"
-                inputFormat="MM/dd/yyyy"
                 value={start}
                 onChange={handleStartChange}
-                renderInput={(params: any) => <TextField {...params} fullWidth sx={{ mb: 3 }} />}
+                slotProps={{ textField: { fullWidth: true, sx: { mb: 3 } } }}
               />
               <DatePicker
                 label="End Date"
-                inputFormat="MM/dd/yyyy"
                 value={end}
                 onChange={handleEndChange}
-                renderInput={(params: any) => (
-                  <TextField
-                    {...params}
-                    fullWidth
-                    sx={{ mb: 3 }}
-                    error={start > end}
-                    helperText={start > end ? 'End date must be later than start date' : ''}
-                  />
-                )}
+                slotProps={{
+                  textField: {
+                    fullWidth: true,
+                    sx: { mb: 3 },
+                    error: start > end,
+                    helperText: start > end ? 'End date must be later than start date' : ''
+                  }
+                }}
               />
             </LocalizationProvider>
 

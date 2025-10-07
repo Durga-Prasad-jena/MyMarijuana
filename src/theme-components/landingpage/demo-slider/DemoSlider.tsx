@@ -8,16 +8,6 @@ import {
 } from "@mui/material";
 
 // images
-import mainDemo from "public/images/landingpage/demos/demo-main.jpg";
-import darkDemo from "public/images/landingpage/demos/demo-dark.jpg";
-import horizontalDemo from "public/images/landingpage/demos/demo-horizontal.jpg";
-import rtlDemo from "public/images/landingpage/demos/demo-rtl.jpg";
-
-import app1 from "public/images/landingpage/apps/app-calendar.jpg";
-import app2 from "public/images/landingpage/apps/app-chat.jpg";
-import app3 from "public/images/landingpage/apps/app-contact.jpg";
-import app4 from "public/images/landingpage/apps/app-email.jpg";
-
 import DemoTitle from "./DemoTitle";
 import Image from "next/image";
 
@@ -37,22 +27,22 @@ interface DemoTypes {
 const demos: DemoTypes[] = [
   {
     link: "https://modernize-nextjs.adminmart.com/landingpage",
-    img: mainDemo,
+    img: "/images/landingpage/demos/demo-main.jpg",
     title: "Main",
   },
   {
     link: "https://modernize-nextjs-dark.netlify.app/dashboards/ecommerce",
-    img: darkDemo,
+    img: "/images/landingpage/demos/demo-dark.jpg",
     title: "Dark",
   },
   {
     link: "https://modernize-nextjs-horizontal.netlify.app/dashboards/modern",
-    img: horizontalDemo,
+    img: "/images/landingpage/demos/demo-horizontal.jpg",
     title: "Horizontal",
   },
   {
     link: "https://modernize-nextjs-rtl.netlify.app/dashboards/modern",
-    img: rtlDemo,
+    img: "/images/landingpage/demos/demo-rtl.jpg",
     title: "RTL",
   },
 ];
@@ -60,22 +50,22 @@ const demos: DemoTypes[] = [
 const apps: DemoTypes[] = [
   {
     link: "https://modernize-nextjs.adminmart.com/apps/calendar",
-    img: app1,
+    img: "/images/landingpage/apps/app-calendar.jpg",
     title: "Calendar",
   },
   {
     link: "https://modernize-nextjs.adminmart.com/apps/chats",
-    img: app2,
+    img: "/images/landingpage/apps/app-chat.jpg",
     title: "Chat",
   },
   {
     link: "https://modernize-nextjs.adminmart.com/apps/contacts",
-    img: app3,
+    img: "/images/landingpage/apps/app-contact.jpg",
     title: "Contact",
   },
   {
     link: "https://modernize-nextjs.adminmart.com/apps/email",
-    img: app4,
+    img: "/images/landingpage/apps/app-email.jpg",
     title: "Email",
   },
 ];
@@ -137,6 +127,8 @@ const DemoSlider = () => {
                     <Image
                       src={demo.img}
                       alt="demo"
+                      width={300}
+                      height={200}
                       style={{
                         borderRadius: "8px",
                         width: "100%",
@@ -180,6 +172,8 @@ const DemoSlider = () => {
                     <Image
                       src={app.img}
                       alt="app"
+                      width={300}
+                      height={200}
                       style={{
                         borderRadius: "8px",
                         width: "100%",

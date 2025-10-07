@@ -3,8 +3,8 @@ import Breadcrumb from '../../../src/layouts/theme/full/shared/breadcrumb/Breadc
 import PageContainer from '../../../src/theme-components/container/PageContainer';
 import ParentCard from '../../../src/theme-components/shared/ParentCard';
 import ChildCard from '../../../src/theme-components/shared/ChildCard';
-import BasicTransferList from '../../../src/components/ui-theme-components/transfer-list/BasicTransferList';
-import EnhancedTransferList from '../../../src/components/ui-theme-components/transfer-list/EnhancedTransferList';
+import BasicTransferList from '../../../src/theme-components/ui-components/transfer-list/BasicTransferList';
+import EnhancedTransferList from '../../../src/theme-components/ui-components/transfer-list/EnhancedTransferList';
 
 const BCrumb = [
   {

@@ -4,12 +4,12 @@ import PageContainer from '../../../src/theme-components/container/PageContainer
 import ParentCard from '../../../src/theme-components/shared/ParentCard';
 import ChildCard from '../../../src/theme-components/shared/ChildCard';
 
-import SimpleList from '../../../src/components/ui-theme-components/lists/SimpleList';
-import NestedList from '../../../src/components/ui-theme-components/lists/NestedList';
-import FolderList from '../../../src/components/ui-theme-components/lists/FolderList';
-import SelectedList from '../../../src/components/ui-theme-components/lists/SelectedList';
-import ControlsList from '../../../src/components/ui-theme-components/lists/ControlsList';
-import SwitchList from '../../../src/components/ui-theme-components/lists/SwitchList';
+import SimpleList from '../../../src/theme-components/ui-components/lists/SimpleList';
+import NestedList from '../../../src/theme-components/ui-components/lists/NestedList';
+import FolderList from '../../../src/theme-components/ui-components/lists/FolderList';
+import SelectedList from '../../../src/theme-components/ui-components/lists/SelectedList';
+import ControlsList from '../../../src/theme-components/ui-components/lists/ControlsList';
+import SwitchList from '../../../src/theme-components/ui-components/lists/SwitchList';
 import React from 'react';
 
 const BCrumb = [

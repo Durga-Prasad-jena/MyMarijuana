@@ -22,7 +22,6 @@ import BlankCard from '../../shared/BlankCard';
 import { ContactType } from '../../../types/apps/contact';
 import { IconPencil, IconStar, IconTrash, IconDeviceFloppy } from '@tabler/icons-react';
 import Scrollbar from '../../../theme-components/custom-scroll/Scrollbar';
-import emailIcon from 'public/images/breadcrumb/emailSv.png';
 import Image from 'next/image';
 
 const ContactDetails = () => {
@@ -278,7 +277,7 @@ const ContactDetails = () => {
           <Box>
             <Typography variant="h4">Please Select a Contact</Typography>
             <br />
-            <Image src={emailIcon} alt={"emailIcon"} width="250" />
+            <Image src="/images/breadcrumb/emailSv.png" alt={"emailIcon"} width={250} height={200} />
           </Box>
         </Box>
       )}

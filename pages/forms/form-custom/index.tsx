@@ -127,11 +127,10 @@ const FormCustom = () => {
                 onChange={(newValue) => {
                   setValue2(newValue);
                 }}
-                renderInput={(params) => (
-                  <CustomTextField
-                    {...params}
-                    fullWidth
-                    sx={{
+                slotProps={{
+                  textField: {
+                    fullWidth: true,
+                    sx: {
                       '& .MuiSvgIcon-root': {
                         width: '18px',
                         height: '18px',
@@ -139,9 +138,9 @@ const FormCustom = () => {
                       '& .MuiFormHelperText-root': {
                         display: 'none',
                       },
-                    }}
-                  />
-                )}
+                    }
+                  }
+                }}
               />
             </LocalizationProvider>
           </Grid>
@@ -170,11 +169,14 @@ const FormCustom = () => {
             <CustomFormLabel htmlFor="date">Date</CustomFormLabel>
             <LocalizationProvider dateAdapter={AdapterDateFns}>
               <DateTimePicker
-                renderInput={(props) => (
-                  <CustomTextField
-                    {...props}
-                    fullWidth
-                    sx={{
+                value={value}
+                onChange={(newValue) => {
+                  setValue(newValue);
+                }}
+                slotProps={{
+                  textField: {
+                    fullWidth: true,
+                    sx: {
                       '& .MuiSvgIcon-root': {
                         width: 18,
                         height: 18,
@@ -182,12 +184,8 @@ const FormCustom = () => {
                       '& .MuiFormHelperText-root': {
                         display: 'none',
                       },
-                    }}
-                  />
-                )}
-                value={value}
-                onChange={(newValue) => {
-                  setValue(newValue);
+                    }
+                  }
                 }}
               />
             </LocalizationProvider>

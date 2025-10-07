@@ -1,5 +1,4 @@
 import React from 'react';
-import dayjs, { Dayjs } from 'dayjs';
 import { Grid } from '@mui/material';
 import ParentCard from '../../../../src/theme-components/shared/ParentCard';
 import ChildCard from '../../../../src/theme-components/shared/ChildCard';
@@ -23,11 +22,12 @@ const BCrumb = [
 ];
 
 const MuiDateTime = () => {
-  const [value, setValue] = React.useState<Dayjs | null>(null);
-  const [value2, setValue2] = React.useState<Dayjs | null>(null);
+  const [value, setValue] = React.useState<Date | null>(null);
+  const [value2, setValue2] = React.useState<Date | null>(null);
 
   // date time
-  const [value3, setValue3] = React.useState<Dayjs | null>(dayjs('2018-01-01T00:00:00.000Z'));
+  const [value3, setValue3] = React.useState<Date | null>(new Date('2018-01-01'));
+  const [value4, setValue4] = React.useState<Date | null>(null);
 
   return (
     <PageContainer>
@@ -47,16 +47,15 @@ const MuiDateTime = () => {
                   onChange={(newValue) => {
                     setValue3(newValue);
                   }}
-                  renderInput={(inputProps) => (
-                    <CustomTextField
-                      fullWidth
-                      variant="outlined"
-                      size="small"
-                      inputProps={{ 'aria-label': 'basic date picker' }}
-                      {...inputProps}
-                    />
-                  )}
                   value={value3}
+                  slotProps={{
+                    textField: {
+                      fullWidth: true,
+                      variant: "outlined",
+                      size: "small",
+                      inputProps: { 'aria-label': 'basic date picker' }
+                    }
+                  }}
                 />
               </LocalizationProvider>
             </ChildCard>
@@ -67,13 +66,16 @@ const MuiDateTime = () => {
           <Grid item xs={12} lg={6} sm={6} display="flex" alignItems="stretch">
             <ChildCard title="Different Design">
               <LocalizationProvider dateAdapter={AdapterDateFns}>
-                <DateTimePicker
-                  renderInput={(props) => (
-                    <CustomTextField
-                      {...props}
-                      fullWidth
-                      size="small"
-                      sx={{
+                                <DateTimePicker
+                  value={value4}
+                  onChange={(newValue) => {
+                    setValue4(newValue);
+                  }}
+                  slotProps={{
+                    textField: {
+                      fullWidth: true,
+                      size: "small",
+                      sx: {
                         '& .MuiSvgIcon-root': {
                           width: '18px',
                           height: '18px',
@@ -81,12 +83,8 @@ const MuiDateTime = () => {
                         '& .MuiFormHelperText-root': {
                           display: 'none',
                         },
-                      }}
-                    />
-                  )}
-                  value={value}
-                  onChange={(newValue) => {
-                    setValue(newValue);
+                      }
+                    }
                   }}
                 />
               </LocalizationProvider>
@@ -103,12 +101,11 @@ const MuiDateTime = () => {
                   onChange={(newValue) => {
                     setValue2(newValue);
                   }}
-                  renderInput={(params) => (
-                    <CustomTextField
-                      size="small"
-                      {...params}
-                      fullWidth
-                      sx={{
+                  slotProps={{
+                    textField: {
+                      size: "small",
+                      fullWidth: true,
+                      sx: {
                         '& .MuiSvgIcon-root': {
                           width: '18px',
                           height: '18px',
@@ -116,9 +113,9 @@ const MuiDateTime = () => {
                         '& .MuiFormHelperText-root': {
                           display: 'none',
                         },
-                      }}
-                    />
-                  )}
+                      }
+                    }
+                  }}
                 />
               </LocalizationProvider>
             </ChildCard>

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Box, Menu, Typography, Button, Divider, Grid } from '@mui/material';
 import Link from 'next/link';
 import { IconChevronDown, IconHelp } from '@tabler/icons-react';
+import { MenuitemsType } from '../sidebar/MenuItems';
 import AppLinks from './AppLinks';
 import QuickLinks from './QuickLinks';
 

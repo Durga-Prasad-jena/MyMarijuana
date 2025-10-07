@@ -1,6 +1,5 @@
 import React from 'react';
 import { Grid, Link, Typography, Container } from '@mui/material';
-import logoIcon from 'public/images/logos/logoIcon.svg';
 import Image from 'next/image';
 
 const Footer = () => {
@@ -8,7 +7,7 @@ const Footer = () => {
     <Container maxWidth="lg">
       <Grid container spacing={3} justifyContent="center" mt={4}>
         <Grid item xs={12} sm={5} lg={4} textAlign="center">
-          <Image src={logoIcon} alt="icon" />
+          <Image src="/images/logos/logoIcon.svg" alt="icon" width={120} height={40} />
           <Typography fontSize="16" color="textSecondary" mt={1} mb={4}>
             All rights reserved by Modernize. Designed & Developed by
             <Link target="_blank" href="https://adminmart.com/">

@@ -3,8 +3,8 @@ import Breadcrumb from '../../../src/layouts/theme/full/shared/breadcrumb/Breadc
 import PageContainer from '../../../src/theme-components/container/PageContainer';
 import ParentCard from '../../../src/theme-components/shared/ParentCard';
 import ChildCard from '../../../src/theme-components/shared/ChildCard';
-import ClickPopover from '../../../src/components/ui-theme-components/popover/ClickPopover';
-import HoverPopover from '../../../src/components/ui-theme-components/popover/HoverPopover';
+import ClickPopover from '../../../src/theme-components/ui-components/popover/ClickPopover';
+import HoverPopover from '../../../src/theme-components/ui-components/popover/HoverPopover';
 
 const BCrumb = [
   {
