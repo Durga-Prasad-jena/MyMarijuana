@@ -1,7 +1,7 @@
 import { Box, Typography, Button, Divider } from "@mui/material";
 import Link from "next/link";
-import CustomTextField from "../../../src/theme-components/forms/theme-elements/CustomTextField";
-import CustomFormLabel from "../../../src/theme-components/forms/theme-elements/CustomFormLabel";
+import CustomFormLabel from "@/theme-components/forms/CustomFormLabel";
+import CustomTextField from "@/theme-components/forms/CustomTextField";
 import { Stack } from "@mui/system";
 import { registerType } from "../../../src/types/auth/auth";
 import AuthSocialButtons from "./AuthSocialButtons";
@@ -15,7 +15,6 @@ const AuthRegister = ({ title, subtitle, subtext }: registerType) => (
     ) : null}
 
     {subtext}
-    <AuthSocialButtons title="Sign up with" />
 
     <Box mt={3}>
       <Divider>
@@ -47,7 +46,7 @@ const AuthRegister = ({ title, subtitle, subtext }: registerType) => (
         size="large"
         fullWidth
         component={Link}
-        href="/auth/login"
+        href="/"
       >
         Sign Up
       </Button>

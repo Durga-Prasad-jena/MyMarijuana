@@ -1,4 +1,3 @@
-import React, { Suspense } from "react";
 import Head from "next/head";
 import { AppProps } from "next/app";
 import { ThemeProvider } from "@mui/material/styles";
@@ -7,7 +6,7 @@ import { CacheProvider, EmotionCache } from "@emotion/react";
 import { ThemeSettings } from "../src/data/theme/Theme";
 import createEmotionCache from "../src/createEmotionCache";
 import { Provider } from "react-redux";
-import Store from "../src/store/Store";
+import Store, { persistor } from "../src/store/Store";
 import RTL from "../src/layouts/theme/full/shared/customizer/RTL";
 import { useSelector } from "../src/store/Store";
 import { AppState } from "../src/store/Store";
@@ -15,17 +14,12 @@ import { AppState } from "../src/store/Store";
 import BlankLayout from "../src/layouts/theme/blank/BlankLayout";
 import FullLayout from "../src/layouts/theme/full/FullLayout";
 
-import "../src/_mockApis";
 import "../src/utils/i18n";
 
+import { PersistGate } from "redux-persist/integration/react";
+import { Toaster } from "react-hot-toast";
+
 // CSS FILES
-import "react-quill/dist/quill.snow.css";
-import "./forms/form-quill/Quill.css";
-import "./apps/calendar/Calendar.css";
-import "../src/theme-components/landingpage/testimonial/testimonial.css";
-import "../src/theme-components/landingpage/demo-slider/demo-slider.css";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache();
@@ -48,11 +42,12 @@ const MyApp = (props: MyAppProps) => {
   const customizer = useSelector((state: AppState) => state.customizer);
   const Layout = layouts[Component.layout] || FullLayout;
 
+
   return (
     <CacheProvider value={emotionCache}>
       <Head>
         <meta name="viewport" content="initial-scale=1, width=device-width" />
-        <title>Modernize NextJs Admin template</title>
+        <title>Basic Project</title>
       </Head>
       <ThemeProvider theme={theme}>
         <RTL direction={customizer.activeDir}>
@@ -68,6 +63,9 @@ const MyApp = (props: MyAppProps) => {
 
 export default (props: MyAppProps) => (
   <Provider store={Store}>
-    <MyApp {...props} />
+    <PersistGate persistor={persistor}>
+      <Toaster />
+      <MyApp {...props} />
+    </PersistGate>
   </Provider>
 );

@@ -12,7 +12,6 @@ const nextConfig = {
   exportPathMap: async function (defaultPathMap, { buildId }) {
     const paths = { ...defaultPathMap };
     // Remove problematic paths from static generation
-    delete paths['/forms/form-quill'];
     delete paths['/forms/form-elements/date-time'];
     delete paths['/theme-pages/treeview'];
     return paths;

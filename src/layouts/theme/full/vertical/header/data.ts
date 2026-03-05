@@ -66,16 +66,10 @@ const profile: ProfileType[] = [
     icon: "/images/svgs/icon-account.svg",
   },
   {
-    href: "/apps/email",
-    title: "My Inbox",
-    subtitle: "Messages & Emails",
-    icon: "/images/svgs/icon-inbox.svg",
-  },
-  {
-    href: "/apps/notes",
-    title: "My Tasks",
-    subtitle: "To-do and Daily Tasks",
-    icon: "/images/svgs/icon-tasks.svg",
+    href: "/auth/change-password",
+    title: "Change Password",
+    subtitle: "Account Settings",
+    icon: "/images/svgs/icon-account.svg",
   },
 ];
 

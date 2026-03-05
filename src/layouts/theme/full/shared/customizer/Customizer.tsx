@@ -25,7 +25,6 @@ import {
   setCardShadow,
 } from "../../../../../store/theme.slice";
 import { AppState } from "../../../../../store/Store";
-import Scrollbar from "../../../../../theme-components/custom-scroll/Scrollbar";
 import WbSunnyTwoToneIcon from "@mui/icons-material/WbSunnyTwoTone";
 import DarkModeTwoToneIcon from "@mui/icons-material/DarkModeTwoTone";
 import SwipeLeftAltTwoToneIcon from "@mui/icons-material/SwipeLeftAltTwoTone";
@@ -39,6 +38,7 @@ import {
   PaddingTwoTone,
   BorderOuter,
 } from "@mui/icons-material";
+import Scrollbar from "@/theme-components/custom-scroll/Scrollbar";
 
 const SidebarWidth = "320px";
 interface colors {
@@ -213,7 +213,7 @@ const Customizer: FC = () => {
             </Typography>
             <Grid container spacing={2}>
               {thColors.map((thcolor) => (
-                <Grid item xs={4} key={thcolor.id}>
+                <Grid >
                   <StyledBox onClick={() => dispatch(setTheme(thcolor.disp))}>
                     <Tooltip title={`${thcolor.disp}`} placement="top">
                       <Box
@@ -241,70 +241,7 @@ const Customizer: FC = () => {
               ))}
             </Grid>
             <Box pt={4} />
-            {/* ------------------------------------------- */}
-            {/* ------------ Layout Horizontal / Vertical ------------- */}
-            {/* ------------------------------------------- */}
-            <Typography variant="h6" gutterBottom>
-              Layout Type
-            </Typography>
-            <Stack direction={"row"} gap={2} my={2}>
-              <StyledBox
-                onClick={() => dispatch(toggleHorizontal(false))}
-                display="flex"
-                gap={1}
-              >
-                <ViewComfyTwoTone
-                  color={
-                    customizer.isHorizontal === false ? "primary" : "inherit"
-                  }
-                />
-                Vertical
-              </StyledBox>
-              <StyledBox
-                onClick={() => dispatch(toggleHorizontal(true))}
-                display="flex"
-                gap={1}
-              >
-                <PaddingTwoTone
-                  color={
-                    customizer.isHorizontal === true ? "primary" : "inherit"
-                  }
-                />
-                Horizontal
-              </StyledBox>
-            </Stack>
-            <Box pt={4} />
-            {/* ------------------------------------------- */}
-            {/* ------------ Layout Boxed / Full ------------- */}
-            {/* ------------------------------------------- */}
-            <Typography variant="h6" gutterBottom>
-              Container Option
-            </Typography>
-            <Stack direction={"row"} gap={2} my={2}>
-              <StyledBox
-                onClick={() => dispatch(toggleLayout("boxed"))}
-                display="flex"
-                gap={1}
-              >
-                <CallToActionTwoToneIcon
-                  color={
-                    customizer.isLayout === "boxed" ? "primary" : "inherit"
-                  }
-                />
-                Boxed
-              </StyledBox>
-              <StyledBox
-                onClick={() => dispatch(toggleLayout("full"))}
-                display="flex"
-                gap={1}
-              >
-                <AspectRatioTwoToneIcon
-                  color={customizer.isLayout === "full" ? "primary" : "inherit"}
-                />
-                Full
-              </StyledBox>
-            </Stack>
-            <Box pt={4} />
+
             {/* ------------------------------------------- */}
             {/* ------------ Sidebar Color setting ------------- */}
             {/* ------------------------------------------- */}

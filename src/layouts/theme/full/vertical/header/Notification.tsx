@@ -11,11 +11,11 @@ import {
   Chip,
 } from '@mui/material';
 import * as dropdownData from './data';
-import Scrollbar from '../../../../../theme-components/custom-scroll/Scrollbar';
 
 import { IconBellRinging } from '@tabler/icons-react';
 import { Stack } from '@mui/system';
 import Link from 'next/link';
+import Scrollbar from '@/theme-components/custom-scroll/Scrollbar';
 
 const Notifications = () => {
   const [anchorEl2, setAnchorEl2] = useState(null);

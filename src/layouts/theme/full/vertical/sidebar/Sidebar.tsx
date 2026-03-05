@@ -4,9 +4,9 @@ import SidebarItems from './SidebarItems';
 import Logo from '../../shared/logo/Logo';
 import { useSelector, useDispatch } from '../../../../../store/Store';
 import { hoverSidebar, toggleMobileSidebar } from '../../../../../store/theme.slice';
-import Scrollbar from '../../../../../theme-components/custom-scroll/Scrollbar';
 import { Profile } from './SidebarProfile/Profile';
 import { AppState } from '../../../../../store/Store';
+import Scrollbar from "@/theme-components/custom-scroll/Scrollbar";
 
 
 interface Props {
@@ -85,7 +85,7 @@ const Sidebar: React.FC<Props> = ({ menuItems }) => {
               {/* ------------------------------------------- */}
               <SidebarItems menuItems={menuItems} />
             </Scrollbar>
-            <Profile />
+            {/* <Profile /> */}
           </Box>
         </Drawer>
       </Box>

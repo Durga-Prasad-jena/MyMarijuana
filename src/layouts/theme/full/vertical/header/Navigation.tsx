@@ -60,7 +60,6 @@ const AppDD: React.FC<Props> = ({ menuItems }) => {
           }}
         >
           <Grid container>
-            <Grid item sm={8} display="flex">
               <Box p={4} pr={0} pb={3}>
                 <AppLinks />
                 <Divider />
@@ -96,12 +95,9 @@ const AppDD: React.FC<Props> = ({ menuItems }) => {
               </Box>
               <Divider orientation="vertical" />
             </Grid>
-            <Grid item sm={4}>
               <Box p={4}>
                 <QuickLinks />
               </Box>
-            </Grid>
-          </Grid>
         </Menu>
       </Box>
       <Button color="inherit" sx={{color: (theme) => theme.palette.text.secondary}} variant="text" href="/apps/chat" component={Link}>

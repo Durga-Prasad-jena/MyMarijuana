@@ -1,7 +1,5 @@
-import { FC } from "react";
 import { Box, Container, Typography, Button } from "@mui/material";
 import Link from "next/link";
-import React from "react";
 
 const Error = () => (
   <Box

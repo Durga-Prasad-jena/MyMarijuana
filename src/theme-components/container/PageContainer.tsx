@@ -1,5 +1,5 @@
 type Props = {
-  children: any | JSX.Element | JSX.Element[];
+  children: any ;
 };
 
 const PageContainer = ({ children }: Props) => <div>{children}</div>;
