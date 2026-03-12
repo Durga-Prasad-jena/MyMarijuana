@@ -4,7 +4,6 @@ import CustomFormLabel from "@/theme-components/forms/CustomFormLabel";
 import CustomTextField from "@/theme-components/forms/CustomTextField";
 import { Stack } from "@mui/system";
 import { registerType } from "../../../src/types/auth/auth";
-import AuthSocialButtons from "./AuthSocialButtons";
 
 const AuthRegister = ({ title, subtitle, subtext }: registerType) => (
   <>
@@ -35,7 +34,7 @@ const AuthRegister = ({ title, subtitle, subtext }: registerType) => (
       <Stack mb={3}>
         <CustomFormLabel htmlFor="name">Name</CustomFormLabel>
         <CustomTextField id="name" variant="outlined" fullWidth />
-        <CustomFormLabel htmlFor="email">Email Adddress</CustomFormLabel>
+        <CustomFormLabel htmlFor="email">Email Address</CustomFormLabel>
         <CustomTextField id="email" variant="outlined" fullWidth />
         <CustomFormLabel htmlFor="password">Password</CustomFormLabel>
         <CustomTextField id="password" variant="outlined" fullWidth />

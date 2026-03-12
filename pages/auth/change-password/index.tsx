@@ -2,6 +2,7 @@ import { Grid, Box, Card } from "@mui/material";
 import Logo from "@/layouts/theme/full/shared/logo/Logo";
 import AuthResetPassword from "../authForms/AuthResetPassword";
 import PageContainer from "@/theme-components/container/PageContainer";
+import AuthChangePassword from "../authForms/AuthChangePassword";
 
 // components
 
@@ -37,7 +38,7 @@ const ChangePassword = () => {
               <Box display="flex" alignItems="center" justifyContent="center">
                 <Logo />
               </Box>
-              <AuthResetPassword />
+              <AuthChangePassword />
             </Card>
           </Grid>
       </Box>

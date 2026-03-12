@@ -9,15 +9,17 @@ import {
 import Api_Endpoint from "../api_endpoints";
 import { baseApi } from "../baseApi";
 import { setMeData } from "../reducer/meDataReducer";
+import { SuccessApiResponse } from "@/types/apps";
+import { ChangePasswordModelType } from "@/types/apps/auth";
 
 const authApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     login: builder.mutation<LoginResponseModel, LoginModelType>({
-      query: ({ emailAddress, password }) => ({
+      query: ({ email, password }) => ({
         url: Api_Endpoint.loginApi,
         method: "POST",
         body: {
-          emailAddress,
+          email,
           password,
         },
       }),
@@ -33,7 +35,7 @@ const authApi = baseApi.injectEndpoints({
       async onQueryStarted(_, { dispatch, queryFulfilled }) {
         try {
           const data = await queryFulfilled;
-          dispatch(setMeData({ meData: data.data.user }));
+          dispatch(setMeData({ meData: data.data }));
         } catch (error) {
           console.log(error);
         }
@@ -55,7 +57,7 @@ const authApi = baseApi.injectEndpoints({
             emailAddress,
           },
         }),
-      }
+      },
     ),
     verifyOTP: builder.mutation<verifyOtpResponseModel, VerifyOtpModel>({
       query: ({ emailAddress, otp }) => ({
@@ -67,14 +69,23 @@ const authApi = baseApi.injectEndpoints({
         },
       }),
     }),
-    resetPass: builder.mutation<{message:string},ResetPassModelType>({
-      query:(body)=>({
+    resetPass: builder.mutation<{ message: string }, ResetPassModelType>({
+      query: (body) => ({
         url: Api_Endpoint.resetPassApi,
-        method:"PUT",
+        method: "PUT",
         body,
-      })
+      }),
     }),
-    // changePass:builder.mutation<{}>()
+    changePassword: builder.mutation<
+      SuccessApiResponse,
+      ChangePasswordModelType
+    >({
+      query: (body) => ({
+        url: Api_Endpoint.changePassApi,
+        method: "PATCH",
+        body,
+      }),
+    }),
   }),
 });
 
@@ -84,5 +95,6 @@ export const {
   useLogoutMutation,
   useForgotPassMutation,
   useVerifyOTPMutation,
-  useResetPassMutation
+  useResetPassMutation,
+  useChangePasswordMutation,
 } = authApi;

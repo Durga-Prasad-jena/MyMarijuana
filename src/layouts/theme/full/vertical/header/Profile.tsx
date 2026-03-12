@@ -1,3 +1,4 @@
+"use client"
 import React, { useState } from "react";
 import Link from "next/link";
 import {
@@ -19,11 +20,14 @@ import notify from "@/utils/toast";
 import { ApiErrorResponse } from "@/types/api_response_model";
 import { useDispatch } from "react-redux";
 import { clearMeData } from "@/store/endpoints/reducer/meDataReducer";
+import { useRouter } from "next/navigation";
+import { capitalize } from "lodash";
 
 const Profile = () => {
   const [anchorEl2, setAnchorEl2] = useState(null);
   const [logout, { isLoading: isLogoutLoading }] = useLogoutMutation();
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
+  const router = useRouter()
 
   //meData
   const meData = useSelector((state) => state.meData.meData);
@@ -40,16 +44,15 @@ const Profile = () => {
   const handleLogout = async (): Promise<void> => {
     try {
       const loggedoutUser = await logout().unwrap();
-      notify(loggedoutUser.message,"success")
-      dispatch(clearMeData())
+      notify(loggedoutUser.message, "success");
+      dispatch(clearMeData());
+      router.push("/auth/login")
     } catch (error) {
       notify((error as ApiErrorResponse)?.data?.message, "error");
     }
   };
 
-  const userName = meData
-    ? `${meData?.firstName}${" "}${meData?.lastName}`
-    : "";
+  const userName = `${meData?.firstName} ${meData?.lastName}`
 
   return (
     <Box>
@@ -98,7 +101,7 @@ const Profile = () => {
           <Avatar
             src={"/images/profile/user-1.jpg"}
             alt={"ProfileImg"}
-            sx={{ width: 95, height: 95 }}
+            sx={{ width: 45, height: 45 }}
           />
           <Box>
             <Typography
@@ -106,7 +109,8 @@ const Profile = () => {
               color="textPrimary"
               fontWeight={600}
             >
-              {userName}
+              {/* {userName} */}
+             {capitalize(userName ?? "")}
             </Typography>
             <Typography variant="subtitle2" color="textSecondary">
               {/* Designer */}
@@ -117,9 +121,10 @@ const Profile = () => {
               display="flex"
               alignItems="center"
               gap={1}
+              fontSize={13}
             >
               <IconMail width={15} height={15} />
-              {meData?.emailAddress ?? ""}
+              {meData?.email ?? ""}
             </Typography>
           </Box>
         </Stack>
@@ -177,30 +182,6 @@ const Profile = () => {
           </Box>
         ))}
         <Box mt={2}>
-          <Box
-            bgcolor="primary.light"
-            p={3}
-            mb={3}
-            overflow="hidden"
-            position="relative"
-          >
-            <Box display="flex" justifyContent="space-between">
-              <Box>
-                <Typography variant="h5" mb={2}>
-                  Unlimited <br />
-                  Access
-                </Typography>
-                <Button variant="contained" color="primary">
-                  Upgrade
-                </Button>
-              </Box>
-              <img
-                src={"/images/backgrounds/unlimited-bg.png"}
-                alt="unlimited"
-                className="signup-bg"
-              ></img>
-            </Box>
-          </Box>
           <Button
             variant="outlined"
             color="primary"

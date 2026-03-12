@@ -1,11 +1,11 @@
-import { MedataType } from "@/types/auth/auth";
+import { MedataResponseModel } from "@/types/auth/auth";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 
 
 interface InitialState {
   access_token?: string | null;
-  meData: MedataType | null;
+  meData: MedataResponseModel | null;
 }
 
 const initialState: InitialState = { access_token: null, meData: null };
@@ -23,7 +23,7 @@ const meDataSlice = createSlice({
       state.meData = null;
     },
 
-    setMeData: (state, action: PayloadAction<{ meData: MedataType }>) => {
+    setMeData: (state, action: PayloadAction<{ meData: MedataResponseModel }>) => {
       const { meData } = action.payload;
       state.meData = meData;
     },

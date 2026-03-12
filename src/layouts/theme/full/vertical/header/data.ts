@@ -60,13 +60,7 @@ interface ProfileType {
 }
 const profile: ProfileType[] = [
   {
-    href: "/apps/user-profile/profile",
-    title: "My Profile",
-    subtitle: "Account Settings",
-    icon: "/images/svgs/icon-account.svg",
-  },
-  {
-    href: "/auth/change-password",
+    href: "/account-settings",
     title: "Change Password",
     subtitle: "Account Settings",
     icon: "/images/svgs/icon-account.svg",

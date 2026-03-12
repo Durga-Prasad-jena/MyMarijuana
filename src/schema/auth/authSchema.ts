@@ -1,14 +1,15 @@
-import constants from "@/utils/constants";
-import * as yup from "yup";
 
-//login
+import * as yup from "yup";
+import constants from "@/utils/constants";
+
+
 export const loginSchema = yup.object().shape({
   emailAddress: yup
     .string()
-    .trim()
     .required("Please enter user email address")
     .email("Please enter a valid email address")
-    .matches(constants.EMAIL_REGEX, "Please enter a valid email address"),
+    .matches(constants.EMAIL_REGEX, "Please enter a valid email address")
+    .trim(),
   password: yup
     .string()
     .trim()
@@ -17,7 +18,7 @@ export const loginSchema = yup.object().shape({
     .matches(
       constants.PASSWORD_REGEX,
       "Password must contain at least one letter, one number, and one special character"
-    ),
+    )
 });
 
 

@@ -16,10 +16,11 @@ import FullLayout from "../src/layouts/theme/full/FullLayout";
 
 import "../src/utils/i18n";
 
+// CSS FILES
 import { PersistGate } from "redux-persist/integration/react";
 import { Toaster } from "react-hot-toast";
-
-// CSS FILES
+import Login2 from "./auth/login";
+import { useEffect, useState } from "react";
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache();
@@ -41,13 +42,25 @@ const MyApp = (props: MyAppProps) => {
   const theme = ThemeSettings();
   const customizer = useSelector((state: AppState) => state.customizer);
   const Layout = layouts[Component.layout] || FullLayout;
+  const access_token = useSelector((state)=>state.meData.access_token)
 
+  const [mount,setMount] = useState(false)
+
+  useEffect(()=>{
+    setMount(true)
+  },[])
+
+  if(!mount) return null;
+
+  if(!access_token){
+    return <Login2/>
+  }
 
   return (
     <CacheProvider value={emotionCache}>
       <Head>
         <meta name="viewport" content="initial-scale=1, width=device-width" />
-        <title>Basic Project</title>
+        <title>Marijuana Admin</title>
       </Head>
       <ThemeProvider theme={theme}>
         <RTL direction={customizer.activeDir}>
@@ -61,7 +74,8 @@ const MyApp = (props: MyAppProps) => {
   );
 };
 
-export default (props: MyAppProps) => (
+
+const AppWrapper = (props: MyAppProps) => (
   <Provider store={Store}>
     <PersistGate persistor={persistor}>
       <Toaster />
@@ -69,3 +83,8 @@ export default (props: MyAppProps) => (
     </PersistGate>
   </Provider>
 );
+
+AppWrapper.displayName = "AppWrapper";
+
+export default AppWrapper;
+

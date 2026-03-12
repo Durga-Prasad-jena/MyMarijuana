@@ -1,11 +1,30 @@
 const Api_Endpoint: Record<string, string> = {
-  loginApi: "admin/auth/login",
-  meDataApi:"admin/auth/me",
-  logoutApi:"admin/auth/logout",
-  forgotPassApi:"admin/auth/forgot-password",
-  verifyOtpApi:"admin/auth/verify-otp",
-  resetPassApi:"admin/auth/reset-password",
-  changePassApi:"admin/auth/change-password"
+  //auth
+  loginApi: "auth/login",
+  meDataApi:"auth/me",
+  logoutApi:"auth/logout",
+  forgotPassApi:"auth/forgot-password",
+  verifyOtpApi:"auth/verify-otp",
+  resetPassApi:"auth/reset-password",
+  changePassApi:"auth/change-password",
+ 
+  //doctor
+  doctorListingApi: "/admin/doctors/",
+  createDoctorApi:"/admin/doctors/create",
+  doctorDetailAPi: "/admin/doctors",
+
+
+  //specialities
+   getAllSpecilitiesApi:"/admin/specialities",
+
+   //therapy
+   getAllTherapiesApi:"/admin/therapies",
+
+   //insurance
+   getAllInsuranceApi:"/admin/insurances",
+
+   //languages
+   getAllLanguagesApi:"/admin/languages",
 };
 
 export default Api_Endpoint;

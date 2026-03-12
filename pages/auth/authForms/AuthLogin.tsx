@@ -2,32 +2,31 @@ import {
   Box,
   Typography,
   FormGroup,
+  FormControlLabel,
   Button,
   Stack,
-  Divider,
 } from "@mui/material";
-import Link from "next/link";
 import { loginType } from "../../../src/types/auth/auth";
-import { useFormik } from "formik";
 
-import AuthSocialButtons from "./AuthSocialButtons";
-import { loginSchema } from "@/schema/auth/authSchema";
+import { useFormik } from "formik";
 import { useLoginMutation } from "@/store/endpoints/auth/authApi";
-import notify from "@/utils/toast";
-import { ApiErrorResponse } from "@/types/api_response_model";
-import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { setTokens } from "@/store/endpoints/reducer/meDataReducer";
+import { useRouter } from "next/navigation";
+import React, { useState } from "react";
+import notify from "@/utils/toast";
+import { ApiErrorResponse } from "@/types/api_response_model";
 import CustomFormLabel from "@/theme-components/forms/CustomFormLabel";
 import CustomTextField from "@/theme-components/forms/CustomTextField";
+import { loginSchema } from "@/schema/auth/authSchema";
 
 const AuthLogin = ({ title, subtitle, subtext }: loginType) => {
+  const router = useRouter();
+  const dispatch = useDispatch();
   const [login, { isLoading: isLoginLoading }] = useLoginMutation();
-  const router = useRouter()
-  const dispatch = useDispatch()
+  const [rememberMe, setRememberMe] = useState(false);
 
-
-  //formik define and login function
+  //formik setup
   const formik = useFormik({
     initialValues: {
       emailAddress: "",
@@ -36,15 +35,15 @@ const AuthLogin = ({ title, subtitle, subtext }: loginType) => {
     validationSchema: loginSchema,
     onSubmit: async (values): Promise<void> => {
       try {
-        const loggeduser = await login({
-          emailAddress:values.emailAddress.trim(),
-          password:values.password.trim()
-        }).unwrap()
-        notify(loggeduser.message,"success")
-        dispatch(setTokens({access_token:loggeduser.token}))
-        router.push("/")
+        const loggedInUser = await login({
+          email: values.emailAddress,
+          password: values.password,
+        }).unwrap();
+        dispatch(setTokens({ access_token: loggedInUser?.token }));
+        notify("logged in successfully", "success");
+        router.push("/");
       } catch (error) {
-        notify((error as ApiErrorResponse)?.data?.message,"error")
+        notify((error as ApiErrorResponse)?.data?.message, "error");
       }
     },
   });
@@ -60,26 +59,10 @@ const AuthLogin = ({ title, subtitle, subtext }: loginType) => {
 
       {subtext}
 
-      <Box mt={3}>
-        <Divider>
-          <Typography
-            component="span"
-            color="textSecondary"
-            variant="h6"
-            fontWeight="400"
-            position="relative"
-            px={2}
-          >
-            or sign in with
-          </Typography>
-        </Divider>
-      </Box>
-
       <Stack>
         <Box>
-          <CustomFormLabel htmlFor="username">Email*</CustomFormLabel>
+          <CustomFormLabel htmlFor="username">Email address*</CustomFormLabel>
           <CustomTextField
-          placeholder="Enter Email"
             id="emailAddress"
             variant="outlined"
             fullWidth
@@ -97,7 +80,6 @@ const AuthLogin = ({ title, subtitle, subtext }: loginType) => {
         <Box>
           <CustomFormLabel htmlFor="password">Password*</CustomFormLabel>
           <CustomTextField
-          placeholder="Enter Password"
             id="password"
             type="password"
             variant="outlined"
@@ -109,27 +91,6 @@ const AuthLogin = ({ title, subtitle, subtext }: loginType) => {
             helperText={formik.touched.password && formik.errors.password}
           />
         </Box>
-        <Stack
-          justifyContent="space-between"
-          direction="row"
-          alignItems="center"
-          my={2}
-        >
-          <FormGroup>
-           
-          </FormGroup>
-          <Typography
-            component={Link}
-            href="/auth/forgot-password"
-            fontWeight="500"
-            sx={{
-              textDecoration: "none",
-              color: "primary.main",
-            }}
-          >
-            Forgot Password ?
-          </Typography>
-        </Stack>
       </Stack>
       <Box>
         <Button
@@ -137,8 +98,10 @@ const AuthLogin = ({ title, subtitle, subtext }: loginType) => {
           variant="contained"
           size="large"
           fullWidth
-          type="submit"
           disabled={isLoginLoading}
+          // component={Link}
+          // href="/"
+          type="submit"
         >
           Sign In
         </Button>

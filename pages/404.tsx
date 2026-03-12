@@ -10,11 +10,11 @@ const Error = () => (
     justifyContent="center"
   >
     <Container maxWidth="md">
-      <img
+      {/* <img
         src={"/images/backgrounds/errorimg.svg"}
         alt="404"
         style={{ width: "100%", maxWidth: "500px" }}
-      />
+      /> */}
       <Typography align="center" variant="h1" mb={4}>
         Opps!!!
       </Typography>
