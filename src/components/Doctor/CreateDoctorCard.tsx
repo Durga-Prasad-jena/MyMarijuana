@@ -16,10 +16,7 @@ import {
 } from "@mui/material";
 import { Formik, Form, FieldArray } from "formik";
 import * as Yup from "yup";
-import {
-  useAvatarUploadMutation,
-  useCreateDoctorMutation,
-} from "@/store/endpoints/doctor/doctorApi";
+import { useCreateDoctorMutation } from "@/store/endpoints/doctor/doctorApi";
 import { useInsuranceDataQuery } from "@/store/endpoints/app/insurances/insuranceApi";
 import { useTherapiesQuery } from "@/store/endpoints/app/therapies/therapiesApi";
 import { useLanguagesDataQuery } from "@/store/endpoints/app/languages/languageApi";
@@ -40,8 +37,9 @@ import { useRouter } from "next/navigation";
 export default function CreateDoctorCard() {
   const [preview, setPreview] = useState<string | null>(null);
   const [fileToUpload, setFileToUpload] = useState<File | null>(null);
+  console.log("fileToUpload", fileToUpload);
 
-  const router = useRouter()
+  const router = useRouter();
 
   const { data: insuranceData } = useInsuranceDataQuery();
   const { data: therapiesData } = useTherapiesQuery();
@@ -50,8 +48,6 @@ export default function CreateDoctorCard() {
 
   const [createDoctor, { isLoading: isCreateDoctorLoading }] =
     useCreateDoctorMutation();
-  const [avatarUpload, { isLoading: isAvatarUploadLoading }] =
-    useAvatarUploadMutation();
 
   const handleSubmit = async (values: any) => {
     try {
@@ -115,16 +111,16 @@ export default function CreateDoctorCard() {
 
       if (!fileToUpload) return;
 
-      try {
-        const res =  await avatarUpload({
-          URL: uploadURL,
-          file: fileToUpload,
-        }).unwrap();
+      const res = await fetch(uploadURL, {
+        method: "PUT",
+        body: fileToUpload,
+        headers: {
+          "Content-Type": fileToUpload.type,
+        },
+      });
 
-        router.push("/dashboards/doctor")
-        notify("Avatar uploaded successfully", "success");
-      } catch (error) {
-        console.error("Upload error:", error);
+      if (res.ok) {
+        router.push("/dashboards/doctor");
       }
     } catch (err) {
       notify((err as ApiErrorResponse).data.message, "error");

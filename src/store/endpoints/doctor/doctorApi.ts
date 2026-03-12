@@ -38,16 +38,7 @@ const doctorApi = baseApi.injectEndpoints({
         method: "GET",
       }),
     }),
-    avatarUpload: builder.mutation({
-      query: ({ URL, file }) => ({
-        url: URL,
-        method: "PUT",
-        body: file,
-        headers: {
-          "Content-Type": file.type || "image/jpeg",
-        },
-      }),
-    }),
+ 
   }),
 });
 
@@ -55,5 +46,4 @@ export const {
   useCreateDoctorMutation,
   useGetAllDoctorQuery,
   useDoctorDetailByIdQuery,
-  useAvatarUploadMutation,
 } = doctorApi;
