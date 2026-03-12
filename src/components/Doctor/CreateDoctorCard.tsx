@@ -111,7 +111,7 @@ export default function CreateDoctorCard() {
       };
       console.log("payload", payload);
       const result = await createDoctor(payload).unwrap();
-      const uploadURL = result.avatar;
+      const uploadURL = result.avatarUploadUrl;
 
       if (!fileToUpload) return;
 
