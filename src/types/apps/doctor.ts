@@ -20,7 +20,7 @@ export const createDoctorInitialValues = {
   firstName: "",
   lastName: "",
   email: "",
-  password: "",
+  // password: "",
   licenseType: "",
   phoneCountryCode: "+1",
   phoneNo: "",
@@ -31,8 +31,8 @@ export const createDoctorInitialValues = {
     licenseNumber: "",
     licenseState: "",
     acceptingNewClients: false,
-    emailForPatients: "",
-    phoneForPatients: "",
+    // emailForPatients: "",
+    // phoneForPatients: "",
     websiteUrl: "",
     clientFocus: [] as string[],
     specialityId: "",
@@ -55,8 +55,8 @@ export const createDoctorInitialValues = {
         state: "",
         country: "",
         postalCode: "",
-        latitude: "",
-        longitude: "",
+        // latitude: "",
+        // longitude: "",
         isPrimary: true,
       },
     ],
@@ -88,10 +88,10 @@ export interface CreateDoctorPayload {
   firstName: string;
   lastName: string;
   email: string;
-  password: string;
+  // password: string;
   phoneCountryCode: string;
   phoneNo: string;
-  professionalTitle: string;
+  // professionalTitle: string;
   bio: string;
   experienceYears: number;
   licenseType: string;
@@ -100,8 +100,8 @@ export interface CreateDoctorPayload {
   licenseState: string;
   licenseVerified: boolean;
   acceptingNewClients: boolean;
-  emailForPatients: string;
-  phoneForPatients: string;
+  // emailForPatients: string;
+  // phoneForPatients: string;
   qualifications: Qualification[];
   specialityIds: string[];
   therapyIds: string[];
@@ -126,8 +126,8 @@ export interface Location {
   state: string;
   country: string;
   postalCode: string;
-  latitude: number;
-  longitude: number;
+  // latitude: number;
+  // longitude: number;
   isPrimary: boolean;
   phone: string;
   email: string;

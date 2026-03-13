@@ -50,6 +50,7 @@ export default function CreateDoctorCard() {
     useCreateDoctorMutation();
 
   const handleSubmit = async (values: any) => {
+    console.log();
     try {
       const profile = values.doctorProfile;
 
@@ -57,11 +58,11 @@ export default function CreateDoctorCard() {
         firstName: values.firstName.trim(),
         lastName: values.lastName.trim(),
         email: values.email.trim(),
-        password: values.password.trim(),
+        // password: values.password.trim(),
         phoneCountryCode: values.phoneCountryCode.trim(),
         phoneNo: values.phoneNo.trim(),
 
-        professionalTitle: profile.professionalTitle.trim(),
+        // professionalTitle: profile.professionalTitle.trim(),
         bio: profile.bio.trim(),
         experienceYears: Number(profile.experienceYears),
 
@@ -73,8 +74,8 @@ export default function CreateDoctorCard() {
         licenseVerified: true,
         acceptingNewClients: profile.acceptingNewClients,
 
-        emailForPatients: profile.emailForPatients.trim(),
-        phoneForPatients: profile.phoneForPatients.trim(),
+        // emailForPatients: profile.emailForPatients.trim(),
+        // phoneForPatients: profile.phoneForPatients.trim(),
 
         clientFocus: profile.clientFocus,
 
@@ -98,13 +99,14 @@ export default function CreateDoctorCard() {
           state: loc.state,
           country: loc.country,
           postalCode: loc.postalCode,
-          latitude: Number(loc.latitude),
-          longitude: Number(loc.longitude),
+          // latitude: Number(loc.latitude),
+          // longitude: Number(loc.longitude),
           isPrimary: loc.isPrimary,
-          phone: profile.phoneForPatients,
-          email: profile.emailForPatients,
+          phone: loc.phone || "",
+          email: loc.email || "",
         })),
       };
+      console.log("payload", payload);
       console.log("payload", payload);
       const result = await createDoctor(payload).unwrap();
       const uploadURL = result.avatarUploadUrl;
@@ -163,7 +165,7 @@ export default function CreateDoctorCard() {
 
         <Formik
           initialValues={createDoctorInitialValues}
-          validationSchema={createDoctorValidationSchema}
+          // validationSchema={createDoctorValidationSchema}
           onSubmit={handleSubmit}
         >
           {({
@@ -217,7 +219,38 @@ export default function CreateDoctorCard() {
                   />
                 </Grid>
 
-                <Grid item xs={6}>
+                {/* PHONE */}
+                <Grid item xs={1}>
+                  <TextField
+                    placeholder="Enter Phone Country Code"
+                    name="phoneCountryCode"
+                    value={values.phoneCountryCode || "+1"}
+                    fullWidth
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    error={Boolean(
+                      touched.phoneCountryCode && errors.phoneCountryCode,
+                    )}
+                    helperText={
+                      touched.phoneCountryCode && errors.phoneCountryCode
+                    }
+                  />
+                </Grid>
+
+                <Grid item xs={5}>
+                  <TextField
+                    placeholder="Enter Phone Number"
+                    name="phoneNo"
+                    value={values.phoneNo}
+                    fullWidth
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    error={Boolean(touched.phoneNo && errors.phoneNo)}
+                    helperText={touched.phoneNo && errors.phoneNo}
+                  />
+                </Grid>
+
+                {/* <Grid item xs={6}>
                   <TextField
                     name="password"
                     placeholder="Enter Password"
@@ -230,7 +263,7 @@ export default function CreateDoctorCard() {
                     error={Boolean(touched.password && errors.password)}
                     helperText={touched.password && errors.password}
                   />
-                </Grid>
+                </Grid> */}
 
                 {/* LICENSE TYPE */}
                 <Grid item xs={6}>
@@ -252,40 +285,27 @@ export default function CreateDoctorCard() {
                     ))}
                   </TextField>
                 </Grid>
-
-                {/* PHONE */}
-                <Grid item xs={3}>
+                <Grid item xs={6}>
                   <TextField
-                    placeholder="Enter Phone Country Code"
-                    name="phoneCountryCode"
-                    value={values.phoneCountryCode}
+                    placeholder="Enter License Number"
+                    name="doctorProfile.licenseNumber"
+                    value={values.doctorProfile.licenseNumber}
                     fullWidth
                     onChange={handleChange}
                     onBlur={handleBlur}
                     error={Boolean(
-                      touched.phoneCountryCode && errors.phoneCountryCode,
+                      touched.doctorProfile?.licenseNumber &&
+                      errors.doctorProfile?.licenseNumber,
                     )}
                     helperText={
-                      touched.phoneCountryCode && errors.phoneCountryCode
+                      touched.doctorProfile?.licenseNumber &&
+                      errors.doctorProfile?.licenseNumber
                     }
                   />
                 </Grid>
 
-                <Grid item xs={3}>
-                  <TextField
-                    placeholder="Enter Phone Number"
-                    name="phoneNo"
-                    value={values.phoneNo}
-                    fullWidth
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    error={Boolean(touched.phoneNo && errors.phoneNo)}
-                    helperText={touched.phoneNo && errors.phoneNo}
-                  />
-                </Grid>
-
                 {/* DOCTOR PROFILE */}
-                <Grid item xs={6}>
+                {/* <Grid item xs={6}>
                   <TextField
                     placeholder="Enter Professional Title"
                     name="doctorProfile.professionalTitle"
@@ -302,7 +322,7 @@ export default function CreateDoctorCard() {
                       errors.doctorProfile?.professionalTitle
                     }
                   />
-                </Grid>
+                </Grid> */}
 
                 <Grid item xs={6}>
                   <TextField
@@ -320,25 +340,6 @@ export default function CreateDoctorCard() {
                     helperText={
                       touched.doctorProfile?.experienceYears &&
                       errors.doctorProfile?.experienceYears
-                    }
-                  />
-                </Grid>
-
-                <Grid item xs={6}>
-                  <TextField
-                    placeholder="Enter License Number"
-                    name="doctorProfile.licenseNumber"
-                    value={values.doctorProfile.licenseNumber}
-                    fullWidth
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    error={Boolean(
-                      touched.doctorProfile?.licenseNumber &&
-                      errors.doctorProfile?.licenseNumber,
-                    )}
-                    helperText={
-                      touched.doctorProfile?.licenseNumber &&
-                      errors.doctorProfile?.licenseNumber
                     }
                   />
                 </Grid>
@@ -396,12 +397,12 @@ export default function CreateDoctorCard() {
                         name="doctorProfile.acceptingNewClients"
                       />
                     }
-                    label="Accepting New Clients"
+                    label="Available both in-person and online"
                   />
                 </Grid>
 
                 {/* PATIENT CONTACT */}
-                <Grid item xs={6}>
+                {/* <Grid item xs={6}>
                   <TextField
                     placeholder="Enter Email For Patients"
                     name="doctorProfile.emailForPatients"
@@ -418,9 +419,9 @@ export default function CreateDoctorCard() {
                       errors.doctorProfile?.emailForPatients
                     }
                   />
-                </Grid>
+                </Grid> */}
 
-                <Grid item xs={6}>
+                {/* <Grid item xs={6}>
                   <TextField
                     placeholder="Phone For Patients"
                     name="doctorProfile.phoneForPatients"
@@ -437,7 +438,7 @@ export default function CreateDoctorCard() {
                       errors.doctorProfile?.phoneForPatients
                     }
                   />
-                </Grid>
+                </Grid> */}
 
                 <Grid item xs={12}>
                   <TextField
@@ -655,7 +656,7 @@ export default function CreateDoctorCard() {
                     onChange={handleChange}
                   />
                 </Grid>
-                <Grid item xs={4}>
+                <Grid item xs={6}>
                   <TextField
                     label="City"
                     name="doctorProfile.locations.0.city"
@@ -664,7 +665,7 @@ export default function CreateDoctorCard() {
                     onChange={handleChange}
                   />
                 </Grid>
-                <Grid item xs={4}>
+                <Grid item xs={6}>
                   <TextField
                     label="State"
                     name="doctorProfile.locations.0.state"
@@ -673,7 +674,7 @@ export default function CreateDoctorCard() {
                     onChange={handleChange}
                   />
                 </Grid>
-                <Grid item xs={4}>
+                <Grid item xs={6}>
                   <TextField
                     label="Postal Code"
                     name="doctorProfile.locations.0.postalCode"
@@ -682,7 +683,7 @@ export default function CreateDoctorCard() {
                     onChange={handleChange}
                   />
                 </Grid>
-                <Grid item xs={4}>
+                <Grid item xs={6}>
                   <TextField
                     label="Country"
                     name="doctorProfile.locations.0.country"
@@ -691,7 +692,7 @@ export default function CreateDoctorCard() {
                     onChange={handleChange}
                   />
                 </Grid>
-                <Grid item xs={4}>
+                {/* <Grid item xs={4}>
                   <TextField
                     label="Latitude"
                     name="doctorProfile.locations.0.latitude"
@@ -699,8 +700,8 @@ export default function CreateDoctorCard() {
                     fullWidth
                     onChange={handleChange}
                   />
-                </Grid>
-                <Grid item xs={4}>
+                </Grid> */}
+                {/* <Grid item xs={4}>
                   <TextField
                     label="Longitude"
                     name="doctorProfile.locations.0.longitude"
@@ -708,7 +709,7 @@ export default function CreateDoctorCard() {
                     fullWidth
                     onChange={handleChange}
                   />
-                </Grid>
+                </Grid> */}
                 <Grid item xs={12}>
                   <FormControlLabel
                     control={

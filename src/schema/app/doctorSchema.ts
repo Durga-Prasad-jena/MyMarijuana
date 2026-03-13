@@ -10,10 +10,10 @@ export const createDoctorValidationSchema = Yup.object().shape({
   email: Yup.string()
     .email("Invalid email address")
     .required("Email is required"),
-  password: Yup.string()
-    .required("Password is required")
-    .min(6, "Password must be at least 6 characters"),
-  licenseType: Yup.string().required("License type is required"),
+  // password: Yup.string()
+  //   .required("Password is required")
+  //   .min(6, "Password must be at least 6 characters"),
+  // licenseType: Yup.string().required("License type is required"),
   phoneCountryCode: Yup.string().required("Country code is required"),
   phoneNo: Yup.string()
     .required("Phone number is required")
@@ -28,8 +28,8 @@ export const createDoctorValidationSchema = Yup.object().shape({
     licenseNumber: Yup.string().required("License number is required"),
     licenseState: Yup.string().required("License state is required"),
     acceptingNewClients: Yup.boolean(),
-    emailForPatients: Yup.string().required("EmailForPatient is required").email("Invalid patient email"),
-    phoneForPatients: Yup.string().required("PhoneForPatient is Required").matches(/^\d*$/, "Phone must contain digits only"),
+    // emailForPatients: Yup.string().required("EmailForPatient is required").email("Invalid patient email"),
+    // phoneForPatients: Yup.string().required("PhoneForPatient is Required").matches(/^\d*$/, "Phone must contain digits only"),
     websiteUrl: Yup.string().required("Website URL is required").url("Invalid website URL"),
     clientFocus: Yup.array().of(Yup.string()),
     specialityId: Yup.string().required("Speciality is required"),
