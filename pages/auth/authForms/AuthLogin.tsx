@@ -102,6 +102,7 @@ const AuthLogin = ({ title, subtitle, subtext }: loginType) => {
           // component={Link}
           // href="/"
           type="submit"
+          style={{marginTop:30}}
         >
           Sign In
         </Button>
