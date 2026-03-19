@@ -20,47 +20,21 @@ export const createDoctorInitialValues = {
   firstName: "",
   lastName: "",
   email: "",
-  // password: "",
-  licenseType: "",
   phoneCountryCode: "+1",
   phoneNo: "",
-  doctorProfile: {
-    professionalTitle: "",
-    bio: "",
-    experienceYears: "",
-    licenseNumber: "",
-    licenseState: "",
-    acceptingNewClients: false,
-    // emailForPatients: "",
-    // phoneForPatients: "",
-    websiteUrl: "",
-    clientFocus: [] as string[],
-    specialityId: "",
-    insuranceId: "",
-    therapyId: "",
-    languageId: "",
-    qualifications: [
-      {
-        degree: "",
-        institution: "",
-        yearCompleted: "",
-        credentialType: "",
-      },
-    ],
-    locations: [
-      {
-        clinicName: "",
-        street: "",
-        city: "",
-        state: "",
-        country: "",
-        postalCode: "",
-        // latitude: "",
-        // longitude: "",
-        isPrimary: true,
-      },
-    ],
-  },
+  subscriptionPlanId: "",
+  specialityIds: [],
+  languageIds: [],
+  locations: [
+    {
+      street: "",
+      city: "",
+      state: "",
+      country: "",
+      postalCode: "",
+      isPrimary: true,
+    },
+  ],
 };
 
 export interface DoctorApiResponseModel {
@@ -80,7 +54,12 @@ export interface DoctorModel {
   acceptingNewClients: boolean;
   email: null;
   phone: null;
-  specialties: any[];
+  specialties: string[];
+  subscription: SubscriptionModel;
+}
+
+export interface SubscriptionModel {
+  planName: string;
 }
 
 //create doctor p[ayload]
@@ -88,49 +67,21 @@ export interface CreateDoctorPayload {
   firstName: string;
   lastName: string;
   email: string;
-  // password: string;
   phoneCountryCode: string;
   phoneNo: string;
-  // professionalTitle: string;
-  bio: string;
-  experienceYears: number;
-  licenseType: string;
-  websiteUrl: string;
-  licenseNumber: string;
-  licenseState: string;
-  licenseVerified: boolean;
-  acceptingNewClients: boolean;
-  // emailForPatients: string;
-  // phoneForPatients: string;
-  qualifications: Qualification[];
   specialityIds: string[];
-  therapyIds: string[];
   languageIds: string[];
-  insuranceIds: string[];
   locations: Location[];
-  clientFocus: string[];
-}
-
-export interface Qualification {
-  degree: string;
-  institution: string;
-  yearCompleted: number;
-  credentialType: string;
-  displayOrder: number;
+  subscriptionPlanId: string;
 }
 
 export interface Location {
-  clinicName: string;
   street: string;
   city: string;
   state: string;
   country: string;
   postalCode: string;
-  // latitude: number;
-  // longitude: number;
   isPrimary: boolean;
-  phone: string;
-  email: string;
 }
 
 //detail
@@ -166,7 +117,12 @@ export interface DoctorDetailResponse {
   insurances: string[];
   locations: Location[];
   clientFocus: string[];
+  // activeSubscription: SubscriptionModel
 }
+
+// export interface SubscriptionModel{
+//   activeSubscription:
+// }
 
 export interface Qualification {
   degree: string;
@@ -177,15 +133,10 @@ export interface Qualification {
 }
 
 export interface Location {
-  clinicName: string;
   street: string;
   city: string;
   state: string;
   country: string;
   postalCode: string;
-  latitude: number;
-  longitude: number;
   isPrimary: boolean;
-  phone: string;
-  email: string;
 }

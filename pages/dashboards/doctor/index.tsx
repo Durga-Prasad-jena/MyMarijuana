@@ -20,6 +20,7 @@ import {
   IconButton,
   Button,
   TextField,
+  Chip,
 } from "@mui/material";
 import { useEffect, useMemo, useState } from "react";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
@@ -108,14 +109,14 @@ const Doctor = () => {
       { id: "name", label: "Name", sortable: false },
       { id: "emailAddress", label: "Email Address", sortable: false },
       { id: "phoneNumber", label: "Phone Number", sortable: false },
-      // { id: "Subscriptions", label: "Subscriptions", sortable: false },
+      { id: "Subscriptions", label: "Subscriptions Plan", sortable: false },
       { id: "actions", label: "Actions" },
     ],
     [],
   );
 
   const totalCount = doctorsData?.pagination?.totalItems;
-  console.log('totalCount', totalCount)
+  console.log("totalCount", totalCount);
 
   return (
     <PageContainer>
@@ -199,17 +200,16 @@ const Doctor = () => {
             ) : (
               doctorsData &&
               doctorsData.data.length > 0 &&
-              doctorsData?.data?.map((doctor,index) => {
+              doctorsData?.data?.map((doctor, index) => {
                 return (
                   <TableRow key={doctor.doctorId}>
                     <TableCell>
-                      <Typography variant="subtitle2">
-                       {index + 1}
-                      </Typography>
+                      <Typography variant="subtitle2">{index + 1}</Typography>
                     </TableCell>
                     <TableCell>
                       <Typography variant="subtitle2">
-                       {doctor?.title} {`${doctor?.firstName} ${doctor?.lastName}`}
+                        {doctor?.title}{" "}
+                        {`${doctor?.firstName} ${doctor?.lastName}`}
                       </Typography>
                     </TableCell>
                     <TableCell>
@@ -222,9 +222,40 @@ const Doctor = () => {
                     <TableCell>
                       <Tooltip title={""}>
                         <Typography variant="subtitle2">
-                          {doctor?.phone} 
+                          {doctor?.phone}
                         </Typography>
                       </Tooltip>
+                    </TableCell>
+
+                    <TableCell>
+                      {/* <Tooltip title={""}>
+                        <Typography variant="subtitle2">
+                          {doctor?.subscription?.planName} 
+                        </Typography>
+                      </Tooltip> */}
+                      <Typography variant="subtitle2">
+                        <Chip
+                          color={
+                            doctor?.subscription?.planName === "Premium"
+                              ? "success"
+                              : doctor?.subscription?.planName ===
+                                  "Super Premium"
+                                ? "primary"
+                                : doctor?.subscription?.planName === "Regular"
+                                  ? "secondary"
+                                  : doctor?.subscription?.planName === "Free"
+                                    ? "info"
+                                    : "warning"
+                          }
+                          sx={{
+                            borderRadius: "6px",
+                            fontSize: 10,
+                            fontWeight: "600",
+                          }}
+                          size="small"
+                          label={doctor?.subscription?.planName}
+                        />
+                      </Typography>
                     </TableCell>
 
                     {/* <TableCell>
@@ -237,7 +268,9 @@ const Doctor = () => {
                           <IconButton
                             aria-label="ACTIVE"
                             onClick={() =>
-                              router.push(`/dashboards/doctor/detail?doctorId=${doctor.doctorId}`)
+                              router.push(
+                                `/dashboards/doctor/detail?doctorId=${doctor.doctorId}`,
+                              )
                             }
                           >
                             <RemoveRedEyeIcon color="primary" />
@@ -250,7 +283,6 @@ const Doctor = () => {
               })
             )}
             {/* //row */}
-
           </TableBody>
           {/* pagination */}
           {totalCount! > rowsPerPage && (

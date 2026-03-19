@@ -25,6 +25,10 @@ const Api_Endpoint: Record<string, string> = {
 
    //languages
    getAllLanguagesApi:"/admin/languages",
+
+
+   //subscriptions
+   getAllSubscriptionsApi: "/admin/subscription-plans/",
 };
 
 export default Api_Endpoint;

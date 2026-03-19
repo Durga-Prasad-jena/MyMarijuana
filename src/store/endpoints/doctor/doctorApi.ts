@@ -10,7 +10,7 @@ import { SuccessApiResponse } from "@/types/apps";
 const doctorApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     createDoctor: builder.mutation<
-      { avatarUploadUrl: string; message: string },
+     SuccessApiResponse,
       CreateDoctorPayload
     >({
       query: (body) => ({

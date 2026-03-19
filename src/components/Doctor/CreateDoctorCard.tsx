@@ -1,5 +1,5 @@
 "use client";
-import React, { ChangeEvent, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Grid,
   TextField,
@@ -7,469 +7,306 @@ import {
   Typography,
   Card,
   CardContent,
-  MenuItem,
   Checkbox,
   FormControlLabel,
-  Box,
-  Avatar,
-  Stack,
+  Autocomplete,
+  Chip,
+  MenuItem,
 } from "@mui/material";
-import { Formik, Form, FieldArray } from "formik";
-import * as Yup from "yup";
-import { useCreateDoctorMutation } from "@/store/endpoints/doctor/doctorApi";
-import { useInsuranceDataQuery } from "@/store/endpoints/app/insurances/insuranceApi";
-import { useTherapiesQuery } from "@/store/endpoints/app/therapies/therapiesApi";
-import { useLanguagesDataQuery } from "@/store/endpoints/app/languages/languageApi";
-import { useSpecialitiesQuery } from "@/store/endpoints/app/specialities/specialitiesApi";
-import {
-  createDoctorInitialValues,
-  CreateDoctorPayload,
-  doctorClientFocusTypes,
-  doctorQualificationCredentialTypes,
-  licenseTypes,
-} from "@/types/apps/doctor";
+import { Formik, Form, FormikErrors } from "formik";
 import notify from "@/utils/toast";
+import { useSpecialitiesQuery } from "@/store/endpoints/app/specialities/specialitiesApi";
+import { useLanguagesDataQuery } from "@/store/endpoints/app/languages/languageApi";
+import { useAllSubscriptionsQuery } from "@/store/endpoints/app/subscriptions/subscriptionsApi";
+import { doctorCreateSchema } from "@/schema/app/doctorSchema";
+import { useCreateDoctorMutation } from "@/store/endpoints/doctor/doctorApi";
 import { ApiErrorResponse } from "@/types/api_response_model";
-import { createDoctorValidationSchema } from "@/schema/app/doctorSchema";
 import { useRouter } from "next/navigation";
 
-/* ------------------ COMPONENT ------------------ */
+/* ---------------- TYPES ---------------- */
+interface Location {
+  street: string;
+  city: string;
+  state: string;
+  country: string;
+  postalCode: string;
+  isPrimary: boolean;
+}
+
+interface CreateDoctorPayload {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneCountryCode: string;
+  phoneNo: string;
+  specialityIds: string[];
+  languageIds: string[];
+  subscriptionPlanId: string;
+  locations: Location[];
+}
+
+interface Country {
+  name: string;
+  code: string;
+  id: string;
+}
+
+const initialValues: CreateDoctorPayload = {
+  firstName: "",
+  lastName: "",
+  email: "",
+  phoneCountryCode: "+1",
+  phoneNo: "",
+  subscriptionPlanId: "",
+  specialityIds: [],
+  languageIds: [],
+  locations: [
+    {
+      street: "",
+      city: "",
+      state: "",
+      country: "",
+      postalCode: "",
+      isPrimary: true,
+    },
+  ],
+};
+
+/* ---------------- COMPONENT ---------------- */
 export default function CreateDoctorCard() {
-  const [preview, setPreview] = useState<string | null>(null);
-  const [fileToUpload, setFileToUpload] = useState<File | null>(null);
-  console.log("fileToUpload", fileToUpload);
-
-  const router = useRouter();
-
-  const { data: insuranceData } = useInsuranceDataQuery();
-  const { data: therapiesData } = useTherapiesQuery();
-  const { data: specialitiesData } = useSpecialitiesQuery();
-  const { data: languageData } = useLanguagesDataQuery();
-
+  const [countries, setCountries] = useState<Country[]>([]);
   const [createDoctor, { isLoading: isCreateDoctorLoading }] =
     useCreateDoctorMutation();
+  const { data: specialitiesData } = useSpecialitiesQuery();
+  const { data: languageData } = useLanguagesDataQuery();
+  const { data: subscriptionsData } = useAllSubscriptionsQuery();
 
-  const handleSubmit = async (values: any) => {
-    console.log();
+  const router = useRouter()
+
+  /* ---------------- FETCH COUNTRIES ---------------- */
+  useEffect(() => {
+    fetch("https://restcountries.com/v3.1/all?fields=name,idd,cca3")
+      .then((res) => res.json())
+      .then((data) => {
+        const formatted: Country[] = data.map((c: any) => {
+          const root = c.idd?.root ?? "";
+          const suffix = c.idd?.suffixes?.[0] ?? "";
+          return {
+            name: c.name.common,
+            code: root + suffix,
+            id: c.cca3,
+          };
+        });
+        formatted.sort((a, b) => a.name.localeCompare(b.name));
+        setCountries(formatted);
+      })
+      .catch(console.error);
+  }, []);
+
+  /* ---------------- HANDLE SUBMIT ---------------- */
+  const handleSubmit = async (values: CreateDoctorPayload): Promise<void> => {
     try {
-      const profile = values.doctorProfile;
-
       const payload: CreateDoctorPayload = {
-        firstName: values.firstName.trim(),
-        lastName: values.lastName.trim(),
-        email: values.email.trim(),
-        // password: values.password.trim(),
-        phoneCountryCode: values.phoneCountryCode.trim(),
-        phoneNo: values.phoneNo.trim(),
-
-        // professionalTitle: profile.professionalTitle.trim(),
-        bio: profile.bio.trim(),
-        experienceYears: Number(profile.experienceYears),
-
-        licenseType: values.licenseType,
-        websiteUrl: profile.websiteUrl.trim(),
-        licenseNumber: profile.licenseNumber.trim(),
-        licenseState: profile.licenseState.trim(),
-
-        licenseVerified: true,
-        acceptingNewClients: profile.acceptingNewClients,
-
-        // emailForPatients: profile.emailForPatients.trim(),
-        // phoneForPatients: profile.phoneForPatients.trim(),
-
-        clientFocus: profile.clientFocus,
-
-        specialityIds: profile.specialityId ? [profile.specialityId] : [],
-        therapyIds: profile.therapyId ? [profile.therapyId] : [],
-        languageIds: profile.languageId ? [profile.languageId] : [],
-        insuranceIds: profile.insuranceId ? [profile.insuranceId] : [],
-
-        qualifications: profile.qualifications.map((q: any, index: number) => ({
-          degree: q.degree.trim(),
-          institution: q.institution.trim(),
-          yearCompleted: Number(q.yearCompleted),
-          credentialType: q.credentialType.trim(),
-          displayOrder: index + 1,
-        })),
-
-        locations: profile.locations.map((loc: any) => ({
-          clinicName: loc.clinicName,
-          street: loc.street,
-          city: loc.city,
-          state: loc.state,
-          country: loc.country,
-          postalCode: loc.postalCode,
-          // latitude: Number(loc.latitude),
-          // longitude: Number(loc.longitude),
-          isPrimary: loc.isPrimary,
-          phone: loc.phone || "",
-          email: loc.email || "",
-        })),
+        firstName: values.firstName,
+        lastName: values.lastName,
+        email: values.email,
+        phoneCountryCode: values.phoneCountryCode,
+        phoneNo: values.phoneNo,
+        specialityIds: values.specialityIds || [],
+        languageIds: values.languageIds || [],
+        locations: values.locations || [],
+        subscriptionPlanId: values.subscriptionPlanId,
       };
-      console.log("payload", payload);
-      console.log("payload", payload);
-      const result = await createDoctor(payload).unwrap();
-      const uploadURL = result.avatarUploadUrl;
-
-      if (!fileToUpload) return;
-
-      const res = await fetch(uploadURL, {
-        method: "PUT",
-        body: fileToUpload,
-        headers: {
-          "Content-Type": fileToUpload.type,
-        },
-      });
-
-      if (res.ok) {
-        router.push("/dashboards/doctor");
-      }
-    } catch (err) {
-      notify((err as ApiErrorResponse).data.message, "error");
+      const res = await createDoctor(payload).unwrap();
+      notify(res.message, "success");
+      router.push("/dashboards/doctor")
+    } catch (error) {
+      notify((error as ApiErrorResponse)?.data?.message, "error");
     }
   };
 
-  const handleUploadImage = (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setFileToUpload(file);
-    setPreview(URL.createObjectURL(file));
-  };
-
+  /* ---------------- RENDER ---------------- */
   return (
-    <Card sx={{ maxWidth: 1000, margin: "auto", mt: 4 }}>
+    <Card sx={{ maxWidth: 1000, m: "auto", mt: 4 }}>
       <CardContent>
         <Typography variant="h5" mb={3}>
           Create Doctor
         </Typography>
-        <Box textAlign="center" display="flex" justifyContent="center">
-          <Box>
-            <Avatar
-              src={preview ?? "/images/profile/user-1.jpg"}
-              alt={"user1"}
-              sx={{ width: 120, height: 120, margin: "0 auto" }}
-            />
-            <Stack direction="row" justifyContent="center" spacing={2} my={3}>
-              <Button variant="contained" color="primary" component="label">
-                Upload
-                <input
-                  hidden
-                  accept="image/*"
-                  type="file"
-                  onChange={handleUploadImage}
-                />
-              </Button>
-            </Stack>
-          </Box>
-        </Box>
 
         <Formik
-          initialValues={createDoctorInitialValues}
-          // validationSchema={createDoctorValidationSchema}
+          initialValues={initialValues}
+          validationSchema={doctorCreateSchema}
           onSubmit={handleSubmit}
         >
-          {({
-            values,
-            handleChange,
-            setFieldValue,
-            touched,
-            errors,
-            handleBlur,
-          }) => (
-            <Form autoComplete="off">
+          {({ values, handleChange, setFieldValue, errors, touched }) => (
+            <Form>
               <Grid container spacing={3}>
-                {/* BASIC INFO */}
+                {/* FIRST NAME */}
                 <Grid item xs={6}>
                   <TextField
                     name="firstName"
-                    placeholder="Enter First Name"
+                    label="First Name"
                     value={values.firstName}
-                    fullWidth
                     onChange={handleChange}
-                    onBlur={handleBlur}
+                    fullWidth
                     error={Boolean(touched.firstName && errors.firstName)}
                     helperText={touched.firstName && errors.firstName}
                   />
                 </Grid>
 
+                {/* LAST NAME */}
                 <Grid item xs={6}>
                   <TextField
                     name="lastName"
-                    placeholder="Enter Last Name"
+                    label="Last Name"
                     value={values.lastName}
-                    fullWidth
                     onChange={handleChange}
-                    onBlur={handleBlur}
+                    fullWidth
                     error={Boolean(touched.lastName && errors.lastName)}
                     helperText={touched.lastName && errors.lastName}
                   />
                 </Grid>
 
+                {/* EMAIL */}
                 <Grid item xs={6}>
                   <TextField
                     name="email"
-                    placeholder="Enter Email"
-                    value={values.email || ""}
-                    fullWidth
+                    label="Email"
+                    value={values.email}
                     onChange={handleChange}
-                    onBlur={handleBlur}
-                    autoComplete="off"
+                    fullWidth
                     error={Boolean(touched.email && errors.email)}
                     helperText={touched.email && errors.email}
                   />
                 </Grid>
 
-                {/* PHONE */}
-                <Grid item xs={1}>
+                {/* PHONE COUNTRY CODE */}
+                <Grid item xs={2}>
                   <TextField
-                    placeholder="Enter Phone Country Code"
+                    select
+                    label="Country Code"
                     name="phoneCountryCode"
-                    value={values.phoneCountryCode || "+1"}
-                    fullWidth
+                    value={values.phoneCountryCode}
                     onChange={handleChange}
-                    onBlur={handleBlur}
+                    fullWidth
                     error={Boolean(
                       touched.phoneCountryCode && errors.phoneCountryCode,
                     )}
                     helperText={
                       touched.phoneCountryCode && errors.phoneCountryCode
                     }
-                  />
+                  >
+                    {countries.map((c) => (
+                      <MenuItem key={c.id} value={c.code}>
+                        {c.name} ({c.code})
+                      </MenuItem>
+                    ))}
+                  </TextField>
                 </Grid>
 
-                <Grid item xs={5}>
+                {/* PHONE NUMBER */}
+                <Grid item xs={4}>
                   <TextField
-                    placeholder="Enter Phone Number"
                     name="phoneNo"
+                    label="Phone Number"
                     value={values.phoneNo}
-                    fullWidth
                     onChange={handleChange}
-                    onBlur={handleBlur}
+                    fullWidth
                     error={Boolean(touched.phoneNo && errors.phoneNo)}
                     helperText={touched.phoneNo && errors.phoneNo}
                   />
                 </Grid>
 
-                {/* <Grid item xs={6}>
-                  <TextField
-                    name="password"
-                    placeholder="Enter Password"
-                    type="password"
-                    value={values.password || ""}
-                    fullWidth
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    autoComplete="off"
-                    error={Boolean(touched.password && errors.password)}
-                    helperText={touched.password && errors.password}
-                  />
-                </Grid> */}
-
-                {/* LICENSE TYPE */}
+                {/* SPECIALITY MULTI-SELECT */}
                 <Grid item xs={6}>
-                  <TextField
-                    select
-                    label="Select License Type"
-                    name="licenseType"
-                    value={values.licenseType}
-                    fullWidth
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    error={Boolean(touched.licenseType && errors.licenseType)}
-                    helperText={touched.licenseType && errors.licenseType}
-                  >
-                    {licenseTypes.map((type) => (
-                      <MenuItem key={type} value={type}>
-                        {type}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                </Grid>
-                <Grid item xs={6}>
-                  <TextField
-                    placeholder="Enter License Number"
-                    name="doctorProfile.licenseNumber"
-                    value={values.doctorProfile.licenseNumber}
-                    fullWidth
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    error={Boolean(
-                      touched.doctorProfile?.licenseNumber &&
-                      errors.doctorProfile?.licenseNumber,
-                    )}
-                    helperText={
-                      touched.doctorProfile?.licenseNumber &&
-                      errors.doctorProfile?.licenseNumber
+                  <Autocomplete
+                    multiple
+                    options={specialitiesData?.data || []}
+                    getOptionLabel={(option) => option.name}
+                    value={
+                      specialitiesData?.data?.filter((s) =>
+                        values.specialityIds.includes(String(s.id)),
+                      ) || []
                     }
-                  />
-                </Grid>
-
-                {/* DOCTOR PROFILE */}
-                {/* <Grid item xs={6}>
-                  <TextField
-                    placeholder="Enter Professional Title"
-                    name="doctorProfile.professionalTitle"
-                    value={values.doctorProfile.professionalTitle}
-                    fullWidth
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    error={Boolean(
-                      touched.doctorProfile?.professionalTitle &&
-                      errors.doctorProfile?.professionalTitle,
-                    )}
-                    helperText={
-                      touched.doctorProfile?.professionalTitle &&
-                      errors.doctorProfile?.professionalTitle
+                    onChange={(_, selected) =>
+                      setFieldValue(
+                        "specialityIds",
+                        selected.map((s) => String(s.id)),
+                      )
                     }
-                  />
-                </Grid> */}
-
-                <Grid item xs={6}>
-                  <TextField
-                    placeholder="Enter Experience Years"
-                    name="doctorProfile.experienceYears"
-                    type="number"
-                    value={values.doctorProfile.experienceYears}
-                    fullWidth
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    error={Boolean(
-                      touched.doctorProfile?.experienceYears &&
-                      errors.doctorProfile?.experienceYears,
-                    )}
-                    helperText={
-                      touched.doctorProfile?.experienceYears &&
-                      errors.doctorProfile?.experienceYears
+                    renderTags={(tagValue, getTagProps) =>
+                      tagValue.map((option, index) => (
+                        <Chip label={option.name} {...getTagProps({ index })} />
+                      ))
                     }
-                  />
-                </Grid>
-
-                <Grid item xs={6}>
-                  <TextField
-                    placeholder="Enter License State"
-                    name="doctorProfile.licenseState"
-                    value={values.doctorProfile.licenseState}
-                    fullWidth
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    error={Boolean(
-                      touched.doctorProfile?.licenseState &&
-                      errors.doctorProfile?.licenseState,
-                    )}
-                    helperText={
-                      touched.doctorProfile?.licenseState &&
-                      errors.doctorProfile?.licenseState
-                    }
-                  />
-                </Grid>
-
-                <Grid item xs={12}>
-                  <TextField
-                    placeholder="Enter Bio"
-                    name="doctorProfile.bio"
-                    value={values.doctorProfile.bio}
-                    fullWidth
-                    multiline
-                    rows={3}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    error={Boolean(
-                      touched.doctorProfile?.bio && errors.doctorProfile?.bio,
-                    )}
-                    helperText={
-                      touched.doctorProfile?.bio && errors.doctorProfile?.bio
-                    }
-                  />
-                </Grid>
-
-                <Grid item xs={12}>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={values.doctorProfile.acceptingNewClients}
-                        onChange={(e) =>
-                          setFieldValue(
-                            "doctorProfile.acceptingNewClients",
-                            e.target.checked,
-                          )
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Select Specialities"
+                        error={
+                          touched.specialityIds && Boolean(errors.specialityIds)
                         }
-                        onBlur={handleBlur}
-                        name="doctorProfile.acceptingNewClients"
+                        helperText={
+                          touched.specialityIds && errors.specialityIds
+                        }
                       />
-                    }
-                    label="Available both in-person and online"
+                    )}
                   />
                 </Grid>
 
-                {/* PATIENT CONTACT */}
-                {/* <Grid item xs={6}>
-                  <TextField
-                    placeholder="Enter Email For Patients"
-                    name="doctorProfile.emailForPatients"
-                    value={values.doctorProfile.emailForPatients}
-                    fullWidth
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    error={Boolean(
-                      touched.doctorProfile?.emailForPatients &&
-                      errors.doctorProfile?.emailForPatients,
-                    )}
-                    helperText={
-                      touched.doctorProfile?.emailForPatients &&
-                      errors.doctorProfile?.emailForPatients
+                {/* LANGUAGE MULTI-SELECT */}
+                <Grid item xs={6}>
+                  <Autocomplete
+                    multiple
+                    options={languageData?.data || []}
+                    getOptionLabel={(option) => option.name}
+                    value={
+                      languageData?.data?.filter((l) =>
+                        values.languageIds.includes(String(l.id)),
+                      ) || []
                     }
-                  />
-                </Grid> */}
-
-                {/* <Grid item xs={6}>
-                  <TextField
-                    placeholder="Phone For Patients"
-                    name="doctorProfile.phoneForPatients"
-                    value={values.doctorProfile.phoneForPatients}
-                    fullWidth
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    error={Boolean(
-                      touched.doctorProfile?.phoneForPatients &&
-                      errors.doctorProfile?.phoneForPatients,
-                    )}
-                    helperText={
-                      touched.doctorProfile?.phoneForPatients &&
-                      errors.doctorProfile?.phoneForPatients
+                    onChange={(_, selected) =>
+                      setFieldValue(
+                        "languageIds",
+                        selected.map((l) => String(l.id)),
+                      )
                     }
-                  />
-                </Grid> */}
-
-                <Grid item xs={12}>
-                  <TextField
-                    placeholder="Enter Website URL"
-                    name="doctorProfile.websiteUrl"
-                    value={values.doctorProfile.websiteUrl}
-                    fullWidth
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    error={Boolean(
-                      touched.doctorProfile?.websiteUrl &&
-                      errors.doctorProfile?.websiteUrl,
-                    )}
-                    helperText={
-                      touched.doctorProfile?.websiteUrl &&
-                      errors.doctorProfile?.websiteUrl
+                    renderTags={(tagValue, getTagProps) =>
+                      tagValue.map((option, index) => (
+                        <Chip label={option.name} {...getTagProps({ index })} />
+                      ))
                     }
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Select Languages"
+                        error={
+                          touched.languageIds && Boolean(errors.languageIds)
+                        }
+                        helperText={touched.languageIds && errors.languageIds}
+                      />
+                    )}
                   />
                 </Grid>
 
-                {/* DROPDOWNS FROM API */}
+                {/* SUBSCRIPTION PLAN */}
                 <Grid item xs={6}>
                   <TextField
                     select
-                    label="Select Speciality"
-                    name="doctorProfile.specialityId"
-                    value={values.doctorProfile.specialityId}
-                    fullWidth
+                    label="Subscription Plan"
+                    name="subscriptionPlanId"
+                    value={values.subscriptionPlanId}
                     onChange={handleChange}
+                    fullWidth
+                    error={
+                      touched.subscriptionPlanId &&
+                      Boolean(errors.subscriptionPlanId)
+                    }
+                    helperText={
+                      touched.subscriptionPlanId && errors.subscriptionPlanId
+                    }
                   >
-                    {specialitiesData?.data.map((s) => (
+                    {subscriptionsData?.data?.map((s) => (
                       <MenuItem key={s.id} value={s.id}>
                         {s.name}
                       </MenuItem>
@@ -477,258 +314,130 @@ export default function CreateDoctorCard() {
                   </TextField>
                 </Grid>
 
-                <Grid item xs={6}>
-                  <TextField
-                    select
-                    label="Select Insurance"
-                    name="doctorProfile.insuranceId"
-                    value={values.doctorProfile.insuranceId}
-                    fullWidth
-                    onChange={handleChange}
-                  >
-                    {insuranceData?.data.map((i) => (
-                      <MenuItem key={i.id} value={i.id}>
-                        {i.name}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                </Grid>
-
-                <Grid item xs={6}>
-                  <TextField
-                    select
-                    label="Select Therapy"
-                    name="doctorProfile.therapyId"
-                    value={values.doctorProfile.therapyId}
-                    fullWidth
-                    onChange={handleChange}
-                  >
-                    {therapiesData?.data.map((t) => (
-                      <MenuItem key={t.id} value={t.id}>
-                        {t.name}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                </Grid>
-
-                <Grid item xs={6}>
-                  <TextField
-                    select
-                    label="Select Language"
-                    name="doctorProfile.languageId"
-                    value={values.doctorProfile.languageId}
-                    fullWidth
-                    onChange={handleChange}
-                  >
-                    {languageData?.data.map((l) => (
-                      <MenuItem key={l.id} value={l.id}>
-                        {l.name}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                </Grid>
-
-                {/* CLIENT FOCUS */}
+                {/* LOCATIONS */}
                 <Grid item xs={12}>
-                  <Typography variant="h6">Client Focus</Typography>
-                  {doctorClientFocusTypes.map((item) => {
-                    const checked =
-                      values.doctorProfile.clientFocus.includes(item);
-                    return (
-                      <FormControlLabel
-                        key={item}
-                        control={
-                          <Checkbox
-                            checked={checked}
-                            onChange={(e) => {
-                              const updated = e.target.checked
-                                ? [...values.doctorProfile.clientFocus, item]
-                                : values.doctorProfile.clientFocus.filter(
-                                    (v) => v !== item,
-                                  );
-                              setFieldValue(
-                                "doctorProfile.clientFocus",
-                                updated,
-                              );
-                            }}
-                          />
-                        }
-                        label={item}
-                      />
-                    );
-                  })}
+                  <Typography variant="h6">Location</Typography>
                 </Grid>
 
-                {/* QUALIFICATIONS */}
-                <Grid item xs={12}>
-                  <Typography variant="h6">Qualifications</Typography>
-                </Grid>
-                <FieldArray name="doctorProfile.qualifications">
-                  {({ push }) => (
-                    <>
-                      {values.doctorProfile.qualifications.map((q, index) => (
-                        <React.Fragment key={index}>
-                          <Grid item xs={3}>
-                            <TextField
-                              label="Degree"
-                              name={`doctorProfile.qualifications.${index}.degree`}
-                              value={q.degree}
-                              fullWidth
-                              onChange={handleChange}
-                            />
-                          </Grid>
-                          <Grid item xs={3}>
-                            <TextField
-                              label="Institution"
-                              name={`doctorProfile.qualifications.${index}.institution`}
-                              value={q.institution}
-                              fullWidth
-                              onChange={handleChange}
-                            />
-                          </Grid>
-                          <Grid item xs={3}>
-                            <TextField
-                              label="Year"
-                              name={`doctorProfile.qualifications.${index}.yearCompleted`}
-                              value={q.yearCompleted}
-                              fullWidth
-                              onChange={handleChange}
-                            />
-                          </Grid>
-                          <Grid item xs={3}>
-                            <TextField
-                              select
-                              label="Credential Type"
-                              name={`doctorProfile.qualifications.${index}.credentialType`}
-                              value={q.credentialType}
-                              fullWidth
-                              onChange={handleChange}
-                            >
-                              {doctorQualificationCredentialTypes.map(
-                                (type) => (
-                                  <MenuItem key={type} value={type}>
-                                    {type}
-                                  </MenuItem>
-                                ),
-                              )}
-                            </TextField>
-                          </Grid>
-                        </React.Fragment>
-                      ))}
-                      <Grid item xs={12}>
-                        <Button
-                          variant="outlined"
-                          onClick={() =>
-                            push({
-                              degree: "",
-                              institution: "",
-                              yearCompleted: "",
-                              credentialType: "",
-                            })
+                {values.locations.map((loc, index) => {
+                  const locationError = (errors.locations?.[index] ||
+                    {}) as FormikErrors<Location>;
+                  const locationTouched = (touched.locations?.[index] ||
+                    {}) as Partial<Record<keyof Location, boolean>>;
+
+                  return (
+                    <React.Fragment key={index}>
+                      <Grid item xs={6}>
+                        <TextField
+                          name={`locations.${index}.street`}
+                          label="Street"
+                          value={loc.street}
+                          onChange={handleChange}
+                          fullWidth
+                          error={Boolean(
+                            locationTouched.street && locationError.street,
+                          )}
+                          helperText={
+                            locationTouched.street && locationError.street
+                          }
+                        />
+                      </Grid>
+                      <Grid item xs={6}>
+                        <TextField
+                          name={`locations.${index}.city`}
+                          label="City"
+                          value={loc.city}
+                          onChange={handleChange}
+                          fullWidth
+                          error={Boolean(
+                            locationTouched.city && locationError.city,
+                          )}
+                          helperText={
+                            locationTouched.city && locationError.city
+                          }
+                        />
+                      </Grid>
+                      <Grid item xs={6}>
+                        <TextField
+                          name={`locations.${index}.state`}
+                          label="State"
+                          value={loc.state}
+                          onChange={handleChange}
+                          fullWidth
+                          error={Boolean(
+                            locationTouched.state && locationError.state,
+                          )}
+                          helperText={
+                            locationTouched.state && locationError.state
+                          }
+                        />
+                      </Grid>
+                      <Grid item xs={6}>
+                        <TextField
+                          name={`locations.${index}.postalCode`}
+                          label="Postal Code"
+                          value={loc.postalCode}
+                          onChange={handleChange}
+                          fullWidth
+                          error={Boolean(
+                            locationTouched.postalCode &&
+                            locationError.postalCode,
+                          )}
+                          helperText={
+                            locationTouched.postalCode &&
+                            locationError.postalCode
+                          }
+                        />
+                      </Grid>
+                      <Grid item xs={6}>
+                        <TextField
+                          select
+                          name={`locations.${index}.country`}
+                          label="Country"
+                          value={loc.country}
+                          onChange={handleChange}
+                          fullWidth
+                          error={Boolean(
+                            locationTouched.country && locationError.country,
+                          )}
+                          helperText={
+                            locationTouched.country && locationError.country
                           }
                         >
-                          Add Qualification
-                        </Button>
+                          {countries.map((c) => (
+                            <MenuItem key={c.id} value={c.code}>
+                              {c.name}
+                            </MenuItem>
+                          ))}
+                        </TextField>
                       </Grid>
-                    </>
-                  )}
-                </FieldArray>
-
-                {/* LOCATION */}
-                <Grid item xs={12}>
-                  <Typography variant="h6">Clinic Location</Typography>
-                </Grid>
-                <Grid item xs={6}>
-                  <TextField
-                    label="Clinic Name"
-                    name="doctorProfile.locations.0.clinicName"
-                    value={values.doctorProfile.locations[0].clinicName}
-                    fullWidth
-                    onChange={handleChange}
-                  />
-                </Grid>
-                <Grid item xs={6}>
-                  <TextField
-                    label="Street"
-                    name="doctorProfile.locations.0.street"
-                    value={values.doctorProfile.locations[0].street}
-                    fullWidth
-                    onChange={handleChange}
-                  />
-                </Grid>
-                <Grid item xs={6}>
-                  <TextField
-                    label="City"
-                    name="doctorProfile.locations.0.city"
-                    value={values.doctorProfile.locations[0].city}
-                    fullWidth
-                    onChange={handleChange}
-                  />
-                </Grid>
-                <Grid item xs={6}>
-                  <TextField
-                    label="State"
-                    name="doctorProfile.locations.0.state"
-                    value={values.doctorProfile.locations[0].state}
-                    fullWidth
-                    onChange={handleChange}
-                  />
-                </Grid>
-                <Grid item xs={6}>
-                  <TextField
-                    label="Postal Code"
-                    name="doctorProfile.locations.0.postalCode"
-                    value={values.doctorProfile.locations[0].postalCode}
-                    fullWidth
-                    onChange={handleChange}
-                  />
-                </Grid>
-                <Grid item xs={6}>
-                  <TextField
-                    label="Country"
-                    name="doctorProfile.locations.0.country"
-                    value={values.doctorProfile.locations[0].country}
-                    fullWidth
-                    onChange={handleChange}
-                  />
-                </Grid>
-                {/* <Grid item xs={4}>
-                  <TextField
-                    label="Latitude"
-                    name="doctorProfile.locations.0.latitude"
-                    value={values.doctorProfile.locations[0].latitude}
-                    fullWidth
-                    onChange={handleChange}
-                  />
-                </Grid> */}
-                {/* <Grid item xs={4}>
-                  <TextField
-                    label="Longitude"
-                    name="doctorProfile.locations.0.longitude"
-                    value={values.doctorProfile.locations[0].longitude}
-                    fullWidth
-                    onChange={handleChange}
-                  />
-                </Grid> */}
-                <Grid item xs={12}>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={values.doctorProfile.locations[0].isPrimary}
-                        name="doctorProfile.locations.0.isPrimary"
-                        onChange={handleChange}
-                      />
-                    }
-                    label="Primary Location"
-                  />
-                </Grid>
+                      <Grid item xs={12}>
+                        <FormControlLabel
+                          control={
+                            <Checkbox
+                              name={`locations.${index}.isPrimary`}
+                              checked={loc.isPrimary}
+                              onChange={(e) =>
+                                setFieldValue(
+                                  `locations.${index}.isPrimary`,
+                                  e.target.checked,
+                                )
+                              }
+                            />
+                          }
+                          label="Primary Location"
+                        />
+                      </Grid>
+                    </React.Fragment>
+                  );
+                })}
 
                 {/* SUBMIT BUTTON */}
                 <Grid item xs={12}>
                   <Button
                     disabled={isCreateDoctorLoading}
-                    variant="contained"
                     type="submit"
+                    variant="contained"
                     size="large"
                   >
                     Create Doctor
