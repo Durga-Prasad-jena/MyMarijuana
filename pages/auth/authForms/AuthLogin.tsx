@@ -5,96 +5,111 @@ import {
   FormControlLabel,
   Button,
   Stack,
-  Divider,
 } from "@mui/material";
-import Link from "next/link";
 import { loginType } from "../../../src/types/auth/auth";
-import CustomCheckbox from "../../../src/theme-components/forms/theme-elements/CustomCheckbox";
-import CustomTextField from "../../../src/theme-components/forms/theme-elements/CustomTextField";
-import CustomFormLabel from "../../../src/theme-components/forms/theme-elements/CustomFormLabel";
 
-import AuthSocialButtons from "./AuthSocialButtons";
+import { useFormik } from "formik";
+import { useLoginMutation } from "@/store/endpoints/auth/authApi";
+import { useDispatch } from "react-redux";
+import { setTokens } from "@/store/endpoints/reducer/meDataReducer";
+import { useRouter } from "next/navigation";
+import React, { useState } from "react";
+import notify from "@/utils/toast";
+import { ApiErrorResponse } from "@/types/api_response_model";
+import CustomFormLabel from "@/theme-components/forms/CustomFormLabel";
+import CustomTextField from "@/theme-components/forms/CustomTextField";
+import { loginSchema } from "@/schema/auth/authSchema";
 
-const AuthLogin = ({ title, subtitle, subtext }: loginType) => (
-  <>
-    {title ? (
-      <Typography fontWeight="700" variant="h3" mb={1}>
-        {title}
-      </Typography>
-    ) : null}
+const AuthLogin = ({ title, subtitle, subtext }: loginType) => {
+  const router = useRouter();
+  const dispatch = useDispatch();
+  const [login, { isLoading: isLoginLoading }] = useLoginMutation();
+  const [rememberMe, setRememberMe] = useState(false);
 
-    {subtext}
+  //formik setup
+  const formik = useFormik({
+    initialValues: {
+      emailAddress: "",
+      password: "",
+    },
+    validationSchema: loginSchema,
+    onSubmit: async (values): Promise<void> => {
+      try {
+        const loggedInUser = await login({
+          email: values.emailAddress,
+          password: values.password,
+        }).unwrap();
+        dispatch(setTokens({ access_token: loggedInUser?.token }));
+        notify("logged in successfully", "success");
+        router.push("/");
+      } catch (error) {
+        notify((error as ApiErrorResponse)?.data?.message, "error");
+      }
+    },
+  });
 
-    <AuthSocialButtons title="Sign in with" />
-    <Box mt={3}>
-      <Divider>
-        <Typography
-          component="span"
-          color="textSecondary"
-          variant="h6"
-          fontWeight="400"
-          position="relative"
-          px={2}
-        >
-          or sign in with
+
+  return (
+    <form onSubmit={formik.handleSubmit} noValidate>
+      {title ? (
+        <Typography fontWeight="700" variant="h3" mb={1}>
+          {title}
         </Typography>
-      </Divider>
-    </Box>
+      ) : null}
 
-    <Stack>
-      <Box>
-        <CustomFormLabel htmlFor="username">Username</CustomFormLabel>
-        <CustomTextField id="username" variant="outlined" fullWidth />
-      </Box>
-      <Box>
-        <CustomFormLabel htmlFor="password">Password</CustomFormLabel>
-        <CustomTextField
-          id="password"
-          type="password"
-          variant="outlined"
-          fullWidth
-        />
-      </Box>
-      <Stack
-        justifyContent="space-between"
-        direction="row"
-        alignItems="center"
-        my={2}
-      >
-        <FormGroup>
-          <FormControlLabel
-            control={<CustomCheckbox defaultChecked />}
-            label="Remeber this Device"
+      {subtext}
+
+      <Stack>
+        <Box>
+          <CustomFormLabel htmlFor="username">Email address*</CustomFormLabel>
+          <CustomTextField
+            id="emailAddress"
+            variant="outlined"
+            fullWidth
+            value={formik.values.emailAddress}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            error={
+              formik.touched.emailAddress && Boolean(formik.errors.emailAddress)
+            }
+            helperText={
+              formik.touched.emailAddress && formik.errors.emailAddress
+            }
           />
-        </FormGroup>
-        <Typography
-          component={Link}
-          href="/auth/forgot-password"
-          fontWeight="500"
-          sx={{
-            textDecoration: "none",
-            color: "primary.main",
-          }}
-        >
-          Forgot Password ?
-        </Typography>
+        </Box>
+        <Box>
+          <CustomFormLabel htmlFor="password">Password*</CustomFormLabel>
+          <CustomTextField
+            id="password"
+            type="password"
+            variant="outlined"
+            fullWidth
+            value={formik.values.password}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            error={formik.touched.password && Boolean(formik.errors.password)}
+            helperText={formik.touched.password && formik.errors.password}
+          />
+        </Box>
       </Stack>
-    </Stack>
-    <Box>
-      <Button
-        color="primary"
-        variant="contained"
-        size="large"
-        fullWidth
-        component={Link}
-        href="/"
-        type="submit"
-      >
-        Sign In
-      </Button>
-    </Box>
-    {subtitle}
-  </>
-);
+      <Box>
+        <Button
+          color="primary"
+          variant="contained"
+          size="large"
+          fullWidth
+          disabled={isLoginLoading}
+          // component={Link}
+          // href="/"
+          type="submit"
+          style={{marginTop:30}}
+        >
+          Sign In
+        </Button>
+      </Box>
+      {subtitle}
+    </form>
+  );
+};
 
 export default AuthLogin;

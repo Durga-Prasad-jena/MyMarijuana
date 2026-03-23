@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import Link from 'next/link';
+"use client"
+import React, { useState } from "react";
+import Link from "next/link";
 import {
   Box,
   Menu,
@@ -8,21 +9,50 @@ import {
   Divider,
   Button,
   IconButton,
-} from '@mui/material';
-import * as dropdownData from './data';
+} from "@mui/material";
+import * as dropdownData from "./data";
 
-import { IconMail } from '@tabler/icons-react';
-import { Stack } from '@mui/system';
-
+import { IconMail } from "@tabler/icons-react";
+import { Stack } from "@mui/system";
+import { useSelector } from "@/store/Store";
+import { useLogoutMutation } from "@/store/endpoints/auth/authApi";
+import notify from "@/utils/toast";
+import { ApiErrorResponse } from "@/types/api_response_model";
+import { useDispatch } from "react-redux";
+import { clearMeData } from "@/store/endpoints/reducer/meDataReducer";
+import { useRouter } from "next/navigation";
+import { capitalize } from "lodash";
 
 const Profile = () => {
   const [anchorEl2, setAnchorEl2] = useState(null);
+  const [logout, { isLoading: isLogoutLoading }] = useLogoutMutation();
+  const dispatch = useDispatch();
+  const router = useRouter()
+
+  //meData
+  const meData = useSelector((state) => state.meData.meData);
+
   const handleClick2 = (event: any) => {
     setAnchorEl2(event.currentTarget);
   };
   const handleClose2 = () => {
     setAnchorEl2(null);
   };
+
+  //logout function
+
+  const handleLogout = async (): Promise<void> => {
+    try {
+      const loggedoutUser = await logout().unwrap();
+      notify(loggedoutUser.message, "success");
+      dispatch(clearMeData());
+      router.push("/auth/login")
+    } catch (error) {
+      notify((error as ApiErrorResponse)?.data?.message, "error");
+    }
+  };
+
+  const userName = `${meData?.firstName} ${meData?.lastName}`
 
   return (
     <Box>
@@ -33,15 +63,15 @@ const Profile = () => {
         aria-controls="msgs-menu"
         aria-haspopup="true"
         sx={{
-          ...(typeof anchorEl2 === 'object' && {
-            color: 'primary.main',
+          ...(typeof anchorEl2 === "object" && {
+            color: "primary.main",
           }),
         }}
         onClick={handleClick2}
       >
         <Avatar
           src={"/images/profile/user-1.jpg"}
-          alt={'ProfileImg'}
+          alt={"ProfileImg"}
           sx={{
             width: 35,
             height: 35,
@@ -57,24 +87,33 @@ const Profile = () => {
         keepMounted
         open={Boolean(anchorEl2)}
         onClose={handleClose2}
-        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-        transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+        anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+        transformOrigin={{ horizontal: "right", vertical: "top" }}
         sx={{
-          '& .MuiMenu-paper': {
-            width: '360px',
+          "& .MuiMenu-paper": {
+            width: "360px",
             p: 4,
           },
         }}
       >
         <Typography variant="h5">User Profile</Typography>
         <Stack direction="row" py={3} spacing={2} alignItems="center">
-        <Avatar src={"/images/profile/user-1.jpg"} alt={"ProfileImg"} sx={{ width: 95, height: 95 }} />
+          <Avatar
+            src={"/images/profile/user-1.jpg"}
+            alt={"ProfileImg"}
+            sx={{ width: 45, height: 45 }}
+          />
           <Box>
-            <Typography variant="subtitle2" color="textPrimary" fontWeight={600}>
-              Mathew Anderson
+            <Typography
+              variant="subtitle2"
+              color="textPrimary"
+              fontWeight={600}
+            >
+              {/* {userName} */}
+             {capitalize(userName ?? "")}
             </Typography>
             <Typography variant="subtitle2" color="textSecondary">
-              Designer
+              {/* Designer */}
             </Typography>
             <Typography
               variant="subtitle2"
@@ -82,9 +121,10 @@ const Profile = () => {
               display="flex"
               alignItems="center"
               gap={1}
+              fontSize={13}
             >
               <IconMail width={15} height={15} />
-              info@modernize.com
+              {meData?.email ?? ""}
             </Typography>
           </Box>
         </Stack>
@@ -120,7 +160,7 @@ const Profile = () => {
                       className="text-hover"
                       noWrap
                       sx={{
-                        width: '240px',
+                        width: "240px",
                       }}
                     >
                       {profile.title}
@@ -129,7 +169,7 @@ const Profile = () => {
                       color="textSecondary"
                       variant="subtitle2"
                       sx={{
-                        width: '240px',
+                        width: "240px",
                       }}
                       noWrap
                     >
@@ -142,21 +182,13 @@ const Profile = () => {
           </Box>
         ))}
         <Box mt={2}>
-          <Box bgcolor="primary.light" p={3} mb={3} overflow="hidden" position="relative">
-            <Box display="flex" justifyContent="space-between">
-              <Box>
-                <Typography variant="h5" mb={2}>
-                  Unlimited <br />
-                  Access
-                </Typography>
-                <Button variant="contained" color="primary">
-                  Upgrade
-                </Button>
-              </Box>
-              <img src={"/images/backgrounds/unlimited-bg.png"} alt="unlimited" className="signup-bg"></img>
-            </Box>
-          </Box>
-          <Button href="/auth/login" variant="outlined" color="primary" component={Link} fullWidth>
+          <Button
+            variant="outlined"
+            color="primary"
+            onClick={handleLogout}
+            disabled={isLogoutLoading}
+            fullWidth
+          >
             Logout
           </Button>
         </Box>

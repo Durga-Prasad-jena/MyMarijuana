@@ -4,11 +4,9 @@ import { toggleSidebar, toggleMobileSidebar } from '../../../../../store/theme.s
 import { IconMenu2 } from '@tabler/icons-react';
 import Notifications from './Notification';
 import Profile from './Profile';
-import Cart from './Cart';
 import Search from './Search';
 import Language from './Language';
 import { AppState } from '../../../../../store/Store';
-import Navigation from './Navigation';
 import MobileRightSidebar from './MobileRightSidebar';
 import { MenuitemsType } from '../sidebar/MenuItems';
 
@@ -56,20 +54,19 @@ const Header : React.FC<Props> = ({ menuItems }) => {
         {/* ------------------------------------------- */}
         {/* Search Dropdown */}
         {/* ------------------------------------------- */}
-        <Search />
-        {lgUp ? (
+        {/* <Search /> */}
+        {/* {lgUp ? (
           <>
             <Navigation menuItems={menuItems} />
           </>
-        ) : null}
+        ) : null} */}
 
         <Box flexGrow={1} />
         <Stack spacing={1} direction="row" alignItems="center">
-          <Language />
+          {/* <Language /> */}
           {/* ------------------------------------------- */}
           {/* Ecommerce Dropdown */}
           {/* ------------------------------------------- */}
-          <Cart />
           {/* ------------------------------------------- */}
           {/* End Ecommerce Dropdown */}
           {/* ------------------------------------------- */}

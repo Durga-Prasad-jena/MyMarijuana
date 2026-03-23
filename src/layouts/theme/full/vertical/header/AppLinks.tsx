@@ -7,8 +7,7 @@ const AppLinks = () => {
   return (
     <Grid container spacing={3} mb={4}>
       {dropdownData.appsLink.map((links, index) => (
-        <Grid item lg={6} key={index}>
-          <Link href={links.href} className="hover-text-primary">
+          <Link href={links.href} className="hover-text-primary" key={index}>
             <Stack direction="row" spacing={2}>
               <Box
                 minWidth="45px"
@@ -55,7 +54,6 @@ const AppLinks = () => {
               </Box>
             </Stack>
           </Link>
-        </Grid>
       ))}
     </Grid>
   );

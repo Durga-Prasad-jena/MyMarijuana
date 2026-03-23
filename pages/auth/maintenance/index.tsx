@@ -1,4 +1,3 @@
-import { FC } from "react";
 import { Box, Container, Typography, Button } from "@mui/material";
 import Link from "next/link";
 

@@ -1,6 +1,5 @@
 import {
     IconAperture,
-    IconPackage,
     IconShoppingCart,
     IconChartDonut3,
     IconPoint

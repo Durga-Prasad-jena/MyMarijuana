@@ -2,22 +2,24 @@ import React from "react";
 import { useTheme } from "@mui/material/styles";
 import { useRouter } from "next/router";
 
-// mui imports
+// MUI imports
 import {
   ListItemIcon,
-  styled,
   ListItemText,
   Box,
   ListItemButton,
+  styled,
 } from "@mui/material";
-import { useSelector } from "../../../../../../store/Store";
 
-// custom imports
+// Redux store
+import { useSelector } from "../../../../../../store/Store";
+import { AppState } from "../../../../../../store/Store";
+
+// Custom components
 import NavItem from "../NavItem/NavItem";
 
-// plugins
+// Icons
 import { IconChevronDown } from "@tabler/icons-react";
-import { AppState } from "../../../../../../store/Store";
 
 type NavGroupProps = {
   [x: string]: any;
@@ -38,19 +40,20 @@ interface NavCollapseProps {
 }
 
 // FC Component For Dropdown Menu
-const NavCollapse = ({
+const NavCollapse: React.FC<NavCollapseProps> = ({
   menu,
   level,
   pathWithoutLastPart,
   pathDirect,
   hideMenu,
   onClick,
-}: NavCollapseProps) => {
+}) => {
   const Icon = menu.icon;
   const theme = useTheme();
   const { pathname } = useRouter();
   const [open, setOpen] = React.useState(false);
   const customizer = useSelector((state: AppState) => state.customizer);
+
   const menuIcon =
     level > 1 ? (
       <Icon stroke={1.5} size="1rem" />
@@ -60,13 +63,14 @@ const NavCollapse = ({
 
   React.useEffect(() => {
     setOpen(false);
-    menu.children.forEach((item: any) => {
+    menu.children?.forEach((item: any) => {
       if (item.href === pathname) {
         setOpen(true);
       }
     });
   }, [pathname, menu.children]);
 
+  // Styled ListItemButton
   const ListItemStyled = styled(ListItemButton)(() => ({
     width: "auto",
     padding: "5px 10px",
@@ -91,6 +95,7 @@ const NavCollapse = ({
     "&:hover > .SubNav": { display: "block" },
   }));
 
+  // Styled Box for submenus
   const ListSubMenu = styled(Box)(() => ({
     display: "none",
     position: "absolute",
@@ -103,13 +108,7 @@ const NavCollapse = ({
     backgroundColor: theme.palette.background.paper,
   }));
 
-  const listItemProps: {
-    component: string;
-  } = {
-    component: "li",
-  };
-
-  // If Menu has Children
+  // Render submenu items
   const submenus = menu.children?.map((item: any) => {
     if (item.children) {
       return (
@@ -140,9 +139,10 @@ const NavCollapse = ({
   return (
     <React.Fragment key={menu.id}>
       <ListItemStyled
-        {...listItemProps}
+        as="li" // ✅ Use 'as' instead of 'component' for styled ListItemButton
         selected={pathWithoutLastPart === menu.href}
         className={open ? "selected" : ""}
+        onClick={onClick}
       >
         <ListItemIcon
           sx={{
@@ -157,7 +157,7 @@ const NavCollapse = ({
           {menu.title}
         </ListItemText>
         <IconChevronDown size="1rem" />
-        <ListSubMenu component={"ul"} className="SubNav">
+        <ListSubMenu as="ul" className="SubNav">
           {submenus}
         </ListSubMenu>
       </ListItemStyled>
