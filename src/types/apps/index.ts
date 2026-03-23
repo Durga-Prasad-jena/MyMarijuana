@@ -8,3 +8,9 @@ export interface Pagination {
   limit: number
   totalPages: number
 }
+
+export interface SearchKeywordModel{
+  page:number;
+  limit:number;
+  keyword?:string
+}

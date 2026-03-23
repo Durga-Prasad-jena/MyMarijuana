@@ -15,7 +15,11 @@ const Api_Endpoint: Record<string, string> = {
 
 
   //specialities
-   getAllSpecilitiesApi:"/admin/specialities",
+   getAllSpecialtiesApi:"/admin/specialities",
+   createSpecialtiesApi: "/admin/specialities/create",
+   updateSpecialtiesApi: "/admin/specialities",
+   deleteSpecialtiesApi: "/admin/specialities",
+   specialtiesDetailApi:"/admin/specialities",
 
    //therapy
    getAllTherapiesApi:"/admin/therapies",

@@ -1,14 +1,24 @@
 import { Pagination } from ".";
 
-export interface SpecialityResponse {
+export interface SpecialtyResponse {
   success: boolean;
-  data: SpecialityModel[];
+  data: SpecialtyModel[];
   pagination: Pagination;
 }
 
-export interface SpecialityModel {
+export interface DetailSpecialtyResponse {
+  success: boolean;
+  data: SpecialtyModel;
+  pagination: Pagination;
+}
+
+export interface SpecialtyModel {
   id: string;
   name: string;
   createdAt: string;
   updatedAt: string;
 }
+
+
+
+

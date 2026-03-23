@@ -15,13 +15,13 @@ import {
 } from "@mui/material";
 import { Formik, Form, FormikErrors } from "formik";
 import notify from "@/utils/toast";
-import { useSpecialitiesQuery } from "@/store/endpoints/app/specialities/specialitiesApi";
 import { useLanguagesDataQuery } from "@/store/endpoints/app/languages/languageApi";
 import { useAllSubscriptionsQuery } from "@/store/endpoints/app/subscriptions/subscriptionsApi";
 import { doctorCreateSchema } from "@/schema/app/doctorSchema";
 import { useCreateDoctorMutation } from "@/store/endpoints/doctor/doctorApi";
 import { ApiErrorResponse } from "@/types/api_response_model";
 import { useRouter } from "next/navigation";
+import { useSpecialtiesQuery } from "@/store/endpoints/app/specialities/specialitiesApi";
 
 /* ---------------- TYPES ---------------- */
 interface Location {
@@ -77,7 +77,7 @@ export default function CreateDoctorCard() {
   const [countries, setCountries] = useState<Country[]>([]);
   const [createDoctor, { isLoading: isCreateDoctorLoading }] =
     useCreateDoctorMutation();
-  const { data: specialitiesData } = useSpecialitiesQuery();
+  const { data: specialitiesData } = useSpecialtiesQuery({page:1, limit: 100});
   const { data: languageData } = useLanguagesDataQuery();
   const { data: subscriptionsData } = useAllSubscriptionsQuery();
 

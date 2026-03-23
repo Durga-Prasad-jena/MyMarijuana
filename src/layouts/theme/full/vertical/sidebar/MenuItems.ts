@@ -75,13 +75,13 @@ const Menuitems: MenuitemsType[] = [
     // chip: 'New',
     chipColor: "secondary",
   },
-  // {
-  //   id: uniqueId(),
-  //   title: "Marijuana",
-  //   icon: IconUserCircle,
-  //   href: "/dashboards/marijuana",
-  //   chipColor: "secondary",
-  // },
+  {
+    id: uniqueId(),
+    title: "Specialities",
+    icon: IconUserCircle,
+    href: "/dashboards/specialities",
+    chipColor: "secondary",
+  },
 ];
 
 export default Menuitems;
