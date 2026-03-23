@@ -9,15 +9,13 @@ import { SuccessApiResponse } from "@/types/apps";
 
 const doctorApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    createDoctor: builder.mutation<
-     SuccessApiResponse,
-      CreateDoctorPayload
-    >({
+    createDoctor: builder.mutation<SuccessApiResponse, CreateDoctorPayload>({
       query: (body) => ({
         url: Api_Endpoint.createDoctorApi,
         method: "POST",
         body,
       }),
+      invalidatesTags: ["Doctor"],
     }),
     getAllDoctor: builder.query<
       DoctorApiResponseModel,
@@ -31,14 +29,15 @@ const doctorApi = baseApi.injectEndpoints({
           keyword,
         },
       }),
+      providesTags: ["Doctor"],
     }),
     doctorDetailById: builder.query<DoctorDetailResponse, { id: string }>({
       query: ({ id }) => ({
         url: `${Api_Endpoint.doctorDetailAPi}/${id}`,
         method: "GET",
       }),
+      providesTags: ["Doctor"],
     }),
- 
   }),
 });
 

@@ -31,18 +31,18 @@ import ConfirmModal from "@/components/modal/ConfirmModal";
 import { ApiErrorResponse } from "@/types/api_response_model";
 import AddEditModal from "@/components/modal/AddEditModal";
 import {
-  useCreateSpecialtiesMutation,
-  useDeleteSpecialtiesMutation,
-  useDetailSpecialtiesQuery,
-  useSpecialtiesQuery,
-  useUpdateSpecialtiesMutation,
-} from "@/store/endpoints/app/specialities/specialitiesApi";
+  useCreateLanguagesMutation,
+  useDeleteLanguagesMutation,
+  useDetailsLanguagesQuery,
+  useLanguagesDataQuery,
+  useUpdateLanguagesMutation,
+} from "@/store/endpoints/app/languages/languageApi";
 
-const Specialties = () => {
+const Languages = () => {
   //-----------state-----------
   const [isOpenModal, setIsOpenModal] = useState(false);
-  const [specialtyId, setSpecialtyId] = useState("");
-  const [page, setPage] = useState(0);
+  const [languageId, setLanguageId] = useState("");
+  const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [orderBy, setOrderBy] = useState("");
   const [orderDirection, setOrderDirection] = useState<"asc" | "desc">("desc");
@@ -51,41 +51,41 @@ const Specialties = () => {
   const [isUpdating, setIsUpdating] = useState(false);
   const [inputValue, setInputValue] = useState("");
 
-  const { data: specialtiesDetailsData } = useDetailSpecialtiesQuery(
-    { id: specialtyId },
+  const { data: languageDetailData } = useDetailsLanguagesQuery(
+    { id: languageId },
     { skip: !isUpdating },
   );
-  console.log("specialtiesDetailsData", specialtiesDetailsData);
-  const [deleteSpecialties, { isLoading: isDeleteSpecialtyLoading }] =
-    useDeleteSpecialtiesMutation();
+  console.log("languageDetailData", languageDetailData);
+  const [deleteSpecialties, { isLoading: isDeleteLanguageLoading }] =
+    useDeleteLanguagesMutation();
 
-  const [createSpecialties, { isLoading: isCreateSpecialtiesLoading }] =
-    useCreateSpecialtiesMutation();
+  const [createLanguages, { isLoading: isCreateLanguagesLoading }] =
+    useCreateLanguagesMutation();
 
-  const { data: specialtiesData, isLoading } = useSpecialtiesQuery({
-    page: page + 1,
+  const { data: languagesData, isLoading } = useLanguagesDataQuery({
+    page,
     limit,
   });
 
-  const [updateSpecialties, { isLoading: isUpdateSpecialtyLoading }] =
-    useUpdateSpecialtiesMutation();
+  const [updateLanguages, { isLoading: isUpdateLanguageLoading }] =
+    useUpdateLanguagesMutation();
 
   //effect function
   useEffect(() => {
-    if (specialtiesDetailsData) {
+    if (languageDetailData) {
       setEditMode(true);
-      setInputValue(specialtiesDetailsData?.data?.name || "");
+      setInputValue(languageDetailData?.data?.name || "");
     } else {
       setEditMode(false);
       setInputValue("");
     }
-  }, [specialtiesDetailsData]);
+  }, [languageDetailData]);
 
   //----------handlers -----------
 
-  const handleDeleteSpecialty = async (): Promise<void> => {
+  const handleDeleteLanguage = async (): Promise<void> => {
     try {
-      const result = await deleteSpecialties({ id: specialtyId }).unwrap();
+      const result = await deleteSpecialties({ id: languageId }).unwrap();
       notify(result?.message, "success");
     } catch (error) {
       notify((error as ApiErrorResponse)?.data?.message, "error");
@@ -100,23 +100,23 @@ const Specialties = () => {
     setOrderBy(column);
   };
 
-  const handlePressSpecialties = async (inputText: string): Promise<void> => {
+  const handlePressLanguages = async (inputText: string): Promise<void> => {
     try {
       if (editMode) {
-        const result = await updateSpecialties({
+        const result = await updateLanguages({
           name: inputText,
-          id: specialtyId,
+          id: languageId,
         }).unwrap();
         notify(result?.message, "success");
         return;
       }
-      const result = await createSpecialties({ name: inputText }).unwrap();
+      const result = await createLanguages({ name: inputText }).unwrap();
       notify(result?.message, "success");
     } catch (error) {
       notify((error as ApiErrorResponse)?.data?.message, "error");
     } finally {
       setIsAddEditModal(false);
-      setSpecialtyId("");
+      setLanguageId("");
       setInputValue("");
       setEditMode(false);
     }
@@ -142,13 +142,12 @@ const Specialties = () => {
     [],
   );
 
-  const totalCount = specialtiesData?.pagination?.totalItems;
-  console.log("totalCount", totalCount);
+  const totalCount = languagesData?.pagination?.total;
 
   return (
     <PageContainer>
       <Typography fontSize={25} fontWeight={"600"} marginBottom={3}>
-        Specialties Management{" "}
+        Languages Management{" "}
       </Typography>
 
       <TableContainer component={Paper} style={{ marginTop: 20 }}>
@@ -162,7 +161,7 @@ const Specialties = () => {
           marginTop={3}
         >
           <Typography fontSize={20} fontWeight={"600"}>
-            Specialties Listing
+            Languages Listing
           </Typography>
           <Button
             onClick={() => {
@@ -170,7 +169,7 @@ const Specialties = () => {
               setInputValue("");
             }}
           >
-            Add Specialties
+            Add Languages
           </Button>
         </Stack>
         <Table stickyHeader aria-label="sticky table">
@@ -206,11 +205,11 @@ const Specialties = () => {
                   />
                 </TableCell>
               </TableRow>
-            ) : specialtiesData && specialtiesData?.data?.length > 0 ? (
-              specialtiesData?.data?.map((item, index) => {
+            ) : languagesData && languagesData?.data?.length > 0 ? (
+              languagesData?.data?.map((item, index) => {
                 return (
                   <TableRow
-                    key={item.id}
+                    key={item.languageId}
                     // hover
                     // sx={{ "&:last-child td": { borderBottom: 0 } }}
                   >
@@ -235,7 +234,7 @@ const Specialties = () => {
                             onClick={() => {
                               // console.log("hello");
                               setIsUpdating(true);
-                              setSpecialtyId(item?.id);
+                              setLanguageId(item?.languageId);
                               setIsAddEditModal(true);
                             }}
                           >
@@ -250,7 +249,7 @@ const Specialties = () => {
                           <IconButton
                             onClick={() => {
                               setIsOpenModal(true);
-                              setSpecialtyId(item?.id);
+                              setLanguageId(item?.languageId);
                             }}
                           >
                             <DeleteIcon color="error" fontSize="small" />
@@ -281,11 +280,11 @@ const Specialties = () => {
               </TableRow>
             )}
           </TableBody>
-          {totalCount && totalCount! > limit && (
+          {totalCount! > limit && (
             <TableFooter>
               <TableRow>
                 <TablePagination
-                  rowsPerPageOptions={[15, 25, 50, 100]}
+                  rowsPerPageOptions={[25, 50, 75, 100]}
                   count={totalCount!}
                   rowsPerPage={limit}
                   page={page}
@@ -313,9 +312,9 @@ const Specialties = () => {
         <ConfirmModal
           open={isOpenModal}
           handleClose={() => setIsOpenModal(false)}
-          handleConfirm={handleDeleteSpecialty}
-          label={`Are you sure you want to delete this specialties?`}
-          isDisableLoading={isDeleteSpecialtyLoading}
+          handleConfirm={handleDeleteLanguage}
+          label={`Are you sure you want to delete this languages?`}
+          isDisableLoading={isDeleteLanguageLoading}
         />
       )}
 
@@ -326,15 +325,13 @@ const Specialties = () => {
             setIsAddEditModal(false);
             setEditMode(false);
           }}
-          handleAddEditName={handlePressSpecialties}
-          label={"Specialties"}
-          isDisableLoading={
-            isCreateSpecialtiesLoading || isUpdateSpecialtyLoading
-          }
+          handleAddEditName={handlePressLanguages}
+          label={"Languages"}
+          isDisableLoading={isCreateLanguagesLoading || isUpdateLanguageLoading}
           confirmBtnText={
             editMode
-              ? `${isUpdateSpecialtyLoading ? "Updating..." : "Update"}`
-              : `${isCreateSpecialtiesLoading ? "Adding" : "Add"}`
+              ? `${isUpdateLanguageLoading ? "Updating..." : "Update"}`
+              : `${isCreateLanguagesLoading ? "Adding" : "Add"}`
           }
           value={inputValue}
           setValue={setInputValue}
@@ -344,4 +341,4 @@ const Specialties = () => {
   );
 };
 
-export default Specialties;
+export default Languages;

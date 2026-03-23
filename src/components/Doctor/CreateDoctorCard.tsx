@@ -23,7 +23,7 @@ import { ApiErrorResponse } from "@/types/api_response_model";
 import { useRouter } from "next/navigation";
 import { useSpecialtiesQuery } from "@/store/endpoints/app/specialities/specialitiesApi";
 
-/* ---------------- TYPES ---------------- */
+/* ---------------- types ---------------- */
 interface Location {
   street: string;
   city: string;
@@ -72,18 +72,20 @@ const initialValues: CreateDoctorPayload = {
   ],
 };
 
-/* ---------------- COMPONENT ---------------- */
 export default function CreateDoctorCard() {
   const [countries, setCountries] = useState<Country[]>([]);
   const [createDoctor, { isLoading: isCreateDoctorLoading }] =
     useCreateDoctorMutation();
-  const { data: specialitiesData } = useSpecialtiesQuery({page:1, limit: 100});
-  const { data: languageData } = useLanguagesDataQuery();
+  const { data: specialitiesData } = useSpecialtiesQuery({
+    page: 1,
+    limit: 100,
+  });
+  const { data: languageData } = useLanguagesDataQuery({ page: 1, limit: 100 });
   const { data: subscriptionsData } = useAllSubscriptionsQuery();
 
-  const router = useRouter()
+  const router = useRouter();
 
-  /* ---------------- FETCH COUNTRIES ---------------- */
+  /* ---------------- get country api ---------------- */
   useEffect(() => {
     fetch("https://restcountries.com/v3.1/all?fields=name,idd,cca3")
       .then((res) => res.json())
@@ -103,7 +105,7 @@ export default function CreateDoctorCard() {
       .catch(console.error);
   }, []);
 
-  /* ---------------- HANDLE SUBMIT ---------------- */
+  /* submit function */
   const handleSubmit = async (values: CreateDoctorPayload): Promise<void> => {
     try {
       const payload: CreateDoctorPayload = {
@@ -119,13 +121,12 @@ export default function CreateDoctorCard() {
       };
       const res = await createDoctor(payload).unwrap();
       notify(res.message, "success");
-      router.push("/dashboards/doctor")
+      router.push("/dashboards/doctor");
     } catch (error) {
       notify((error as ApiErrorResponse)?.data?.message, "error");
     }
   };
 
-  /* ---------------- RENDER ---------------- */
   return (
     <Card sx={{ maxWidth: 1000, m: "auto", mt: 4 }}>
       <CardContent>
@@ -141,7 +142,7 @@ export default function CreateDoctorCard() {
           {({ values, handleChange, setFieldValue, errors, touched }) => (
             <Form>
               <Grid container spacing={3}>
-                {/* FIRST NAME */}
+                {/* first name */}
                 <Grid item xs={6}>
                   <TextField
                     name="firstName"
@@ -154,7 +155,7 @@ export default function CreateDoctorCard() {
                   />
                 </Grid>
 
-                {/* LAST NAME */}
+                {/* last anme  */}
                 <Grid item xs={6}>
                   <TextField
                     name="lastName"
@@ -167,7 +168,7 @@ export default function CreateDoctorCard() {
                   />
                 </Grid>
 
-                {/* EMAIL */}
+                {/* email */}
                 <Grid item xs={6}>
                   <TextField
                     name="email"
@@ -180,7 +181,7 @@ export default function CreateDoctorCard() {
                   />
                 </Grid>
 
-                {/* PHONE COUNTRY CODE */}
+                {/* counrty code  */}
                 <Grid item xs={2}>
                   <TextField
                     select
@@ -204,7 +205,7 @@ export default function CreateDoctorCard() {
                   </TextField>
                 </Grid>
 
-                {/* PHONE NUMBER */}
+                {/* phone  */}
                 <Grid item xs={4}>
                   <TextField
                     name="phoneNo"
@@ -217,7 +218,7 @@ export default function CreateDoctorCard() {
                   />
                 </Grid>
 
-                {/* SPECIALITY MULTI-SELECT */}
+                {/* multi sleect specialty */}
                 <Grid item xs={6}>
                   <Autocomplete
                     multiple
@@ -254,7 +255,7 @@ export default function CreateDoctorCard() {
                   />
                 </Grid>
 
-                {/* LANGUAGE MULTI-SELECT */}
+                {/* multi select language */}
                 <Grid item xs={6}>
                   <Autocomplete
                     multiple
@@ -262,13 +263,13 @@ export default function CreateDoctorCard() {
                     getOptionLabel={(option) => option.name}
                     value={
                       languageData?.data?.filter((l) =>
-                        values.languageIds.includes(String(l.id)),
+                        values.languageIds.includes(String(l.languageId)),
                       ) || []
                     }
                     onChange={(_, selected) =>
                       setFieldValue(
                         "languageIds",
-                        selected.map((l) => String(l.id)),
+                        selected.map((l) => String(l.languageId)),
                       )
                     }
                     renderTags={(tagValue, getTagProps) =>
@@ -289,7 +290,7 @@ export default function CreateDoctorCard() {
                   />
                 </Grid>
 
-                {/* SUBSCRIPTION PLAN */}
+                {/* subscription plan */}
                 <Grid item xs={6}>
                   <TextField
                     select
@@ -314,7 +315,7 @@ export default function CreateDoctorCard() {
                   </TextField>
                 </Grid>
 
-                {/* LOCATIONS */}
+                {/* locations */}
                 <Grid item xs={12}>
                   <Typography variant="h6">Location</Typography>
                 </Grid>
@@ -432,7 +433,7 @@ export default function CreateDoctorCard() {
                   );
                 })}
 
-                {/* SUBMIT BUTTON */}
+                {/* submit */}
                 <Grid item xs={12}>
                   <Button
                     disabled={isCreateDoctorLoading}

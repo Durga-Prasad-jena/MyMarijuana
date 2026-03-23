@@ -77,9 +77,16 @@ const Menuitems: MenuitemsType[] = [
   },
   {
     id: uniqueId(),
-    title: "Specialities",
+    title: "Specialties",
     icon: IconUserCircle,
     href: "/dashboards/specialities",
+    chipColor: "secondary",
+  },
+  {
+    id: uniqueId(),
+    title: "Languages",
+    icon: IconUserCircle,
+    href: "/dashboards/languages",
     chipColor: "secondary",
   },
 ];

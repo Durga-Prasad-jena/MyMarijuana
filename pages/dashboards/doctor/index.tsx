@@ -38,11 +38,6 @@ const Doctor = () => {
   const [orderBy, setOrderBy] = useState("");
   const [orderDirection, setOrderDirection] = useState<"asc" | "desc">("desc");
 
-  const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([
-    null,
-    null,
-  ]);
-  const [startDate, endDate] = dateRange;
 
   const { data: doctorsData, isLoading: isDoctorsLoading } =
     useGetAllDoctorQuery({

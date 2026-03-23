@@ -1,4 +1,3 @@
-import { Pagination } from ".";
 
 export interface LanguageResponse {
   success: boolean;
@@ -7,8 +6,15 @@ export interface LanguageResponse {
 }
 
 export interface LanguageModel {
-  id: string;
+  languageId: string;
   name: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface Pagination {
+  total: number
+  page: number
+  limit: number
+  totalPages: number
 }
