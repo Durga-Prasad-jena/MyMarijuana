@@ -38,7 +38,6 @@ const Doctor = () => {
   const [orderBy, setOrderBy] = useState("");
   const [orderDirection, setOrderDirection] = useState<"asc" | "desc">("desc");
 
-
   const { data: doctorsData, isLoading: isDoctorsLoading } =
     useGetAllDoctorQuery({
       page: page + 1,
@@ -197,7 +196,13 @@ const Doctor = () => {
               doctorsData.data.length > 0 &&
               doctorsData?.data?.map((doctor, index) => {
                 return (
-                  <TableRow key={doctor.doctorId}>
+                  <TableRow
+                    key={doctor.doctorId}
+                    sx={{
+                      height: 56,
+                      "&:nth-of-type(even)": { backgroundColor: "#fafafa" },
+                    }}
+                  >
                     <TableCell>
                       <Typography variant="subtitle2">{index + 1}</Typography>
                     </TableCell>
