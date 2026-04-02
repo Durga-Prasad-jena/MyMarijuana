@@ -26,6 +26,7 @@ import { useEffect, useMemo, useState } from "react";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import { useRouter } from "next/router";
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
+import { Edit } from "@mui/icons-material";
 
 import constants from "@/utils/constants";
 import PageContainer from "@/theme-components/container/PageContainer";
@@ -191,9 +192,7 @@ const Doctor = () => {
                   />
                 </TableCell>
               </TableRow>
-            ) : (
-              doctorsData &&
-              doctorsData.data.length > 0 &&
+            ) : doctorsData && doctorsData.data.length > 0 ? (
               doctorsData?.data?.map((doctor, index) => {
                 return (
                   <TableRow
@@ -276,11 +275,31 @@ const Doctor = () => {
                             <RemoveRedEyeIcon color="primary" />
                           </IconButton>
                         </Tooltip>
+                        <Tooltip title="Edit Profile">
+                          <IconButton
+                            aria-label="ACTIVE"
+                            onClick={() =>
+                              router.push(
+                                `/dashboards/doctor/update-profile?doctorId=${doctor.doctorId}`,
+                              )
+                            }
+                          >
+                            <Edit fontSize="small" /> 
+                          </IconButton>
+                        </Tooltip>
                       </Stack>
                     </TableCell>
                   </TableRow>
                 );
               })
+            ) : (
+              <TableRow>
+                <TableCell colSpan={6} align="center">
+                  <Typography color="text.secondary">
+                    {constants.NO_DATA_FOUND}
+                  </Typography>
+                </TableCell>
+              </TableRow>
             )}
             {/* //row */}
           </TableBody>
