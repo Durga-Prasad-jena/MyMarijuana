@@ -2,14 +2,15 @@ import {
   CreateDoctorPayload,
   DoctorApiResponseModel,
   DoctorDetailResponse,
+  UpdateDoctorProfilePayload,
 } from "@/types/apps/doctor";
 import Api_Endpoint from "../api_endpoints";
 import { baseApi } from "../baseApi";
-import { SuccessApiResponse } from "@/types/apps";
+import { CreateDoctorResponse, SuccessApiResponse, updateDoctorProfileResponse } from "@/types/apps";
 
 const doctorApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    createDoctor: builder.mutation<SuccessApiResponse, CreateDoctorPayload>({
+    createDoctor: builder.mutation<CreateDoctorResponse, CreateDoctorPayload>({
       query: (body) => ({
         url: Api_Endpoint.createDoctorApi,
         method: "POST",
@@ -38,6 +39,17 @@ const doctorApi = baseApi.injectEndpoints({
       }),
       providesTags: ["Doctor"],
     }),
+     updateProfile: builder.mutation<
+      updateDoctorProfileResponse,
+      { id: string; body: UpdateDoctorProfilePayload }
+    >({
+      query: ({ id, body }) => ({
+        url: `/admin/doctors/${id}/profile`,
+        method: "PUT",
+        body,
+      }),
+      invalidatesTags: ["Doctor"],
+    }),
   }),
 });
 
@@ -45,4 +57,5 @@ export const {
   useCreateDoctorMutation,
   useGetAllDoctorQuery,
   useDoctorDetailByIdQuery,
+  useUpdateProfileMutation,
 } = doctorApi;

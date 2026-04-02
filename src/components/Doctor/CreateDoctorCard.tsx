@@ -121,7 +121,9 @@ export default function CreateDoctorCard() {
       };
       const res = await createDoctor(payload).unwrap();
       notify(res.message, "success");
-      router.push("/dashboards/doctor");
+      router.push(
+        `/dashboards/doctor/update-profile?doctorId=${res?.doctorId}`,
+      );
     } catch (error) {
       notify((error as ApiErrorResponse)?.data?.message, "error");
     }
@@ -197,11 +199,7 @@ export default function CreateDoctorCard() {
                       touched.phoneCountryCode && errors.phoneCountryCode
                     }
                   >
-                    {countries.map((c) => (
-                      <MenuItem key={c.id} value={c.code}>
-                        {c.name} ({c.code})
-                      </MenuItem>
-                    ))}
+                    <MenuItem value="+1">+1 </MenuItem>
                   </TextField>
                 </Grid>
 

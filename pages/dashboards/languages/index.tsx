@@ -42,8 +42,8 @@ const Languages = () => {
   //-----------state-----------
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [languageId, setLanguageId] = useState("");
-  const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(10);
+  const [page, setPage] = useState(0);
+  const [limit, setLimit] = useState(5);
   const [orderBy, setOrderBy] = useState("");
   const [orderDirection, setOrderDirection] = useState<"asc" | "desc">("desc");
   const [isAddEditModal, setIsAddEditModal] = useState(false);
@@ -63,7 +63,7 @@ const Languages = () => {
     useCreateLanguagesMutation();
 
   const { data: languagesData, isLoading } = useLanguagesDataQuery({
-    page,
+    page: page + 1,
     limit,
   });
 
@@ -122,6 +122,7 @@ const Languages = () => {
     }
   };
 
+    /*  ------------pagination page change ----------*/
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
   };
@@ -133,16 +134,12 @@ const Languages = () => {
     setPage(0);
   };
 
-  const columns = useMemo(
-    () => [
-      { id: "SrNo", label: "Sr No", sortable: true },
-      { id: "name", label: "Name" },
-      { id: "actions", label: "Actions" },
-    ],
-    [],
-  );
+
+
 
   const totalCount = languagesData?.pagination?.total;
+
+  const totalPages = languagesData?.pagination?.totalPages || 0;
 
   return (
     <PageContainer>
@@ -172,139 +169,159 @@ const Languages = () => {
             Add Languages
           </Button>
         </Stack>
-        <Table stickyHeader aria-label="sticky table">
-          {/* table header */}
+        <Table stickyHeader sx={{ tableLayout: "fixed" }}>
+          {/* HEADER */}
           <TableHead>
-            {columns.map(({ id, label, sortable }) => (
-              <TableCell key={id}>
-                <Typography variant="h6">
-                  {sortable ? (
-                    <TableSortLabel
-                      active={orderBy === id}
-                      direction={orderBy === id ? orderDirection : "asc"}
-                      onClick={() => handleSort(id)}
-                    >
-                      {label}
-                    </TableSortLabel>
-                  ) : (
-                    label
-                  )}
-                </Typography>
+            <TableRow sx={{ backgroundColor: "#f9fafb" }}>
+              <TableCell sx={{ width: "80px", fontWeight: 600 }}>
+                <TableSortLabel
+                  active={orderBy === "SrNo"}
+                  direction={orderBy === "SrNo" ? orderDirection : "asc"}
+                  onClick={() => handleSort("SrNo")}
+                >
+                  Sr No
+                </TableSortLabel>
               </TableCell>
-            ))}
+
+              <TableCell sx={{ width: "60%", fontWeight: 600 }}>Name</TableCell>
+
+              <TableCell
+                align="center"
+                sx={{ width: "160px", fontWeight: 600 }}
+              >
+                Actions
+              </TableCell>
+            </TableRow>
           </TableHead>
 
-          {/* // table body */}
+          {/* BODY */}
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell>
-                  <CircularProgress
-                    size={constants.CIRCULAR_PROGRESS_SIZE}
-                    sx={{ marginLeft: 60, marginTop: 5 }}
-                  />
+                <TableCell colSpan={3} align="center">
+                  <CircularProgress size={30} />
                 </TableCell>
               </TableRow>
-            ) : languagesData && languagesData?.data?.length > 0 ? (
-              languagesData?.data?.map((item, index) => {
-                return (
-                  <TableRow
-                    key={item.languageId}
-                    // hover
-                    // sx={{ "&:last-child td": { borderBottom: 0 } }}
-                  >
-                    <TableCell>
-                      <Typography fontWeight={500}>{index + 1}</Typography>
-                    </TableCell>
+            ) : languagesData &&  languagesData?.data?.length > 0 ? (
+              languagesData.data.map((item, index) => (
+                <TableRow
+                  key={item.languageId}
+                  hover
+                  sx={{
+                    height: 56,
+                    "&:nth-of-type(even)": { backgroundColor: "#fafafa" },
+                  }}
+                >
+                  {/* SR NO */}
+                  <TableCell>
+                    <Typography fontWeight={500}>
+                      {index + 1}
+                    </Typography>
+                  </TableCell>
 
-                    <TableCell>
-                      <Typography fontWeight={500}>
-                        {capitalize(item?.name)}
-                      </Typography>
-                    </TableCell>
+                  {/* NAME */}
+                  <TableCell>
+                    <Typography
+                      fontWeight={500}
+                      noWrap
+                      sx={{
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                      }}
+                    >
+                      {capitalize(item?.name)}
+                    </Typography>
+                  </TableCell>
 
-                    <TableCell>
-                      <Stack
-                        direction="row"
-                        spacing={1}
-                        // justifyContent="center"
-                      >
-                        <Tooltip title="Edit">
-                          <IconButton
-                            onClick={() => {
-                              // console.log("hello");
-                              setIsUpdating(true);
-                              setLanguageId(item?.languageId);
-                              setIsAddEditModal(true);
-                            }}
-                          >
-                            <ModeEditOutlineIcon
-                              color="primary"
-                              fontSize="small"
-                            />
-                          </IconButton>
-                        </Tooltip>
+                  {/* ACTIONS */}
+                  <TableCell align="center">
+                    <Stack direction="row" spacing={1} justifyContent="center">
+                      <Tooltip title="Edit">
+                        <IconButton
+                          size="small"
+                          onClick={() => {
+                            setIsUpdating(true);
+                            setLanguageId(item.languageId);
+                            setIsAddEditModal(true);
+                          }}
+                        >
+                          <ModeEditOutlineIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
 
-                        <Tooltip title="Delete">
-                          <IconButton
-                            onClick={() => {
-                              setIsOpenModal(true);
-                              setLanguageId(item?.languageId);
-                            }}
-                          >
-                            <DeleteIcon color="error" fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                      </Stack>
-                    </TableCell>
-                  </TableRow>
-                );
-              })
+                      <Tooltip title="Delete">
+                        <IconButton
+                          size="small"
+                          onClick={() => {
+                            setIsOpenModal(true);
+                            setLanguageId(item.languageId);
+                          }}
+                        >
+                          <DeleteIcon fontSize="small" color="error" />
+                        </IconButton>
+                      </Tooltip>
+                    </Stack>
+                  </TableCell>
+                </TableRow>
+              ))
             ) : (
               <TableRow>
-                <TableCell colSpan={3}>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      minHeight: "30vh",
-                      width: "100%",
-                    }}
-                  >
-                    <Typography variant="h6" color="textSecondary">
-                      {constants.NO_DATA_FOUND}
-                    </Typography>
-                  </Box>
+                <TableCell colSpan={3} align="center">
+                  <Typography color="text.secondary">
+                    {constants.NO_DATA_FOUND}
+                  </Typography>
                 </TableCell>
               </TableRow>
             )}
           </TableBody>
-          {totalCount! > limit && (
+
             <TableFooter>
-              <TableRow>
-                <TablePagination
-                  rowsPerPageOptions={[25, 50, 75, 100]}
-                  count={totalCount!}
-                  rowsPerPage={limit}
-                  page={page}
-                  onPageChange={handleChangePage}
-                  onRowsPerPageChange={handleChangeRowsPerPage}
+            <TableRow>
+              <TableCell colSpan={3} sx={{ p: 0 }}>
+                <Box
                   sx={{
-                    "& .MuiTablePagination-toolbar": {
-                      fontSize: "0.9rem",
-                    },
-                    "& .MuiTablePagination-selectLabel": {
-                      fontWeight: "bold",
-                    },
-                    "& .MuiTablePagination-displayedRows": {
-                      color: "#1976d2",
-                    },
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    px: 2,
+                    py: 1.5,
+                    borderTop: "1px solid #e0e0e0",
+                    backgroundColor: "#fafafa",
                   }}
-                />
-              </TableRow>
-            </TableFooter>
-          )}
+                >
+                  {/* LEFT SIDE */}
+                  <Typography variant="body2" color="text.secondary">
+                    Total: {totalCount || 0} items
+                  </Typography>
+
+                  {/* RIGHT SIDE */}
+                  {totalPages > 1 && (
+                    <TablePagination
+                      component="div"
+                      rowsPerPageOptions={[10, 25, 50, 100]}
+                      count={totalCount || 0}
+                      rowsPerPage={limit}
+                      page={page}
+                      onPageChange={handleChangePage}
+                      onRowsPerPageChange={handleChangeRowsPerPage}
+                      sx={{
+                        "& .MuiTablePagination-toolbar": {
+                          minHeight: "40px",
+                          padding: 0,
+                        },
+                        "& .MuiTablePagination-selectLabel": {
+                          fontSize: "0.85rem",
+                        },
+                        "& .MuiTablePagination-displayedRows": {
+                          fontSize: "0.85rem",
+                        },
+                      }}
+                    />
+                  )}
+                </Box>
+              </TableCell>
+            </TableRow>
+          </TableFooter>
         </Table>
       </TableContainer>
 

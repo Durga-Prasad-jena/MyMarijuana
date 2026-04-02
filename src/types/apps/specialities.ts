@@ -1,15 +1,14 @@
-import { Pagination } from ".";
 
 export interface SpecialtyResponse {
   success: boolean;
   data: SpecialtyModel[];
-  pagination: Pagination;
+  pagination: SpecialtyPagination;
 }
 
 export interface DetailSpecialtyResponse {
   success: boolean;
   data: SpecialtyModel;
-  pagination: Pagination;
+  pagination: SpecialtyPagination;
 }
 
 export interface SpecialtyModel {
@@ -17,6 +16,13 @@ export interface SpecialtyModel {
   name: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface SpecialtyPagination{
+  limit: number;
+  page: number;
+  total: number;
+  totalPages: number;
 }
 
 

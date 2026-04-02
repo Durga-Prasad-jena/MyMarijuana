@@ -140,3 +140,32 @@ export interface Location {
   postalCode: string;
   isPrimary: boolean;
 }
+
+
+// export interface  UpdateDoctorPayload
+export interface UpdateDoctorProfilePayload {
+  sessionPrice: number,
+  professionalTitle: string
+  experienceYears: number
+  licenseNumber: string
+  licenseType: string
+  licenseState: string
+  licenseVerified: boolean
+  verifiedBy: string
+  acceptingNewClients: boolean
+  websiteUrl: string
+  generateAvatarUploadUrl: boolean
+  generateMediaUploadUrls: boolean
+  mediaCount: number
+  mediaType: string
+  mediaContentType: string
+  qualifications: Qualification[],
+}
+
+export interface Qualification {
+  degree: string
+  institution: string
+  yearCompleted: number
+  credentialType: string
+  displayOrder: number
+}

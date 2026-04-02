@@ -14,3 +14,18 @@ export interface SearchKeywordModel{
   limit:number;
   keyword?:string
 }
+
+
+export interface CreateDoctorResponse extends SuccessApiResponse{
+  doctorId: string
+}
+
+export interface updateDoctorProfileResponse extends SuccessApiResponse{
+  avatarUploadUrl:string;
+  mediaUploadUrls: MediaUploadURLModel[]
+
+}
+
+export interface MediaUploadURLModel{
+  uploadUrl: string
+}
