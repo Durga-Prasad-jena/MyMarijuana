@@ -26,7 +26,7 @@ const DoctorDetailCard: React.FC<DoctorDetailCardProps> = ({ doctorId }) => {
   if (isLoading)
     return (
       <CircularProgress
-        size={60}
+        size={20}
         sx={{ display: "block", mx: "auto", my: 5 }}
       />
     );
