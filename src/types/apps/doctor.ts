@@ -181,12 +181,12 @@ export const licenseTypes = [
   "Other",
 ];
 
-export const doctorClientFocusTypes = ["Adults", "Elders", "Teens"];
-export const doctorQualificationCredentialTypes = [
-  "Degree",
-  "Diploma",
-  "Fellowship",
-];
+// export const doctorClientFocusTypes = ["Adults", "Elders", "Teens"];
+// export const doctorQualificationCredentialTypes = [
+//   "Degree",
+//   "Diploma",
+//   "Fellowship",
+// ];
 
 export const createDoctorInitialValues = {
   firstName: "",
@@ -334,7 +334,7 @@ export interface Qualification {
   degree: string
   institution: string
   yearCompleted: number
-  credentialType: string
+  // credentialType: string
   displayOrder: number
 }
 
@@ -376,7 +376,7 @@ export interface Qualification {
   degree: string;
   institution: string;
   yearCompleted: number;
-  credentialType: string;
+  // credentialType: string;
   displayOrder: number;
 }
 
@@ -404,7 +404,7 @@ export interface UpdateDoctorProfilePayload {
   websiteUrl: string
   generateAvatarUploadUrl: boolean
   generateMediaUploadUrls: boolean
-  mediaCount: number
+  mediaCount?: number
   mediaType: string
   mediaContentType: string
   qualifications: Qualification[],
@@ -414,7 +414,7 @@ export interface Qualification {
   degree: string
   institution: string
   yearCompleted: number
-  credentialType: string
+  // credentialType: string
   displayOrder: number
 }
 

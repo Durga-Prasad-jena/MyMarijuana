@@ -62,7 +62,7 @@ const validationSchema = Yup.object({
           .required("Year is required")
           .min(1900, "Year must be valid")
           .max(new Date().getFullYear(), "Year cannot be in the future"),
-        credentialType: Yup.string().required("Credential is required"),
+        // credentialType: Yup.string().required("Credential is required"),
       }),
     )
     .min(1, "At least one qualification is required"),
@@ -76,8 +76,10 @@ export default function ProfessionalForm({ doctorId }: { doctorId: string }) {
   );
   console.log("multiImages", multiImages);
   const [isUpdateLoading, setIsUpdateLoading] = useState(false);
-  const [deletedMediaId, setDeletedMediaId] = useState("");
   const [doctorMedia, setDoctorMedia] = useState<Medum[]>([]);
+
+  const isNoUserImage = (url?: string | null) =>
+    !url || url.toLowerCase().includes("no_user_image");
 
   const router = useRouter();
 
@@ -107,7 +109,7 @@ export default function ProfessionalForm({ doctorId }: { doctorId: string }) {
             degree: q.degree || "",
             institution: q.institution || "",
             yearCompleted: q.yearCompleted || "",
-            credentialType: q.credentialType || "",
+            // credentialType: q.credentialType || "",
           }))
         : [
             {
@@ -123,16 +125,23 @@ export default function ProfessionalForm({ doctorId }: { doctorId: string }) {
 
   useEffect(() => {
     if (doctorDetail) {
-      setPreviewUrl(doctorDetail?.avatar);
+      const avatar = doctorDetail.avatar;
+      if (avatar && !isNoUserImage(avatar)) {
+        setPreviewUrl(avatar);
+      } else {
+        setPreviewUrl("");
+      }
     }
   }, [doctorDetail]);
 
   const [updateProfile] = useUpdateProfileMutation();
 
   useEffect(() => {
-    if (doctorDetail?.media) {
-      setDoctorMedia(doctorDetail.media);
-    }
+    setDoctorMedia(
+      doctorDetail?.media
+        ? doctorDetail.media.filter((m) => !isNoUserImage(m.url))
+        : [],
+    );
   }, [doctorDetail]);
 
   // Generate preview URL and cleanup
@@ -170,15 +179,7 @@ export default function ProfessionalForm({ doctorId }: { doctorId: string }) {
 
   const handleUpdateProfile = async (v: typeof initialValues) => {
     try {
-      // if (!preview) {
-      //   notify("Please select a profile image", "error");
-      //   return;
-      // }
       setIsUpdateLoading(true);
-      if (multiImages.length === 0) {
-        notify("Please select at least one media image", "error");
-        return;
-      }
 
       const payload: UpdateDoctorProfilePayload = {
         sessionPrice: Number(v.sessionPrice),
@@ -193,17 +194,21 @@ export default function ProfessionalForm({ doctorId }: { doctorId: string }) {
         websiteUrl: v.websiteUrl,
         generateAvatarUploadUrl: !!preview,
         generateMediaUploadUrls: multiImages.length > 0,
-        mediaCount: multiImages.length,
+
         mediaType: "image",
         mediaContentType: "image/jpeg",
         qualifications: v.qualifications.map((q, index) => ({
           degree: q.degree,
           institution: q.institution,
           yearCompleted: Number(q.yearCompleted) || 0,
-          credentialType: q.credentialType,
+          // credentialType: q.credentialType,
           displayOrder: index + 1,
         })),
       };
+
+      if (multiImages.length > 0) {
+        payload.mediaCount = multiImages.length;
+      }
 
       const res = await updateProfile({ id: doctorId, body: payload }).unwrap();
 
@@ -237,8 +242,9 @@ export default function ProfessionalForm({ doctorId }: { doctorId: string }) {
       await refetch();
 
       setMultiImages([]);
+      setDoctorMedia([]);
 
-      notify("Updated Successfully", "success");
+      notify(res?.message, "success");
       // notify("Profile updated successfully", "success");
       router.push("/dashboards/doctor");
     } catch (error) {
@@ -282,20 +288,25 @@ export default function ProfessionalForm({ doctorId }: { doctorId: string }) {
                         alignItems="center"
                         textAlign="center"
                       >
-                        {doctorDetail?.avatar ? (
+                        {(doctorDetail?.avatar && !doctorDetail.avatar.includes("no_user_image")) ? (
                           <Avatar
-                            src={doctorDetail?.avatar}
+                            src={doctorDetail.avatar}
+                            alt="Profile"
+                            sx={{ width: 120, height: 120, mb: 2 }}
+                          />
+                        ) : previewUrl ? (
+                          <Avatar
+                            src={previewUrl}
                             alt="Profile"
                             sx={{ width: 120, height: 120, mb: 2 }}
                           />
                         ) : (
                           <Avatar
-                            src={
-                              previewUrl ?? "/images/profile/no_user_image.png"
-                            }
-                            // alt="Profile"
                             sx={{ width: 120, height: 120, mb: 2 }}
-                          />
+                          // transparent fallback if no image
+                          src=""
+                          alt="Profile"
+                        />
                         )}
 
                         <Button
@@ -321,7 +332,9 @@ export default function ProfessionalForm({ doctorId }: { doctorId: string }) {
                         Gallery Images
                       </Typography>
                       <Grid container spacing={2}>
-                        {doctorMedia.map((img, index) => (
+                        {doctorMedia
+                          .filter((img) => !isNoUserImage(img.url))
+                          .map((img, index) => (
                           <Grid
                             item
                             xs={6}
@@ -357,36 +370,42 @@ export default function ProfessionalForm({ doctorId }: { doctorId: string }) {
                             </Tooltip>
                           </Grid>
                         ))}
-                        {multiImages.map((img, index) => (
-                          <Grid
-                            item
-                            xs={6}
-                            sm={4}
-                            md={3}
-                            key={index}
-                            position="relative"
-                          >
-                            <Avatar
-                              src={img.url}
-                              variant="rounded"
-                              sx={{
-                                width: "100%",
-                                height: 150,
-                                objectFit: "contain",
-                              }}
-                            />
-                            <Tooltip title="Remove">
-                              <IconButton
-                                size="small"
-                                color="error"
-                                sx={{ position: "absolute", top: 14, right: 4 }}
-                                onClick={() => handleRemoveImage(index)}
-                              >
-                                <Delete fontSize="small" />
-                              </IconButton>
-                            </Tooltip>
-                          </Grid>
-                        ))}
+                        {multiImages
+                          .filter((img) => !isNoUserImage(img.url))
+                          .map((img, index) => (
+                            <Grid
+                              item
+                              xs={6}
+                              sm={4}
+                              md={3}
+                              key={index}
+                              position="relative"
+                            >
+                              <Avatar
+                                src={img.url}
+                                variant="rounded"
+                                sx={{
+                                  width: "100%",
+                                  height: 150,
+                                  objectFit: "contain",
+                                }}
+                              />
+                              <Tooltip title="Remove">
+                                <IconButton
+                                  size="small"
+                                  color="error"
+                                  sx={{
+                                    position: "absolute",
+                                    top: 14,
+                                    right: 4,
+                                  }}
+                                  onClick={() => handleRemoveImage(index)}
+                                >
+                                  <Delete fontSize="small" />
+                                </IconButton>
+                              </Tooltip>
+                            </Grid>
+                          ))}
                       </Grid>
                       <Box display="flex" justifyContent="center" mt={2}>
                         <Button variant="outlined" component="label">
@@ -598,7 +617,7 @@ export default function ProfessionalForm({ doctorId }: { doctorId: string }) {
                                 degree?: string;
                                 institution?: string;
                                 yearCompleted?: string;
-                                credentialType?: string;
+                                // credentialType?: string;
                               };
 
                               return (
@@ -681,29 +700,6 @@ export default function ProfessionalForm({ doctorId }: { doctorId: string }) {
                                       />
                                     </Grid>
 
-                                    <Grid item xs={12} md={2}>
-                                      <CustomFormLabel>
-                                        Credential
-                                      </CustomFormLabel>
-                                      <TextField
-                                        // label="Credential"
-                                        placeholder="Enter Credential"
-                                        name={`qualifications.${i}.credentialType`}
-                                        fullWidth
-                                        value={q.credentialType}
-                                        onChange={handleChange}
-                                        error={Boolean(
-                                          touched.qualifications?.[i]
-                                            ?.credentialType &&
-                                          qualError.credentialType,
-                                        )}
-                                        helperText={
-                                          touched.qualifications?.[i]
-                                            ?.credentialType &&
-                                          qualError.credentialType
-                                        }
-                                      />
-                                    </Grid>
 
                                     <Grid item xs={12} md={2}>
                                       <IconButton
@@ -729,7 +725,7 @@ export default function ProfessionalForm({ doctorId }: { doctorId: string }) {
                                   degree: "",
                                   institution: "",
                                   yearCompleted: "",
-                                  credentialType: "",
+                                  // credentialType: "",
                                 })
                               }
                             >

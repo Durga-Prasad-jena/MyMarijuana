@@ -302,12 +302,11 @@ export default function CreateDoctorCard() {
                 {/* subscription plan */}
                 <Grid item xs={6}>
                   <CustomFormLabel>Subscription Plan</CustomFormLabel>
+
                   <TextField
                     select
-                    // label="Subscription Plan"
-                    placeholder="Select Subscription Plan"
                     name="subscriptionPlanId"
-                    value={values.subscriptionPlanId}
+                    value={values.subscriptionPlanId || ""} // important
                     onChange={handleChange}
                     fullWidth
                     error={
@@ -318,9 +317,11 @@ export default function CreateDoctorCard() {
                       touched.subscriptionPlanId && errors.subscriptionPlanId
                     }
                   >
-                    {/* <MenuItem value="Select Plan" disabled>
+                    {/* ✅ Placeholder option */}
+                    <MenuItem value="" disabled>
                       Select Plan
-                    </MenuItem> */}
+                    </MenuItem>
+
                     {subscriptionsData?.data?.map((s) => (
                       <MenuItem key={s.id} value={s.id}>
                         {s.name}

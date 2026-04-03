@@ -6,146 +6,230 @@ import {
   Typography,
   Avatar,
   Chip,
-  Divider,
   Stack,
+  Divider,
+  Box,
   CircularProgress,
 } from "@mui/material";
 import { useDoctorDetailByIdQuery } from "@/store/endpoints/doctor/doctorApi";
-import constants from "@/utils/constants";
 
 interface DoctorDetailCardProps {
-  doctorId: string;
+  doctorId?: string;
 }
 
-const DoctorDetailCard: React.FC<Partial<DoctorDetailCardProps>> = ({
-  doctorId,
-}) => {
-  const { data: doctorDetails, isLoading } = useDoctorDetailByIdQuery(
+const DoctorDetailCard: React.FC<DoctorDetailCardProps> = ({ doctorId }) => {
+  const { data: doctor, isLoading } = useDoctorDetailByIdQuery(
     { id: doctorId! },
-    { skip: !doctorId },
+    { skip: !doctorId }
   );
 
-  if (isLoading) {
+  if (isLoading)
     return (
       <CircularProgress
-        size={constants.CIRCULAR_PROGRESS_SIZE}
+        size={60}
         sx={{ display: "block", mx: "auto", my: 5 }}
       />
     );
-  }
 
-  if (!doctorDetails) return null;
+  if (!doctor) return null;
 
   return (
-    <Grid container spacing={3} p={3}>
-      {/* Doctor Basic Info */}
-      <Grid item xs={12}>
-        <Card>
-          <CardContent>
-            <Stack direction="row" spacing={3} alignItems="center">
-              <Avatar
-                src={doctorDetails.avatar}
-                sx={{ width: 80, height: 80 }}
-              />
-              <div>
-                <Typography variant="h5" fontWeight="bold">
-                  {doctorDetails.title} {doctorDetails.firstName}{" "}
-                  {doctorDetails.lastName}
+    <Box p={3}>
+      {/* HEADER */}
+      <Card sx={{ p: 3, mb: 3 }}>
+        <Stack direction="row" spacing={2} alignItems="center">
+          <Avatar src={doctor.avatar} sx={{ width: 80, height: 80 }} />
+
+          <Box flex={1}>
+            <Typography variant="h5" fontWeight="bold">
+              {doctor.title} {doctor.firstName} {doctor.lastName}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              {doctor.professionalTitle}
+            </Typography>
+            <Stack direction="row" spacing={1} mt={1}>
+              <Chip label={doctor.status} color="success" size="small" />
+              {/* <Chip
+                label={doctor.isEmailVerified ? "Verified" : "Unverified"}
+                color={doctor.isEmailVerified ? "success" : "warning"}
+                size="small"
+              /> */}
+            </Stack>
+          </Box>
+
+          <Box textAlign="right">
+            <Typography fontWeight="bold">₹{doctor.sessionPrice}</Typography>
+            <Typography variant="caption">per session</Typography>
+          </Box>
+        </Stack>
+      </Card>
+
+      {/* QUICK STATS */}
+      <Grid container spacing={2} mb={3} alignItems="stretch">
+        {[
+          { label: "Experience", value: `${doctor.experienceYears} yrs` },
+          { label: "License", value: doctor.licenseType },
+          { label: "State", value: doctor.licenseState },
+          {
+            label: "Subscription",
+            value: doctor.activeSubscription?.planName,
+          },
+        ].map((item, i) => (
+          <Grid item xs={6} md={3} key={i}>
+            <Card
+              sx={{
+                height: "100%",
+                display: "flex",
+                flexDirection: "column",
+              }}
+            >
+              <CardContent sx={{ flexGrow: 1 }}>
+                <Typography variant="caption" color="text.secondary">
+                  {item.label}
                 </Typography>
-                <Stack direction="row" spacing={1} mt={1}>
-                  {/* <Chip
-                    label={doctorDetails. ? "Active" : "Inactive"}
-                    color={doctorDetails. ? "success" : "default"}
-                  /> */}
-                  <Chip
-                    label={
-                      doctorDetails.isEmailVerified
-                        ? "Email Verified"
-                        : "Email Not Verified"
-                    }
-                    color={
-                      doctorDetails.isEmailVerified ? "success" : "warning"
-                    }
-                  />
-                </Stack>
-              </div>
-            </Stack>
-          </CardContent>
-        </Card>
+                <Typography fontWeight="bold">{item.value}</Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
       </Grid>
 
-      {/* Contact Info */}
-      <Grid item xs={12} md={6}>
-        <Card sx={{ minHeight: 220, display: "flex", flexDirection: "column" }}>
-          <CardContent>
-            <Typography variant="h6" gutterBottom>
-              Contact Information
-            </Typography>
-            <Divider sx={{ my: 1 }} />
-            <Typography>Email: {doctorDetails.email}</Typography>
-            <Typography>
-              Phone: {doctorDetails.phoneCountryCode} {doctorDetails.phoneNo}
-            </Typography>
-            {doctorDetails.email && (
+      {/* MAIN GRID */}
+      <Grid container spacing={3} alignItems="stretch">
+        {/* CONTACT */}
+        <Grid item xs={12} md={6}>
+          <Card sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
+            <CardContent sx={{ flexGrow: 1 }}>
+              <Typography variant="h6">Contact</Typography>
+              <Divider sx={{ my: 1 }} />
+              <Typography>{doctor.email}</Typography>
               <Typography>
-                Patient Email: {doctorDetails.email}
+                {doctor.phoneCountryCode} {doctor.phoneNo}
               </Typography>
-            )}
-            {doctorDetails.phoneNo && (
+              {doctor.websiteUrl && <Typography>{doctor.websiteUrl}</Typography>}
+            </CardContent>
+          </Card>
+        </Grid>
+
+        {/* PROFESSIONAL */}
+        <Grid item xs={12} md={6}>
+          <Card sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
+            <CardContent sx={{ flexGrow: 1 }}>
+              <Typography variant="h6">Professional</Typography>
+              <Divider sx={{ my: 1 }} />
+              <Typography>License #: {doctor.licenseNumber}</Typography>
               <Typography>
-                Patient Phone: {doctorDetails.phoneNo}
+                Verified: {doctor.licenseVerified ? "Yes" : "No"}
               </Typography>
-            )}
-          </CardContent>
-        </Card>
-      </Grid>
+              <Typography>
+                Online: {doctor.acceptingOnlineClients ? "Yes" : "No"}
+              </Typography>
+              <Typography>
+                In-Person: {doctor.acceptingInPersonClients ? "Yes" : "No"}
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
 
-      {/* Specialties & Languages */}
-      <Grid item xs={12} md={6}>
-        <Card>
-          <CardContent>
-            <Typography variant="h6">Specialties</Typography>
-            <Stack direction="row" spacing={1} flexWrap="wrap" mt={1}>
-              {doctorDetails.specialties?.map((s, i) => (
-                <Chip key={i} label={s} color="primary" />
-              ))}
-            </Stack>
+        {/* SPECIALTIES */}
+        <Grid item xs={12} md={6}>
+          <Card sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
+            <CardContent sx={{ flexGrow: 1 }}>
+              <Typography variant="h6">Specialties</Typography>
+              <Stack direction="row" flexWrap="wrap" gap={1} mt={1}>
+                {doctor.specialties.map((s, i) => (
+                  <Chip key={i} label={s} color="primary" />
+                ))}
+              </Stack>
 
-            <Typography variant="h6" mt={3}>
-              Languages
-            </Typography>
-            <Stack direction="row" spacing={1} flexWrap="wrap" mt={1}>
-              {doctorDetails.languages?.map((l, i) => (
-                <Chip key={i} label={l} />
-              ))}
-            </Stack>
-          </CardContent>
-        </Card>
-      </Grid>
+              <Typography variant="h6" mt={3}>
+                Languages
+              </Typography>
+              <Stack direction="row" flexWrap="wrap" gap={1} mt={1}>
+                {doctor.languages.map((l, i) => (
+                  <Chip key={i} label={l} />
+                ))}
+              </Stack>
+            </CardContent>
+          </Card>
+        </Grid>
 
-      {/* Locations */}
-      <Grid item xs={12}>
-        <Card>
-          <CardContent>
-            <Typography variant="h6">Locations</Typography>
-            <Divider sx={{ my: 2 }} />
-            <Stack spacing={2}>
-              {doctorDetails.locations?.map((loc, i) => (
-                <Card key={i} variant="outlined" sx={{ p: 2 }}>
-                  <Typography>
-                    {loc.street}, {loc.city}, {loc.state}, {loc.country} -{" "}
-                    {loc.postalCode}
-                  </Typography>
-                  {loc.isPrimary && (
-                    <Chip label="Primary" size="small" color="success" />
-                  )}
-                </Card>
-              ))}
-            </Stack>
-          </CardContent>
-        </Card>
+        {/* QUALIFICATIONS */}
+        <Grid item xs={12} md={6}>
+          <Card sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
+            <CardContent sx={{ flexGrow: 1 }}>
+              <Typography variant="h6">Qualifications</Typography>
+              <Divider sx={{ my: 1 }} />
+              <Stack spacing={1}>
+                {doctor.qualifications.map((q, i) => (
+                  <Box key={i}>
+                    <Typography fontWeight="bold">{q.degree}</Typography>
+                    <Typography variant="body2">
+                      {q.institution} ({q.yearCompleted})
+                    </Typography>
+                  </Box>
+                ))}
+              </Stack>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        {/* LOCATIONS */}
+        <Grid item xs={12}>
+          <Card>
+            <CardContent>
+              <Typography variant="h6">Locations</Typography>
+              <Divider sx={{ my: 2 }} />
+              <Grid container spacing={2}>
+                {doctor.locations.map((loc, i) => (
+                  <Grid item xs={12} md={6} key={i}>
+                    <Box
+                      sx={{
+                        border: "1px solid #eee",
+                        p: 2,
+                        borderRadius: 2,
+                        height: "100%",
+                      }}
+                    >
+                      <Typography>
+                        {loc.street}, {loc.city}, {loc.state}
+                      </Typography>
+                      {loc.isPrimary && (
+                        <Chip label="Primary" size="small" color="success" sx={{ mt: 1 }} />
+                      )}
+                    </Box>
+                  </Grid>
+                ))}
+              </Grid>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        {/* MEDIA */}
+        <Grid item xs={12}>
+          <Card>
+            <CardContent>
+              <Typography variant="h6">Media</Typography>
+              <Divider sx={{ my: 2 }} />
+              <Grid container spacing={2}>
+                {doctor.media.map((m, i) => (
+                  <Grid item xs={6} md={3} key={i}>
+                    <img
+                      src={m.url}
+                      style={{
+                        width: "100%",
+                        borderRadius: 8,
+                        objectFit: "cover",
+                      }}
+                    />
+                  </Grid>
+                ))}
+              </Grid>
+            </CardContent>
+          </Card>
+        </Grid>
       </Grid>
-    </Grid>
+    </Box>
   );
 };
 
