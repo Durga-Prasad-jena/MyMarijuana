@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Grid,
   TextField,
@@ -46,12 +46,6 @@ interface CreateDoctorPayload {
   locations: Location[];
 }
 
-interface Country {
-  name: string;
-  code: string;
-  id: string;
-}
-
 const initialValues: CreateDoctorPayload = {
   firstName: "",
   lastName: "",
@@ -66,7 +60,7 @@ const initialValues: CreateDoctorPayload = {
       street: "",
       city: "",
       state: "",
-      country: "",
+      country: "US",
       postalCode: "",
       isPrimary: true,
     },
@@ -74,7 +68,7 @@ const initialValues: CreateDoctorPayload = {
 };
 
 export default function CreateDoctorCard() {
-  const [countries, setCountries] = useState<Country[]>([]);
+  const [formInitialValues, setFormInitialValues] = useState<CreateDoctorPayload>(initialValues);
   const [createDoctor, { isLoading: isCreateDoctorLoading }] =
     useCreateDoctorMutation();
   const { data: specialitiesData } = useSpecialtiesQuery({
@@ -83,28 +77,24 @@ export default function CreateDoctorCard() {
   });
   const { data: languageData } = useLanguagesDataQuery({ page: 1, limit: 100 });
   const { data: subscriptionsData } = useAllSubscriptionsQuery();
+  console.log('subscriptionsData', subscriptionsData)
 
   const router = useRouter();
 
-  /* ---------------- get country api ---------------- */
+  /* Set default subscription plan to Regular */
   useEffect(() => {
-    fetch("https://restcountries.com/v3.1/all?fields=name,idd,cca3")
-      .then((res) => res.json())
-      .then((data) => {
-        const formatted: Country[] = data.map((c: any) => {
-          const root = c.idd?.root ?? "";
-          const suffix = c.idd?.suffixes?.[0] ?? "";
-          return {
-            name: c.name.common,
-            code: root + suffix,
-            id: c.cca3,
-          };
-        });
-        formatted.sort((a, b) => a.name.localeCompare(b.name));
-        setCountries(formatted);
-      })
-      .catch(console.error);
-  }, []);
+    if (subscriptionsData?.data && subscriptionsData.data.length > 0) {
+      const regularPlan = subscriptionsData.data.find(
+        (plan) => plan.name.toLowerCase() === "regular"
+      );
+      if (regularPlan) {
+        setFormInitialValues((prev) => ({
+          ...prev,
+          subscriptionPlanId: regularPlan.id,
+        }));
+      }
+    }
+  }, [subscriptionsData]);
 
   /* submit function */
   const handleSubmit = async (values: CreateDoctorPayload): Promise<void> => {
@@ -138,9 +128,10 @@ export default function CreateDoctorCard() {
         </Typography>
 
         <Formik
-          initialValues={initialValues}
+          initialValues={formInitialValues}
           validationSchema={doctorCreateSchema}
           onSubmit={handleSubmit}
+          enableReinitialize
         >
           {({ values, handleChange, setFieldValue, errors, touched }) => (
             <Form>
@@ -306,7 +297,7 @@ export default function CreateDoctorCard() {
                   <TextField
                     select
                     name="subscriptionPlanId"
-                    value={values.subscriptionPlanId || ""} // important
+                    value={values.subscriptionPlanId || ""}
                     onChange={handleChange}
                     fullWidth
                     error={
@@ -317,11 +308,9 @@ export default function CreateDoctorCard() {
                       touched.subscriptionPlanId && errors.subscriptionPlanId
                     }
                   >
-                    {/* ✅ Placeholder option */}
                     <MenuItem value="" disabled>
-                      Select Plan
+                      Select Subscription Plan
                     </MenuItem>
-
                     {subscriptionsData?.data?.map((s) => (
                       <MenuItem key={s.id} value={s.id}>
                         {s.name}
@@ -430,12 +419,7 @@ export default function CreateDoctorCard() {
                             locationTouched.country && locationError.country
                           }
                         >
-                          <MenuItem value="">Select Country</MenuItem>
-                          {countries.map((c) => (
-                            <MenuItem key={c.id} value={c.code}>
-                              {c.name}
-                            </MenuItem>
-                          ))}
+                          <MenuItem value="US">United States</MenuItem>
                         </TextField>
                       </Grid>
                       <Grid item xs={12}>

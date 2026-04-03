@@ -701,7 +701,7 @@ export default function ProfessionalForm({ doctorId }: { doctorId: string }) {
                                     </Grid>
 
 
-                                    <Grid item xs={12} md={2}>
+                                    <Grid item xs={12} md={2} sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
                                       <IconButton
                                         color="error"
                                         onClick={() => remove(i)}
@@ -718,19 +718,21 @@ export default function ProfessionalForm({ doctorId }: { doctorId: string }) {
                             })}
 
                             {/* Add Button */}
-                            <IconButton
-                              color="primary"
-                              onClick={() =>
-                                push({
-                                  degree: "",
-                                  institution: "",
-                                  yearCompleted: "",
-                                  // credentialType: "",
-                                })
-                              }
-                            >
-                              <Add />
-                            </IconButton>
+                            <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
+                              <IconButton
+                                color="primary"
+                                onClick={() =>
+                                  push({
+                                    degree: "",
+                                    institution: "",
+                                    yearCompleted: "",
+                                    // credentialType: "",
+                                  })
+                                }
+                              >
+                                <Add />
+                              </IconButton>
+                            </Box>
                           </Stack>
                         )}
                       </FieldArray>
