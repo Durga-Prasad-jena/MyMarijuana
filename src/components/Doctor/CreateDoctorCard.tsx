@@ -22,6 +22,7 @@ import { useCreateDoctorMutation } from "@/store/endpoints/doctor/doctorApi";
 import { ApiErrorResponse } from "@/types/api_response_model";
 import { useRouter } from "next/navigation";
 import { useSpecialtiesQuery } from "@/store/endpoints/app/specialities/specialitiesApi";
+import CustomFormLabel from "@/theme-components/forms/CustomFormLabel";
 
 /* ---------------- types ---------------- */
 interface Location {
@@ -146,9 +147,11 @@ export default function CreateDoctorCard() {
               <Grid container spacing={3}>
                 {/* first name */}
                 <Grid item xs={6}>
+                  <CustomFormLabel>First Name</CustomFormLabel>
                   <TextField
                     name="firstName"
-                    label="First Name"
+                    placeholder="Enter First Name"
+                    // label="First Name"
                     value={values.firstName}
                     onChange={handleChange}
                     fullWidth
@@ -159,9 +162,11 @@ export default function CreateDoctorCard() {
 
                 {/* last anme  */}
                 <Grid item xs={6}>
+                  <CustomFormLabel>Last Name</CustomFormLabel>
                   <TextField
+                    placeholder="Enter Last Name"
                     name="lastName"
-                    label="Last Name"
+                    // label="Last Name"
                     value={values.lastName}
                     onChange={handleChange}
                     fullWidth
@@ -172,9 +177,11 @@ export default function CreateDoctorCard() {
 
                 {/* email */}
                 <Grid item xs={6}>
+                  <CustomFormLabel>Email</CustomFormLabel>
                   <TextField
                     name="email"
-                    label="Email"
+                    // label="Email"
+                    placeholder="Enter Email"
                     value={values.email}
                     onChange={handleChange}
                     fullWidth
@@ -185,9 +192,11 @@ export default function CreateDoctorCard() {
 
                 {/* counrty code  */}
                 <Grid item xs={2}>
+                  <CustomFormLabel>Country Code</CustomFormLabel>
                   <TextField
                     select
-                    label="Country Code"
+                    // label="Country Code"
+                    placeholder="Enter Country Code"
                     name="phoneCountryCode"
                     value={values.phoneCountryCode}
                     onChange={handleChange}
@@ -205,9 +214,11 @@ export default function CreateDoctorCard() {
 
                 {/* phone  */}
                 <Grid item xs={4}>
+                  <CustomFormLabel>Phone Number</CustomFormLabel>
                   <TextField
                     name="phoneNo"
-                    label="Phone Number"
+                    // label="Phone Number"
+                    placeholder="Enter Phone Number"
                     value={values.phoneNo}
                     onChange={handleChange}
                     fullWidth
@@ -290,9 +301,11 @@ export default function CreateDoctorCard() {
 
                 {/* subscription plan */}
                 <Grid item xs={6}>
+                  <CustomFormLabel>Subscription Plan</CustomFormLabel>
                   <TextField
                     select
-                    label="Subscription Plan"
+                    // label="Subscription Plan"
+                    placeholder="Select Subscription Plan"
                     name="subscriptionPlanId"
                     value={values.subscriptionPlanId}
                     onChange={handleChange}
@@ -305,6 +318,9 @@ export default function CreateDoctorCard() {
                       touched.subscriptionPlanId && errors.subscriptionPlanId
                     }
                   >
+                    {/* <MenuItem value="Select Plan" disabled>
+                      Select Plan
+                    </MenuItem> */}
                     {subscriptionsData?.data?.map((s) => (
                       <MenuItem key={s.id} value={s.id}>
                         {s.name}
@@ -327,9 +343,11 @@ export default function CreateDoctorCard() {
                   return (
                     <React.Fragment key={index}>
                       <Grid item xs={6}>
+                        <CustomFormLabel>Street</CustomFormLabel>
                         <TextField
                           name={`locations.${index}.street`}
-                          label="Street"
+                          // label="Street"
+                          placeholder="Enter Street"
                           value={loc.street}
                           onChange={handleChange}
                           fullWidth
@@ -342,9 +360,11 @@ export default function CreateDoctorCard() {
                         />
                       </Grid>
                       <Grid item xs={6}>
+                        <CustomFormLabel>City</CustomFormLabel>
                         <TextField
                           name={`locations.${index}.city`}
-                          label="City"
+                          // label="City"
+                          placeholder="Enter City"
                           value={loc.city}
                           onChange={handleChange}
                           fullWidth
@@ -357,9 +377,11 @@ export default function CreateDoctorCard() {
                         />
                       </Grid>
                       <Grid item xs={6}>
+                        <CustomFormLabel>State</CustomFormLabel>
                         <TextField
                           name={`locations.${index}.state`}
-                          label="State"
+                          // label="State"
+                          placeholder="Enter State"
                           value={loc.state}
                           onChange={handleChange}
                           fullWidth
@@ -372,9 +394,11 @@ export default function CreateDoctorCard() {
                         />
                       </Grid>
                       <Grid item xs={6}>
+                        <CustomFormLabel>Postal Code</CustomFormLabel>
                         <TextField
                           name={`locations.${index}.postalCode`}
-                          label="Postal Code"
+                          // label="Postal Code"
+                          placeholder="Enter Postal Code"
                           value={loc.postalCode}
                           onChange={handleChange}
                           fullWidth
@@ -389,10 +413,12 @@ export default function CreateDoctorCard() {
                         />
                       </Grid>
                       <Grid item xs={6}>
+                        <CustomFormLabel>Country</CustomFormLabel>
                         <TextField
                           select
                           name={`locations.${index}.country`}
-                          label="Country"
+                          // label="Country"
+                          placeholder="Select Country"
                           value={loc.country}
                           onChange={handleChange}
                           fullWidth
@@ -403,6 +429,7 @@ export default function CreateDoctorCard() {
                             locationTouched.country && locationError.country
                           }
                         >
+                          <MenuItem value="">Select Country</MenuItem>
                           {countries.map((c) => (
                             <MenuItem key={c.id} value={c.code}>
                               {c.name}

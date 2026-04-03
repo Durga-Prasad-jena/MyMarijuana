@@ -17,37 +17,21 @@ import {
 } from "@mui/material";
 import { Formik, Form, FieldArray } from "formik";
 import { Add, Delete } from "@mui/icons-material";
-import { useUpdateProfileMutation } from "@/store/endpoints/doctor/doctorApi";
+import {
+  useDoctorDetailByIdQuery,
+  useRemoveMultipleImageMutation,
+  useUpdateProfileMutation,
+} from "@/store/endpoints/doctor/doctorApi";
 import notify from "@/utils/toast";
 import { ApiErrorResponse } from "@/types/api_response_model";
-import { Qualification, UpdateDoctorProfilePayload } from "@/types/apps/doctor";
+import {
+  Medum,
+  Qualification,
+  UpdateDoctorProfilePayload,
+} from "@/types/apps/doctor";
 import { useRouter } from "next/navigation";
 import * as Yup from "yup";
-
-/* ---------------- initial values ---------------- */
-const initialValues = {
-  sessionPrice: "",
-  professionalTitle: "",
-  experienceYears: "",
-  licenseNumber: "",
-  licenseType: "",
-  licenseState: "",
-  licenseVerified: false,
-  acceptingNewClients: false,
-  websiteUrl: "",
-  generateMediaUploadUrls: false,
-  mediaCount: "",
-  mediaType: "",
-  mediaContentType: "",
-  qualifications: [
-    {
-      degree: "",
-      institution: "",
-      yearCompleted: "",
-      credentialType: "",
-    },
-  ],
-};
+import CustomFormLabel from "@/theme-components/forms/CustomFormLabel";
 
 /* ---------------- validation schema ---------------- */
 const validationSchema = Yup.object({
@@ -90,50 +74,107 @@ export default function ProfessionalForm({ doctorId }: { doctorId: string }) {
   const [multiImages, setMultiImages] = useState<{ file: File; url: string }[]>(
     [],
   );
+  console.log("multiImages", multiImages);
+  const [isUpdateLoading, setIsUpdateLoading] = useState(false);
+  const [deletedMediaId, setDeletedMediaId] = useState("");
+  const [doctorMedia, setDoctorMedia] = useState<Medum[]>([]);
 
   const router = useRouter();
 
-  const [updateProfile, { isLoading: isUPdateProfileLoading }] =
-    useUpdateProfileMutation();
+  const { data: doctorDetail, refetch } = useDoctorDetailByIdQuery(
+    { id: doctorId },
+    { skip: !doctorId },
+  );
+
+  const [removeMultipleImage, { isLoading: isRemoveImageLoading }] =
+    useRemoveMultipleImageMutation();
+  console.log("doctorDetail", doctorDetail);
+
+  const initialValues = React.useMemo(
+    () => ({
+      sessionPrice: doctorDetail?.sessionPrice || "",
+      professionalTitle: doctorDetail?.professionalTitle || "",
+      experienceYears: doctorDetail?.experienceYears || "",
+      licenseNumber: doctorDetail?.licenseNumber || "",
+      licenseType: doctorDetail?.licenseType || "",
+      licenseState: doctorDetail?.licenseState || "",
+      licenseVerified: doctorDetail?.licenseVerified || false,
+      acceptingNewClients: doctorDetail?.acceptingInPersonClients || false,
+      websiteUrl: doctorDetail?.websiteUrl || "",
+
+      qualifications: doctorDetail?.qualifications?.length
+        ? doctorDetail.qualifications.map((q: Qualification) => ({
+            degree: q.degree || "",
+            institution: q.institution || "",
+            yearCompleted: q.yearCompleted || "",
+            credentialType: q.credentialType || "",
+          }))
+        : [
+            {
+              degree: "",
+              institution: "",
+              yearCompleted: "",
+              credentialType: "",
+            },
+          ],
+    }),
+    [doctorDetail],
+  );
+
+  useEffect(() => {
+    if (doctorDetail) {
+      setPreviewUrl(doctorDetail?.avatar);
+    }
+  }, [doctorDetail]);
+
+  const [updateProfile] = useUpdateProfileMutation();
+
+  useEffect(() => {
+    if (doctorDetail?.media) {
+      setDoctorMedia(doctorDetail.media);
+    }
+  }, [doctorDetail]);
 
   // Generate preview URL and cleanup
   useEffect(() => {
     if (!preview) return;
-    const objectUrl = URL.createObjectURL(preview);
-    setPreviewUrl(objectUrl);
-    return () => URL.revokeObjectURL(objectUrl);
+    const url = URL.createObjectURL(preview);
+    setPreviewUrl(url);
+    return () => URL.revokeObjectURL(url);
   }, [preview]);
 
-  // Handle image upload
-  const handleUploadImage = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
+  /* ---------------- HANDLERS ---------------- */
+  const handleUploadImage = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
     if (file) setPreview(file);
   };
 
-  // Handle multiple image uploads
   const handleUploadMultipleImages = (
-    event: React.ChangeEvent<HTMLInputElement>,
+    e: React.ChangeEvent<HTMLInputElement>,
   ) => {
-    const files = event.target.files;
+    const files = e.target.files;
     if (!files) return;
+
     const newImages = Array.from(files).map((file) => ({
       file,
       url: URL.createObjectURL(file),
+      isNew: true,
     }));
+
     setMultiImages((prev) => [...prev, ...newImages]);
   };
 
-  // Remove an image
   const handleRemoveImage = (index: number) => {
     setMultiImages((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleUpdateProfile = async (v: typeof initialValues) => {
     try {
-      if (!preview) {
-        notify("Please select a profile image", "error");
-        return;
-      }
+      // if (!preview) {
+      //   notify("Please select a profile image", "error");
+      //   return;
+      // }
+      setIsUpdateLoading(true);
       if (multiImages.length === 0) {
         notify("Please select at least one media image", "error");
         return;
@@ -166,7 +207,7 @@ export default function ProfessionalForm({ doctorId }: { doctorId: string }) {
 
       const res = await updateProfile({ id: doctorId, body: payload }).unwrap();
 
-      // Upload avatar
+      // avatar upload
       if (preview && res.avatarUploadUrl) {
         await fetch(res.avatarUploadUrl, {
           method: "PUT",
@@ -175,12 +216,13 @@ export default function ProfessionalForm({ doctorId }: { doctorId: string }) {
         });
       }
 
-      // Upload media images
+      // multiple upload
       if (multiImages.length && res.mediaUploadUrls?.length) {
         await Promise.all(
-          res.mediaUploadUrls.map((item, index) => {
+          res.mediaUploadUrls.map((item: any, index: number) => {
             const file = multiImages[index]?.file;
             if (!file) return;
+
             return fetch(item.uploadUrl, {
               method: "PUT",
               body: file,
@@ -190,18 +232,37 @@ export default function ProfessionalForm({ doctorId }: { doctorId: string }) {
         );
       }
 
-      notify("Profile updated successfully", "success");
+      // important fix
+      await new Promise((r) => setTimeout(r, 1000));
+      await refetch();
+
+      setMultiImages([]);
+
+      notify("Updated Successfully", "success");
+      // notify("Profile updated successfully", "success");
       router.push("/dashboards/doctor");
+    } catch (error) {
+      notify((error as ApiErrorResponse)?.data?.message, "error");
+    } finally {
+      setIsUpdateLoading(false);
+    }
+  };
+
+  //delete image function
+  const handleDeleteImage = async (mediaId: string) => {
+    try {
+      const res = await removeMultipleImage({ id: doctorId, mediaId }).unwrap();
+      notify(res?.message, "success");
     } catch (error) {
       notify((error as ApiErrorResponse)?.data?.message, "error");
     }
   };
-
   return (
     <Box sx={{ maxWidth: 1200, mx: "auto", mt: 4 }}>
       <Formik
         initialValues={initialValues}
         onSubmit={handleUpdateProfile}
+        enableReinitialize
         validationSchema={validationSchema}
       >
         {({ values, handleChange, setFieldValue, errors, touched }) => (
@@ -221,11 +282,22 @@ export default function ProfessionalForm({ doctorId }: { doctorId: string }) {
                         alignItems="center"
                         textAlign="center"
                       >
-                        <Avatar
-                          src={previewUrl ?? "/images/profile/user-1.jpg"}
-                          alt="Profile"
-                          sx={{ width: 120, height: 120, mb: 2 }}
-                        />
+                        {doctorDetail?.avatar ? (
+                          <Avatar
+                            src={doctorDetail?.avatar}
+                            alt="Profile"
+                            sx={{ width: 120, height: 120, mb: 2 }}
+                          />
+                        ) : (
+                          <Avatar
+                            src={
+                              previewUrl ?? "/images/profile/no_user_image.png"
+                            }
+                            // alt="Profile"
+                            sx={{ width: 120, height: 120, mb: 2 }}
+                          />
+                        )}
+
                         <Button
                           variant="contained"
                           color="primary"
@@ -249,6 +321,42 @@ export default function ProfessionalForm({ doctorId }: { doctorId: string }) {
                         Gallery Images
                       </Typography>
                       <Grid container spacing={2}>
+                        {doctorMedia.map((img, index) => (
+                          <Grid
+                            item
+                            xs={6}
+                            sm={4}
+                            md={3}
+                            key={index}
+                            position="relative"
+                          >
+                            <Avatar
+                              src={img.url}
+                              variant="rounded"
+                              sx={{
+                                width: "100%",
+                                height: 150,
+                                objectFit: "contain",
+                              }}
+                            />
+
+                            <Tooltip title="Remove">
+                              <IconButton
+                                size="small"
+                                color="error"
+                                sx={{
+                                  position: "absolute",
+                                  top: 14,
+                                  right: 4,
+                                }}
+                                // disabled={isRemoveImageLoading}
+                                onClick={() => handleDeleteImage(img.mediaId)}
+                              >
+                                <Delete fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                          </Grid>
+                        ))}
                         {multiImages.map((img, index) => (
                           <Grid
                             item
@@ -307,8 +415,10 @@ export default function ProfessionalForm({ doctorId }: { doctorId: string }) {
                       </Typography>
                       <Grid container spacing={2}>
                         <Grid item xs={12} md={6}>
+                          <CustomFormLabel>Session Price</CustomFormLabel>
                           <TextField
-                            label="Session Price"
+                            // label="Session Price"
+                            placeholder="Enter Session Price"
                             name="sessionPrice"
                             fullWidth
                             value={values.sessionPrice}
@@ -322,9 +432,11 @@ export default function ProfessionalForm({ doctorId }: { doctorId: string }) {
                           />
                         </Grid>
                         <Grid item xs={12} md={6}>
+                          <CustomFormLabel>Professional Title</CustomFormLabel>
                           <TextField
-                            label="Professional Title"
+                            // label="Professional Title"
                             name="professionalTitle"
+                            placeholder="Licensed Professional Clinical Counselor , LPCC, ATR-BC,MFA,RYT-200,CTHP"
                             fullWidth
                             value={values.professionalTitle}
                             onChange={handleChange}
@@ -339,8 +451,10 @@ export default function ProfessionalForm({ doctorId }: { doctorId: string }) {
                           />
                         </Grid>
                         <Grid item xs={12} md={6}>
+                          <CustomFormLabel>Experience (Years)</CustomFormLabel>
                           <TextField
-                            label="Experience (Years)"
+                            // label="Experience (Years)"
+                            placeholder="Enter Experience year"
                             name="experienceYears"
                             fullWidth
                             value={values.experienceYears}
@@ -354,8 +468,10 @@ export default function ProfessionalForm({ doctorId }: { doctorId: string }) {
                           />
                         </Grid>
                         <Grid item xs={12} md={6}>
+                          <CustomFormLabel>Website</CustomFormLabel>
                           <TextField
-                            label="Website"
+                            // label="Website"
+                            placeholder="Enter Website"
                             name="websiteUrl"
                             fullWidth
                             value={values.websiteUrl}
@@ -394,8 +510,10 @@ export default function ProfessionalForm({ doctorId }: { doctorId: string }) {
                       </Typography>
                       <Grid container spacing={2}>
                         <Grid item xs={12} md={4}>
+                          <CustomFormLabel>License Number</CustomFormLabel>
                           <TextField
-                            label="License Number"
+                            // label="License Number"
+                            placeholder="Enter License Number"
                             name="licenseNumber"
                             fullWidth
                             value={values.licenseNumber}
@@ -409,8 +527,10 @@ export default function ProfessionalForm({ doctorId }: { doctorId: string }) {
                           />
                         </Grid>
                         <Grid item xs={12} md={4}>
+                          <CustomFormLabel>License Type</CustomFormLabel>
                           <TextField
-                            label="License Type"
+                            // label="License Type"
+                            placeholder="Enter License Type"
                             name="licenseType"
                             fullWidth
                             value={values.licenseType}
@@ -424,8 +544,10 @@ export default function ProfessionalForm({ doctorId }: { doctorId: string }) {
                           />
                         </Grid>
                         <Grid item xs={12} md={4}>
+                          <CustomFormLabel>License State</CustomFormLabel>
                           <TextField
-                            label="License State"
+                            // label="License State"
+                            placeholder="Enter License State"
                             name="licenseState"
                             fullWidth
                             value={values.licenseState}
@@ -494,8 +616,10 @@ export default function ProfessionalForm({ doctorId }: { doctorId: string }) {
                                     alignItems="center"
                                   >
                                     <Grid item xs={12} md={3}>
+                                      <CustomFormLabel>Degree</CustomFormLabel>
                                       <TextField
-                                        label="Degree"
+                                        // label="Degree"
+                                        placeholder="Enter Degree"
                                         name={`qualifications.${i}.degree`}
                                         fullWidth
                                         value={q.degree}
@@ -512,8 +636,12 @@ export default function ProfessionalForm({ doctorId }: { doctorId: string }) {
                                     </Grid>
 
                                     <Grid item xs={12} md={3}>
+                                      <CustomFormLabel>
+                                        Institution
+                                      </CustomFormLabel>
                                       <TextField
-                                        label="Institution"
+                                        // label="Institution"
+                                        placeholder="Enter Institution"
                                         name={`qualifications.${i}.institution`}
                                         fullWidth
                                         value={q.institution}
@@ -532,8 +660,10 @@ export default function ProfessionalForm({ doctorId }: { doctorId: string }) {
                                     </Grid>
 
                                     <Grid item xs={12} md={2}>
+                                      <CustomFormLabel>Year</CustomFormLabel>
                                       <TextField
-                                        label="Year"
+                                        // label="Year"
+                                        placeholder="Enter Year"
                                         name={`qualifications.${i}.yearCompleted`}
                                         fullWidth
                                         value={q.yearCompleted}
@@ -552,8 +682,12 @@ export default function ProfessionalForm({ doctorId }: { doctorId: string }) {
                                     </Grid>
 
                                     <Grid item xs={12} md={2}>
+                                      <CustomFormLabel>
+                                        Credential
+                                      </CustomFormLabel>
                                       <TextField
-                                        label="Credential"
+                                        // label="Credential"
+                                        placeholder="Enter Credential"
                                         name={`qualifications.${i}.credentialType`}
                                         fullWidth
                                         value={q.credentialType}
@@ -608,12 +742,12 @@ export default function ProfessionalForm({ doctorId }: { doctorId: string }) {
                   </Card>
 
                   <Button
-                    disabled={isUPdateProfileLoading}
+                    disabled={isUpdateLoading}
                     type="submit"
                     variant="contained"
                     size="large"
                   >
-                    {isUPdateProfileLoading ? "Updating..." : "Update"}
+                    {isUpdateLoading ? "Updating..." : "Update"}
                   </Button>
                 </Stack>
               </Grid>

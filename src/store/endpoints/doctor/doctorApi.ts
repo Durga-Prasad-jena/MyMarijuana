@@ -6,7 +6,11 @@ import {
 } from "@/types/apps/doctor";
 import Api_Endpoint from "../api_endpoints";
 import { baseApi } from "../baseApi";
-import { CreateDoctorResponse, SuccessApiResponse, updateDoctorProfileResponse } from "@/types/apps";
+import {
+  CreateDoctorResponse,
+  SuccessApiResponse,
+  updateDoctorProfileResponse,
+} from "@/types/apps";
 
 const doctorApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -39,7 +43,7 @@ const doctorApi = baseApi.injectEndpoints({
       }),
       providesTags: ["Doctor"],
     }),
-     updateProfile: builder.mutation<
+    updateProfile: builder.mutation<
       updateDoctorProfileResponse,
       { id: string; body: UpdateDoctorProfilePayload }
     >({
@@ -47,6 +51,13 @@ const doctorApi = baseApi.injectEndpoints({
         url: `/admin/doctors/${id}/profile`,
         method: "PUT",
         body,
+      }),
+      invalidatesTags: ["Doctor"],
+    }),
+    removeMultipleImage: builder.mutation<SuccessApiResponse, { id: string,mediaId:string }>({
+      query: ({ id ,mediaId}) => ({
+        url: `/admin/doctors/${id}/media/${mediaId}`,
+        method: "DELETE",
       }),
       invalidatesTags: ["Doctor"],
     }),
@@ -58,4 +69,5 @@ export const {
   useGetAllDoctorQuery,
   useDoctorDetailByIdQuery,
   useUpdateProfileMutation,
+  useRemoveMultipleImageMutation,
 } = doctorApi;
