@@ -53,10 +53,10 @@ const DoctorDetailCard: React.FC<Partial<DoctorDetailCardProps>> = ({
                   {doctorDetails.lastName}
                 </Typography>
                 <Stack direction="row" spacing={1} mt={1}>
-                  <Chip
-                    label={doctorDetails.isActive ? "Active" : "Inactive"}
-                    color={doctorDetails.isActive ? "success" : "default"}
-                  />
+                  {/* <Chip
+                    label={doctorDetails. ? "Active" : "Inactive"}
+                    color={doctorDetails. ? "success" : "default"}
+                  /> */}
                   <Chip
                     label={
                       doctorDetails.isEmailVerified
@@ -86,14 +86,14 @@ const DoctorDetailCard: React.FC<Partial<DoctorDetailCardProps>> = ({
             <Typography>
               Phone: {doctorDetails.phoneCountryCode} {doctorDetails.phoneNo}
             </Typography>
-            {doctorDetails.emailForPatients && (
+            {doctorDetails.email && (
               <Typography>
-                Patient Email: {doctorDetails.emailForPatients}
+                Patient Email: {doctorDetails.email}
               </Typography>
             )}
-            {doctorDetails.phoneForPatients && (
+            {doctorDetails.phoneNo && (
               <Typography>
-                Patient Phone: {doctorDetails.phoneForPatients}
+                Patient Phone: {doctorDetails.phoneNo}
               </Typography>
             )}
           </CardContent>
