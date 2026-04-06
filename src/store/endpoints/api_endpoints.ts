@@ -35,6 +35,13 @@ const Api_Endpoint: Record<string, string> = {
 
   //subscriptions
   getAllSubscriptionsApi: "/admin/subscription-plans/",
+
+  //faqs
+  getAllFaqApi:"/admin/faqs/",
+  createFaqApi:"/admin/faqs/create",
+  updateFaqApi:"/admin/faqs",
+  deleteFaqApi:"/admin/faqs",
+  faqDetailApi:"/admin/faqs"
 };
 
 export default Api_Endpoint;

@@ -1,4 +1,3 @@
-
 export interface LanguageResponse {
   success: boolean;
   data: LanguageModel[];
@@ -13,8 +12,9 @@ export interface LanguageModel {
 }
 
 export interface Pagination {
-  total: number
-  page: number
-  limit: number
-  totalPages: number
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
 }
+

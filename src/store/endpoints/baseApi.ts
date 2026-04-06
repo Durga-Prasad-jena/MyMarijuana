@@ -41,6 +41,6 @@ const baseQueryWithInterceptor: BaseQueryFn<
 export const baseApi = createApi({
   reducerPath: "apiReducer",
   baseQuery: baseQueryWithInterceptor,
-  tagTypes: ["MeData","Specialty","Languages","Doctor"],
+  tagTypes: ["MeData","Specialty","Languages","Doctor","Faq"],
   endpoints: () => ({}),
 });

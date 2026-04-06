@@ -1,6 +1,11 @@
 import { uniqueId } from "lodash";
 
-import { IconPoint, IconUserCircle, IconAperture } from "@tabler/icons-react";
+import {
+  IconStethoscope,
+  IconCategory,
+  IconLanguage,
+  IconHelpCircle,
+} from "@tabler/icons-react";
 
 export interface MenuitemsType {
   [x: string]: any;
@@ -70,7 +75,7 @@ const Menuitems: MenuitemsType[] = [
   {
     id: uniqueId(),
     title: "Doctor Management",
-    icon: IconAperture,
+    icon: IconStethoscope,
     href: "/dashboards/doctor",
     // chip: 'New',
     chipColor: "secondary",
@@ -78,15 +83,22 @@ const Menuitems: MenuitemsType[] = [
   {
     id: uniqueId(),
     title: "Specialties",
-    icon: IconUserCircle,
+    icon: IconCategory,
     href: "/dashboards/specialities",
     chipColor: "secondary",
   },
   {
     id: uniqueId(),
     title: "Languages",
-    icon: IconUserCircle,
+    icon: IconLanguage,
     href: "/dashboards/languages",
+    chipColor: "secondary",
+  },
+  {
+    id: uniqueId(),
+    title: "Faq",
+    icon: IconHelpCircle,
+    href: "/dashboards/faq",
     chipColor: "secondary",
   },
 ];
