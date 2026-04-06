@@ -74,12 +74,8 @@ export default function ProfessionalForm({ doctorId }: { doctorId: string }) {
   const [multiImages, setMultiImages] = useState<{ file: File; url: string }[]>(
     [],
   );
-  console.log("multiImages", multiImages);
   const [isUpdateLoading, setIsUpdateLoading] = useState(false);
   const [doctorMedia, setDoctorMedia] = useState<Medum[]>([]);
-
-  const isNoUserImage = (url?: string | null) =>
-    !url || url.toLowerCase().includes("no_user_image");
 
   const router = useRouter();
 
@@ -88,9 +84,8 @@ export default function ProfessionalForm({ doctorId }: { doctorId: string }) {
     { skip: !doctorId },
   );
 
-  const [removeMultipleImage, { isLoading: isRemoveImageLoading }] =
-    useRemoveMultipleImageMutation();
-  console.log("doctorDetail", doctorDetail);
+  const [removeMultipleImage] = useRemoveMultipleImageMutation();
+  const [updateProfile] = useUpdateProfileMutation();
 
   const initialValues = React.useMemo(
     () => ({
@@ -109,20 +104,22 @@ export default function ProfessionalForm({ doctorId }: { doctorId: string }) {
             degree: q.degree || "",
             institution: q.institution || "",
             yearCompleted: q.yearCompleted || "",
-            // credentialType: q.credentialType || "",
           }))
         : [
             {
               degree: "",
               institution: "",
               yearCompleted: "",
-              credentialType: "",
             },
           ],
     }),
     [doctorDetail],
   );
 
+  const isNoUserImage = (url?: string | null) =>
+    !url || url.toLowerCase().includes("no_user_image");
+
+  // Setup avatar preview
   useEffect(() => {
     if (doctorDetail) {
       const avatar = doctorDetail.avatar;
@@ -134,8 +131,7 @@ export default function ProfessionalForm({ doctorId }: { doctorId: string }) {
     }
   }, [doctorDetail]);
 
-  const [updateProfile] = useUpdateProfileMutation();
-
+  // Setup doctor media from API
   useEffect(() => {
     setDoctorMedia(
       doctorDetail?.media
@@ -144,7 +140,7 @@ export default function ProfessionalForm({ doctorId }: { doctorId: string }) {
     );
   }, [doctorDetail]);
 
-  // Generate preview URL and cleanup
+  // Generate preview URL for new avatar
   useEffect(() => {
     if (!preview) return;
     const url = URL.createObjectURL(preview);
@@ -152,7 +148,8 @@ export default function ProfessionalForm({ doctorId }: { doctorId: string }) {
     return () => URL.revokeObjectURL(url);
   }, [preview]);
 
-  /* ---------------- HANDLERS ---------------- */
+  const allowedTypes = ["image/jpeg", "image/png", "video/mp4"];
+
   const handleUploadImage = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) setPreview(file);
@@ -164,7 +161,15 @@ export default function ProfessionalForm({ doctorId }: { doctorId: string }) {
     const files = e.target.files;
     if (!files) return;
 
-    const newImages = Array.from(files).map((file) => ({
+    const validFiles = Array.from(files).filter((file) =>
+      allowedTypes.includes(file.type),
+    );
+
+    if (validFiles.length !== files.length) {
+      notify("Only JPG, PNG, and MP4 files are allowed", "error");
+    }
+
+    const newImages = validFiles.map((file) => ({
       file,
       url: URL.createObjectURL(file),
       isNew: true,
@@ -175,6 +180,16 @@ export default function ProfessionalForm({ doctorId }: { doctorId: string }) {
 
   const handleRemoveImage = (index: number) => {
     setMultiImages((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleDeleteImage = async (mediaId: string) => {
+    try {
+      const res = await removeMultipleImage({ id: doctorId, mediaId }).unwrap();
+      notify(res?.message, "success");
+      await refetch();
+    } catch (error) {
+      notify((error as ApiErrorResponse)?.data?.message, "error");
+    }
   };
 
   const handleUpdateProfile = async (v: typeof initialValues) => {
@@ -195,24 +210,33 @@ export default function ProfessionalForm({ doctorId }: { doctorId: string }) {
         generateAvatarUploadUrl: !!preview,
         generateMediaUploadUrls: multiImages.length > 0,
 
-        mediaType: "image",
-        mediaContentType: "image/jpeg",
+        // mediaItems: multiImages.map((item) => ({
+        //   contentType: item.file.type as
+        //     | "image/jpeg"
+        //     | "image/png"
+        //     | "video/mp4",
+        // })),
         qualifications: v.qualifications.map((q, index) => ({
           degree: q.degree,
           institution: q.institution,
           yearCompleted: Number(q.yearCompleted) || 0,
-          // credentialType: q.credentialType,
           displayOrder: index + 1,
         })),
       };
 
       if (multiImages.length > 0) {
-        payload.mediaCount = multiImages.length;
+        ((payload.mediaItems = multiImages.map((item) => ({
+          contentType: item.file.type as
+            | "image/jpeg"
+            | "image/png"
+            | "video/mp4",
+        }))),
+          (payload.mediaCount = multiImages.length));
       }
 
       const res = await updateProfile({ id: doctorId, body: payload }).unwrap();
 
-      // avatar upload
+      // Upload avatar
       if (preview && res.avatarUploadUrl) {
         await fetch(res.avatarUploadUrl, {
           method: "PUT",
@@ -221,13 +245,12 @@ export default function ProfessionalForm({ doctorId }: { doctorId: string }) {
         });
       }
 
-      // multiple upload
+      // Upload multiple media files
       if (multiImages.length && res.mediaUploadUrls?.length) {
         await Promise.all(
           res.mediaUploadUrls.map((item: any, index: number) => {
             const file = multiImages[index]?.file;
             if (!file) return;
-
             return fetch(item.uploadUrl, {
               method: "PUT",
               body: file,
@@ -237,15 +260,12 @@ export default function ProfessionalForm({ doctorId }: { doctorId: string }) {
         );
       }
 
-      // important fix
       await new Promise((r) => setTimeout(r, 1000));
       await refetch();
 
       setMultiImages([]);
       setDoctorMedia([]);
-
       notify(res?.message, "success");
-      // notify("Profile updated successfully", "success");
       router.push("/dashboards/doctor");
     } catch (error) {
       notify((error as ApiErrorResponse)?.data?.message, "error");
@@ -254,15 +274,10 @@ export default function ProfessionalForm({ doctorId }: { doctorId: string }) {
     }
   };
 
-  //delete image function
-  const handleDeleteImage = async (mediaId: string) => {
-    try {
-      const res = await removeMultipleImage({ id: doctorId, mediaId }).unwrap();
-      notify(res?.message, "success");
-    } catch (error) {
-      notify((error as ApiErrorResponse)?.data?.message, "error");
-    }
-  };
+  // Utility: detect if file/url is video
+  const isVideo = (url: string, file?: File) =>
+    file?.type === "video/mp4" || url.endsWith(".mp4");
+
   return (
     <Box sx={{ maxWidth: 1200, mx: "auto", mt: 4 }}>
       <Formik
@@ -277,6 +292,7 @@ export default function ProfessionalForm({ doctorId }: { doctorId: string }) {
               {/* Profile & Gallery */}
               <Grid item xs={12} md={9} lg={12}>
                 <Stack spacing={4}>
+                  {/* Profile Avatar */}
                   <Card sx={{ p: 3 }}>
                     <CardContent>
                       <Typography variant="h6" mb={2} textAlign="center">
@@ -286,29 +302,29 @@ export default function ProfessionalForm({ doctorId }: { doctorId: string }) {
                         display="flex"
                         flexDirection="column"
                         alignItems="center"
-                        textAlign="center"
                       >
-                        {(doctorDetail?.avatar && !doctorDetail.avatar.includes("no_user_image")) ? (
-                          <Avatar
-                            src={doctorDetail.avatar}
-                            alt="Profile"
-                            sx={{ width: 120, height: 120, mb: 2 }}
-                          />
-                        ) : previewUrl ? (
-                          <Avatar
-                            src={previewUrl}
-                            alt="Profile"
-                            sx={{ width: 120, height: 120, mb: 2 }}
-                          />
+                        {previewUrl ? (
+                          isVideo(previewUrl, preview!) ? (
+                            <video
+                              src={previewUrl}
+                              style={{
+                                width: 120,
+                                height: 120,
+                                objectFit: "cover",
+                                borderRadius: "50%",
+                              }}
+                              controls
+                            />
+                          ) : (
+                            <Avatar
+                              src={previewUrl}
+                              alt="Profile"
+                              sx={{ width: 120, height: 120, mb: 2 }}
+                            />
+                          )
                         ) : (
-                          <Avatar
-                            sx={{ width: 120, height: 120, mb: 2 }}
-                          // transparent fallback if no image
-                          src=""
-                          alt="Profile"
-                        />
+                          <Avatar sx={{ width: 120, height: 120, mb: 2 }} />
                         )}
-
                         <Button
                           variant="contained"
                           color="primary"
@@ -326,15 +342,15 @@ export default function ProfessionalForm({ doctorId }: { doctorId: string }) {
                     </CardContent>
                   </Card>
 
+                  {/* Gallery */}
                   <Card sx={{ p: 3 }}>
                     <CardContent>
                       <Typography variant="h6" mb={2}>
-                        Gallery Images
+                        Gallery
                       </Typography>
                       <Grid container spacing={2}>
-                        {doctorMedia
-                          .filter((img) => !isNoUserImage(img.url))
-                          .map((img, index) => (
+                        {/* Existing API media */}
+                        {doctorMedia.map((img, index) => (
                           <Grid
                             item
                             xs={6}
@@ -343,44 +359,18 @@ export default function ProfessionalForm({ doctorId }: { doctorId: string }) {
                             key={index}
                             position="relative"
                           >
-                            <Avatar
-                              src={img.url}
-                              variant="rounded"
-                              sx={{
-                                width: "100%",
-                                height: 150,
-                                objectFit: "contain",
-                              }}
-                            />
-
-                            <Tooltip title="Remove">
-                              <IconButton
-                                size="small"
-                                color="error"
-                                sx={{
-                                  position: "absolute",
-                                  top: 14,
-                                  right: 4,
+                            {isVideo(img.url) ? (
+                              <video
+                                src={img.url}
+                                style={{
+                                  width: "100%",
+                                  height: 150,
+                                  objectFit: "contain",
+                                  borderRadius: 8,
                                 }}
-                                // disabled={isRemoveImageLoading}
-                                onClick={() => handleDeleteImage(img.mediaId)}
-                              >
-                                <Delete fontSize="small" />
-                              </IconButton>
-                            </Tooltip>
-                          </Grid>
-                        ))}
-                        {multiImages
-                          .filter((img) => !isNoUserImage(img.url))
-                          .map((img, index) => (
-                            <Grid
-                              item
-                              xs={6}
-                              sm={4}
-                              md={3}
-                              key={index}
-                              position="relative"
-                            >
+                                controls
+                              />
+                            ) : (
                               <Avatar
                                 src={img.url}
                                 variant="rounded"
@@ -390,30 +380,72 @@ export default function ProfessionalForm({ doctorId }: { doctorId: string }) {
                                   objectFit: "contain",
                                 }}
                               />
-                              <Tooltip title="Remove">
-                                <IconButton
-                                  size="small"
-                                  color="error"
-                                  sx={{
-                                    position: "absolute",
-                                    top: 14,
-                                    right: 4,
-                                  }}
-                                  onClick={() => handleRemoveImage(index)}
-                                >
-                                  <Delete fontSize="small" />
-                                </IconButton>
-                              </Tooltip>
-                            </Grid>
-                          ))}
+                            )}
+                            <Tooltip title="Remove">
+                              <IconButton
+                                size="small"
+                                color="error"
+                                sx={{ position: "absolute", top: 14, right: 4 }}
+                                onClick={() => handleDeleteImage(img.mediaId)}
+                              >
+                                <Delete fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                          </Grid>
+                        ))}
+
+                        {/* New uploads */}
+                        {multiImages.map((img, index) => (
+                          <Grid
+                            item
+                            xs={6}
+                            sm={4}
+                            md={3}
+                            key={index}
+                            position="relative"
+                          >
+                            {isVideo(img.url, img.file) ? (
+                              <video
+                                src={img.url}
+                                style={{
+                                  width: "100%",
+                                  height: 150,
+                                  objectFit: "contain",
+                                  borderRadius: 8,
+                                }}
+                                controls
+                              />
+                            ) : (
+                              <Avatar
+                                src={img.url}
+                                variant="rounded"
+                                sx={{
+                                  width: "100%",
+                                  height: 150,
+                                  objectFit: "contain",
+                                }}
+                              />
+                            )}
+                            <Tooltip title="Remove">
+                              <IconButton
+                                size="small"
+                                color="error"
+                                sx={{ position: "absolute", top: 14, right: 4 }}
+                                onClick={() => handleRemoveImage(index)}
+                              >
+                                <Delete fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                          </Grid>
+                        ))}
                       </Grid>
                       <Box display="flex" justifyContent="center" mt={2}>
                         <Button variant="outlined" component="label">
-                          Upload Multiple Images
+                          Upload Images/Videos
                           <input
                             hidden
                             type="file"
-                            accept="image/*"
+                            accept="image/jpeg,image/png,video/mp4"
                             multiple
                             onChange={handleUploadMultipleImages}
                           />
@@ -700,8 +732,16 @@ export default function ProfessionalForm({ doctorId }: { doctorId: string }) {
                                       />
                                     </Grid>
 
-
-                                    <Grid item xs={12} md={2} sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                    <Grid
+                                      item
+                                      xs={12}
+                                      md={2}
+                                      sx={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                      }}
+                                    >
                                       <IconButton
                                         color="error"
                                         onClick={() => remove(i)}
@@ -718,7 +758,13 @@ export default function ProfessionalForm({ doctorId }: { doctorId: string }) {
                             })}
 
                             {/* Add Button */}
-                            <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
+                            <Box
+                              sx={{
+                                display: "flex",
+                                justifyContent: "center",
+                                mt: 2,
+                              }}
+                            >
                               <IconButton
                                 color="primary"
                                 onClick={() =>

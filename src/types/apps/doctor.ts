@@ -405,9 +405,14 @@ export interface UpdateDoctorProfilePayload {
   generateAvatarUploadUrl: boolean
   generateMediaUploadUrls: boolean
   mediaCount?: number
-  mediaType: string
-  mediaContentType: string
+  // mediaType: string
+  // mediaContentType: string
   qualifications: Qualification[],
+  mediaItems?: MediaItemType[]
+}
+
+export interface MediaItemType {
+  contentType: "image/jpeg"| "video/mp4" | "image/png"
 }
 
 export interface Qualification {

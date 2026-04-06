@@ -50,7 +50,6 @@ const Faq = () => {
   const [isAddEditModal, setIsAddEditModal] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
-  const [inputValue, setInputValue] = useState("");
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
 
@@ -129,7 +128,6 @@ const Faq = () => {
     } finally {
       setIsAddEditModal(false);
       setFaqId("");
-      setInputValue("");
       setEditMode(false);
     }
   };
@@ -172,7 +170,8 @@ const Faq = () => {
           <Button
             onClick={() => {
               setIsAddEditModal(true);
-              setInputValue("");
+              setQuestion("");
+              setAnswer("");
             }}
           >
             Add Faq
