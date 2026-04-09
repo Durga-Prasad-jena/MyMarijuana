@@ -228,10 +228,12 @@ export interface DoctorModel {
   phone: null;
   specialties: string[];
   subscription: SubscriptionModel;
+  status: string
 }
 
 export interface SubscriptionModel {
   planName: string;
+  status:string
 }
 
 //create doctor p[ayload]

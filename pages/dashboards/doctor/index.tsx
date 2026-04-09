@@ -104,7 +104,12 @@ const Doctor = () => {
       { id: "name", label: "Name", sortable: false },
       { id: "emailAddress", label: "Email Address", sortable: false },
       { id: "phoneNumber", label: "Phone Number", sortable: false },
-      { id: "Subscriptions", label: "Subscriptions Plan", sortable: false },
+      { id: "Status", label: "Status", sortable: false },
+      {
+        id: "subscriptionStatus",
+        label: "Subscriptions Status",
+        sortable: false,
+      },
       { id: "actions", label: "Actions" },
     ],
     [],
@@ -235,16 +240,11 @@ const Doctor = () => {
                       <Typography variant="subtitle2">
                         <Chip
                           color={
-                            doctor?.subscription?.planName === "Premium"
+                            doctor?.status === "Active"
                               ? "success"
-                              : doctor?.subscription?.planName ===
-                                  "Super Premium"
-                                ? "primary"
-                                : doctor?.subscription?.planName === "Regular"
-                                  ? "secondary"
-                                  : doctor?.subscription?.planName === "Free"
-                                    ? "info"
-                                    : "warning"
+                              : doctor?.status === "Pending"
+                                ? "secondary"
+                                : "warning"
                           }
                           sx={{
                             borderRadius: "6px",
@@ -252,7 +252,32 @@ const Doctor = () => {
                             fontWeight: "600",
                           }}
                           size="small"
-                          label={doctor?.subscription?.planName}
+                          label={doctor?.status}
+                        />
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      {/* <Tooltip title={""}>
+                        <Typography variant="subtitle2">
+                          {doctor?.subscription?.planName} 
+                        </Typography>
+                      </Tooltip> */}
+                      <Typography variant="subtitle2">
+                        <Chip
+                          color={
+                            doctor?.subscription?.status === "Active"
+                              ? "success"
+                              : doctor?.subscription?.status === "Pending"
+                                ? "secondary"
+                                : "warning"
+                          }
+                          sx={{
+                            borderRadius: "6px",
+                            fontSize: 10,
+                            fontWeight: "600",
+                          }}
+                          size="small"
+                          label={doctor?.subscription?.status}
                         />
                       </Typography>
                     </TableCell>
@@ -284,7 +309,7 @@ const Doctor = () => {
                               )
                             }
                           >
-                            <Edit fontSize="small" /> 
+                            <Edit fontSize="small" />
                           </IconButton>
                         </Tooltip>
                       </Stack>
