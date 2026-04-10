@@ -10,6 +10,8 @@ import Store, { persistor } from "../src/store/Store";
 import RTL from "../src/layouts/theme/full/shared/customizer/RTL";
 import { useSelector } from "../src/store/Store";
 import { AppState } from "../src/store/Store";
+// index.tsx or _app.tsx
+import "leaflet/dist/leaflet.css";
 
 import BlankLayout from "../src/layouts/theme/blank/BlankLayout";
 import FullLayout from "../src/layouts/theme/full/FullLayout";

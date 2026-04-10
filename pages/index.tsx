@@ -10,6 +10,7 @@ import Doctor from "./dashboards/doctor";
 
 
 
+
 interface Props extends React.PropsWithChildren {
   sidebarMenuitems?: MenuitemsType[],
   headerMenuitems?: MenuitemsType[]
