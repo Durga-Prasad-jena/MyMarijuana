@@ -5,6 +5,7 @@ import {
   IconCategory,
   IconLanguage,
   IconHelpCircle,
+  IconPhone,
 } from "@tabler/icons-react";
 
 export interface MenuitemsType {
@@ -99,6 +100,13 @@ const Menuitems: MenuitemsType[] = [
     title: "Faq",
     icon: IconHelpCircle,
     href: "/dashboards/faq",
+    chipColor: "secondary",
+  },
+  {
+    id: uniqueId(),
+    title: "Contact",
+    icon: IconPhone,
+    href: "/dashboards/contact",
     chipColor: "secondary",
   },
 ];

@@ -37,11 +37,16 @@ const Api_Endpoint: Record<string, string> = {
   getAllSubscriptionsApi: "/admin/subscription-plans/",
 
   //faqs
-  getAllFaqApi:"/admin/faqs/",
-  createFaqApi:"/admin/faqs/create",
-  updateFaqApi:"/admin/faqs",
-  deleteFaqApi:"/admin/faqs",
-  faqDetailApi:"/admin/faqs"
+  getAllFaqApi: "/admin/faqs/",
+  createFaqApi: "/admin/faqs/create",
+  updateFaqApi: "/admin/faqs",
+  deleteFaqApi: "/admin/faqs",
+  faqDetailApi: "/admin/faqs",
+
+  //contact
+  getAllContactApi: "/admin/contact/inquiries",
+  contactDetailApi: "/admin/contact/inquiry",
+  deleteContactApi: "/admin/contact/inquiry",
 };
 
 export default Api_Endpoint;
