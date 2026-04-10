@@ -125,7 +125,7 @@ fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComp
       { id: "Status", label: "Status", sortable: false },
       {
         id: "subscriptionStatus",
-        label: "Subscriptions Status",
+        label: "Subscription",
         sortable: false,
       },
       { id: "actions", label: "Actions" },
@@ -270,7 +270,7 @@ fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComp
                             fontWeight: "600",
                           }}
                           size="small"
-                          label={doctor?.status}
+                          label={`${doctor?.status}`}
                         />
                       </Typography>
                     </TableCell>
@@ -295,7 +295,7 @@ fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComp
                             fontWeight: "600",
                           }}
                           size="small"
-                          label={doctor?.subscription?.status}
+                          label={`${doctor?.subscription?.subscriptionPlan?.name}${" "}(${doctor?.subscription?.status})`}
                         />
                       </Typography>
                     </TableCell>

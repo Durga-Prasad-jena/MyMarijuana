@@ -234,6 +234,11 @@ export interface DoctorModel {
 export interface SubscriptionModel {
   planName: string;
   status:string
+  subscriptionPlan: SubscriptionPlanModel
+}
+
+export interface SubscriptionPlanModel{
+  name: string
 }
 
 //create doctor p[ayload]
