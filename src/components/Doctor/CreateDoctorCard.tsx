@@ -23,6 +23,7 @@ import { ApiErrorResponse } from "@/types/api_response_model";
 import { useRouter } from "next/navigation";
 import { useSpecialtiesQuery } from "@/store/endpoints/app/specialities/specialitiesApi";
 import CustomFormLabel from "@/theme-components/forms/CustomFormLabel";
+import MapPicker from "./MapPickerWrapper";
 
 /* ---------------- types ---------------- */
 interface Location {
@@ -32,6 +33,8 @@ interface Location {
   country: string;
   postalCode: string;
   isPrimary: boolean;
+  lat?: number;
+  lng?: number;
 }
 
 interface CreateDoctorPayload {
@@ -45,6 +48,24 @@ interface CreateDoctorPayload {
   subscriptionPlanId: string;
   locations: Location[];
 }
+
+const geocodeAddress = async (address: string) => {
+  try {
+    const res = await fetch(
+      `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
+        address
+      )}&key=${process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY}`
+    );
+    const data = await res.json();
+    if (data.results && data.results.length > 0) {
+      const { lat, lng } = data.results[0].geometry.location;
+      return { lat, lng };
+    }
+  } catch (error) {
+    console.error("Geocoding error:", error);
+  }
+  return null;
+};
 
 const initialValues: CreateDoctorPayload = {
   firstName: "",
@@ -63,6 +84,8 @@ const initialValues: CreateDoctorPayload = {
       country: "US",
       postalCode: "",
       isPrimary: true,
+      lat: 20.2961,
+      lng: 85.8245,
     },
   ],
 };
@@ -107,7 +130,16 @@ export default function CreateDoctorCard() {
         phoneNo: values.phoneNo,
         specialityIds: values.specialityIds || [],
         languageIds: values.languageIds || [],
-        locations: values.locations || [],
+        locations:values.locations.map((item) => ({
+                   street: item.street,
+                   city: item.city,
+                   state: item.state,
+                   country: item.country,
+                   postalCode: item.postalCode,
+                   isPrimary: item.isPrimary,
+                   latitude: item.lat,
+                   longitude: item.lng,
+            })) || [],
         subscriptionPlanId: values.subscriptionPlanId,
       };
       const res = await createDoctor(payload).unwrap();
@@ -340,6 +372,17 @@ export default function CreateDoctorCard() {
                           placeholder="Enter Street"
                           value={loc.street}
                           onChange={handleChange}
+                          onBlur={(e) => {
+                            handleChange(e);
+                            const updatedLoc = { ...loc, street: e.target.value };
+                            const address = `${updatedLoc.street}, ${updatedLoc.city}, ${updatedLoc.state} ${updatedLoc.postalCode}, ${updatedLoc.country}`;
+                            geocodeAddress(address).then((coords) => {
+                              if (coords) {
+                                setFieldValue(`locations.${index}.lat`, coords.lat);
+                                setFieldValue(`locations.${index}.lng`, coords.lng);
+                              }
+                            });
+                          }}
                           fullWidth
                           error={Boolean(
                             locationTouched.street && locationError.street,
@@ -357,6 +400,17 @@ export default function CreateDoctorCard() {
                           placeholder="Enter City"
                           value={loc.city}
                           onChange={handleChange}
+                          onBlur={(e) => {
+                            handleChange(e);
+                            const updatedLoc = { ...loc, city: e.target.value };
+                            const address = `${updatedLoc.street}, ${updatedLoc.city}, ${updatedLoc.state} ${updatedLoc.postalCode}, ${updatedLoc.country}`;
+                            geocodeAddress(address).then((coords) => {
+                              if (coords) {
+                                setFieldValue(`locations.${index}.lat`, coords.lat);
+                                setFieldValue(`locations.${index}.lng`, coords.lng);
+                              }
+                            });
+                          }}
                           fullWidth
                           error={Boolean(
                             locationTouched.city && locationError.city,
@@ -374,6 +428,17 @@ export default function CreateDoctorCard() {
                           placeholder="Enter State"
                           value={loc.state}
                           onChange={handleChange}
+                          onBlur={(e) => {
+                            handleChange(e);
+                            const updatedLoc = { ...loc, state: e.target.value };
+                            const address = `${updatedLoc.street}, ${updatedLoc.city}, ${updatedLoc.state} ${updatedLoc.postalCode}, ${updatedLoc.country}`;
+                            geocodeAddress(address).then((coords) => {
+                              if (coords) {
+                                setFieldValue(`locations.${index}.lat`, coords.lat);
+                                setFieldValue(`locations.${index}.lng`, coords.lng);
+                              }
+                            });
+                          }}
                           fullWidth
                           error={Boolean(
                             locationTouched.state && locationError.state,
@@ -391,6 +456,17 @@ export default function CreateDoctorCard() {
                           placeholder="Enter Postal Code"
                           value={loc.postalCode}
                           onChange={handleChange}
+                          onBlur={(e) => {
+                            handleChange(e);
+                            const updatedLoc = { ...loc, postalCode: e.target.value };
+                            const address = `${updatedLoc.street}, ${updatedLoc.city}, ${updatedLoc.state} ${updatedLoc.postalCode}, ${updatedLoc.country}`;
+                            geocodeAddress(address).then((coords) => {
+                              if (coords) {
+                                setFieldValue(`locations.${index}.lat`, coords.lat);
+                                setFieldValue(`locations.${index}.lng`, coords.lng);
+                              }
+                            });
+                          }}
                           fullWidth
                           error={Boolean(
                             locationTouched.postalCode &&
@@ -410,7 +486,17 @@ export default function CreateDoctorCard() {
                           // label="Country"
                           placeholder="Select Country"
                           value={loc.country}
-                          onChange={handleChange}
+                          onChange={(e) => {
+                            handleChange(e);
+                            const updatedLoc = { ...loc, country: e.target.value };
+                            const address = `${updatedLoc.street}, ${updatedLoc.city}, ${updatedLoc.state} ${updatedLoc.postalCode}, ${updatedLoc.country}`;
+                            geocodeAddress(address).then((coords) => {
+                              if (coords) {
+                                setFieldValue(`locations.${index}.lat`, coords.lat);
+                                setFieldValue(`locations.${index}.lng`, coords.lng);
+                              }
+                            });
+                          }}
                           fullWidth
                           error={Boolean(
                             locationTouched.country && locationError.country,
@@ -420,6 +506,7 @@ export default function CreateDoctorCard() {
                           }
                         >
                           <MenuItem value="US">United States</MenuItem>
+                          <MenuItem value="india">India</MenuItem>
                         </TextField>
                       </Grid>
                       <Grid item xs={12}>
@@ -439,6 +526,12 @@ export default function CreateDoctorCard() {
                           label="Primary Location"
                         />
                       </Grid>
+                      <MapPicker
+                        location={loc}
+                        onChange={(newLoc: any) =>
+                          setFieldValue(`locations.${index}`, { ...loc, ...newLoc })
+                        }
+                      />
                     </React.Fragment>
                   );
                 })}

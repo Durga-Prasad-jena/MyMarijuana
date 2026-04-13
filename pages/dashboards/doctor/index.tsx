@@ -47,23 +47,23 @@ const Doctor = () => {
 
   const router = useRouter();
 
-  useEffect(()=>{
-    const address = "Itamati, Nayagarh, India";
-const apiKey = process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY; // replace with your Google API key
+//   useEffect(()=>{
+//     const address = "Itamati, Nayagarh, India";
+// const apiKey = process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY; // replace with your Google API key
 
-fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}`)
-  .then(response => response.json())
-  .then(data => {
-    if (data.status === "OK" && data.results.length > 0) {
-      const location = data.results[0].geometry.location;
-      console.log("Latitude:", location.lat);
-      console.log("Longitude:", location.lng);
-    } else {
-      console.error("Geocoding error:", data.status, data.error_message);
-    }
-  })
-  .catch(err => console.error("Fetch error:", err));
-  },[])
+// fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}`)
+//   .then(response => response.json())
+//   .then(data => {
+//     if (data.status === "OK" && data.results.length > 0) {
+//       const location = data.results[0].geometry.location;
+//       console.log("Latitude:", location.lat);
+//       console.log("Longitude:", location.lng);
+//     } else {
+//       console.error("Geocoding error:", data.status, data.error_message);
+//     }
+//   })
+//   .catch(err => console.error("Fetch error:", err));
+//   },[])
 
   /*  ------------set query args ----------*/
   // const queryArgs: CommissionTransactionsQueryParams = {
