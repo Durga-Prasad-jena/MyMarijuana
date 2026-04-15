@@ -33,67 +33,31 @@ import PageContainer from "@/theme-components/container/PageContainer";
 import RefreshButton from "@/components/RefreshButton";
 import { TextFields } from "@mui/icons-material";
 import { useGetAllDoctorQuery } from "@/store/endpoints/doctor/doctorApi";
+import { useDebounce } from "@/components/useDebounse";
 const Doctor = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(constants.SIZE);
   const [orderBy, setOrderBy] = useState("");
   const [orderDirection, setOrderDirection] = useState<"asc" | "desc">("desc");
+  const [textInput, setTextInput] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("");
+
+  const debouncedKeyword = useDebounce(textInput, 400);
 
   const { data: doctorsData, isLoading: isDoctorsLoading } =
     useGetAllDoctorQuery({
       page: page + 1,
       limit: rowsPerPage,
+      keyword: debouncedKeyword || "",
+       ...(selectedStatus && { subscriptionPlan: selectedStatus })
     });
 
   const router = useRouter();
 
-//   useEffect(()=>{
-//     const address = "Itamati, Nayagarh, India";
-// const apiKey = process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY; // replace with your Google API key
-
-// fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}`)
-//   .then(response => response.json())
-//   .then(data => {
-//     if (data.status === "OK" && data.results.length > 0) {
-//       const location = data.results[0].geometry.location;
-//       console.log("Latitude:", location.lat);
-//       console.log("Longitude:", location.lng);
-//     } else {
-//       console.error("Geocoding error:", data.status, data.error_message);
-//     }
-//   })
-//   .catch(err => console.error("Fetch error:", err));
-//   },[])
-
-  /*  ------------set query args ----------*/
-  // const queryArgs: CommissionTransactionsQueryParams = {
-  //   page: page + 1,
-  //   size: rowsPerPage,
-  // };
-
-  // if (customRange.start) {
-  //   queryArgs.startDate = customRange.start.format("YYYY-MM-DD");
-  // }
-  // if (customRange.end) {
-  //   queryArgs.endDate = customRange.end.format("YYYY-MM-DD");
-  // }
-
-  /*  ------------api call ----------*/
-  // const { data: transactionCommissions, isLoading: isOrderLoading } =
-  //   useCommissionTransactionsQuery(queryArgs);
-
-  // useEffect(() => {
-  //   if (selectedDate === "custom") {
-  //     setCustomRange({
-  //       start: startDate ? dayjs(startDate) : null,
-  //       end: endDate ? dayjs(endDate) : null,
-  //     });
-  //   }
-  // }, [startDate, endDate, selectedDate]);
-
   const handleFilter = () => {
     setPage(0);
     setRowsPerPage(10);
+    setSelectedStatus("")
   };
 
   /*  ------------pagination page change ----------*/
@@ -115,6 +79,17 @@ const Doctor = () => {
     setOrderBy(column);
   };
 
+  const handleSearch = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    setTextInput(e.target.value);
+  };
+
+  //select dropdown function
+  const handleStatusFilter = (e: SelectChangeEvent<string>) => {
+    setSelectedStatus(e.target.value);
+  };
+
   /*  ------------table header ----------*/
   const columns = useMemo(
     () => [
@@ -126,7 +101,7 @@ const Doctor = () => {
       {
         id: "subscriptionStatus",
         label: "Subscription",
-        sortable: false,
+        sortable: true,
       },
       { id: "actions", label: "Actions" },
     ],
@@ -162,8 +137,8 @@ const Doctor = () => {
             <TextField
               placeholder="Search Doctor here..."
               sx={{ width: 350 }}
-              // onChange={handleSearch}
-              // value={textInput}
+              onChange={handleSearch}
+              value={textInput}
               InputProps={{
                 sx: {
                   height: 35,
@@ -175,6 +150,24 @@ const Doctor = () => {
                 },
               }}
             />
+            <Box sx={{ minWidth: { xs: "100%", sm: 120 } }}>
+              <FormControl fullWidth>
+                <InputLabel id="demo-simple-select-label">Status</InputLabel>
+                <Select
+                  label="Status"
+                  fullWidth
+                  value={selectedStatus}
+                  size="small"
+                  onChange={handleStatusFilter}
+                >
+                  <MenuItem value={""}>All</MenuItem>
+                  <MenuItem value={"Super Premium"}>Super Premium</MenuItem>
+                  <MenuItem value={"Premium"}>Premium</MenuItem>
+                  <MenuItem value={"Regular"}>Regular</MenuItem>
+                  <MenuItem value={"Free"}>Free</MenuItem>
+                </Select>
+              </FormControl>
+            </Box>
             <RefreshButton onClick={handleFilter} />
           </Stack>
           <Button

@@ -290,9 +290,11 @@ const Languages = () => {
                   }}
                 >
                   {/* LEFT SIDE */}
-                  <Typography variant="body2" color="text.secondary">
+                 {totalCount! > 0 && (
+                   <Typography variant="body2" color="text.secondary">
                     Total: {totalCount || 0} items
                   </Typography>
+                 )}
 
                   {/* RIGHT SIDE */}
                   {totalPages > 1 && (

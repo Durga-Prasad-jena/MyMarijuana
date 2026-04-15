@@ -24,14 +24,15 @@ const doctorApi = baseApi.injectEndpoints({
     }),
     getAllDoctor: builder.query<
       DoctorApiResponseModel,
-      { page?: number; limit?: number; keyword?: string }
+      { page?: number; limit?: number; keyword?: string,subscriptionPlan?: string }
     >({
-      query: ({ page, keyword, limit }) => ({
+      query: ({ page, keyword, limit,subscriptionPlan }) => ({
         url: Api_Endpoint.doctorListingApi,
         params: {
           page,
           limit,
           keyword,
+          subscriptionPlan
         },
       }),
       providesTags: ["Doctor"],

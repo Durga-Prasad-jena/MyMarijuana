@@ -317,9 +317,11 @@ const Faq = () => {
                   }}
                 >
                   {/* LEFT SIDE */}
-                  <Typography variant="body2" color="text.secondary">
-                    {/* Total: {totalCount || 0} items */}
+                {totalCount! > 0 && (
+                    <Typography variant="body2" color="text.secondary">
+                    Total: {totalCount || 0} items
                   </Typography>
+                )}
 
                   {/* RIGHT SIDE */}
                   {totalPages > 1 && (
