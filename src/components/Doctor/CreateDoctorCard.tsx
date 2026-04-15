@@ -12,6 +12,9 @@ import {
   Autocomplete,
   Chip,
   MenuItem,
+  FormControl,
+  Select,
+  FormHelperText,
 } from "@mui/material";
 import { Formik, Form, FormikErrors } from "formik";
 import notify from "@/utils/toast";
@@ -24,6 +27,7 @@ import { useRouter } from "next/navigation";
 import { useSpecialtiesQuery } from "@/store/endpoints/app/specialities/specialitiesApi";
 import CustomFormLabel from "@/theme-components/forms/CustomFormLabel";
 import MapPicker from "./MapPickerWrapper";
+import { US_STATES } from "@/layouts/theme/full/vertical/header/data";
 
 /* ---------------- types ---------------- */
 interface Location {
@@ -53,8 +57,8 @@ const geocodeAddress = async (address: string) => {
   try {
     const res = await fetch(
       `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
-        address
-      )}&key=${process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY}`
+        address,
+      )}&key=${process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY}`,
     );
     const data = await res.json();
     if (data.results && data.results.length > 0) {
@@ -84,14 +88,15 @@ const initialValues: CreateDoctorPayload = {
       country: "US",
       postalCode: "",
       isPrimary: true,
-      lat: 20.2961,
-      lng: 85.8245,
+      lat: undefined,
+      lng: undefined,
     },
   ],
 };
 
 export default function CreateDoctorCard() {
-  const [formInitialValues, setFormInitialValues] = useState<CreateDoctorPayload>(initialValues);
+  const [formInitialValues, setFormInitialValues] =
+    useState<CreateDoctorPayload>(initialValues);
   const [createDoctor, { isLoading: isCreateDoctorLoading }] =
     useCreateDoctorMutation();
   const { data: specialitiesData } = useSpecialtiesQuery({
@@ -100,7 +105,7 @@ export default function CreateDoctorCard() {
   });
   const { data: languageData } = useLanguagesDataQuery({ page: 1, limit: 100 });
   const { data: subscriptionsData } = useAllSubscriptionsQuery();
-  console.log('subscriptionsData', subscriptionsData)
+  console.log("subscriptionsData", subscriptionsData);
 
   const router = useRouter();
 
@@ -108,7 +113,7 @@ export default function CreateDoctorCard() {
   useEffect(() => {
     if (subscriptionsData?.data && subscriptionsData.data.length > 0) {
       const regularPlan = subscriptionsData.data.find(
-        (plan) => plan.name.toLowerCase() === "regular"
+        (plan) => plan.name.toLowerCase() === "regular",
       );
       if (regularPlan) {
         setFormInitialValues((prev) => ({
@@ -130,16 +135,17 @@ export default function CreateDoctorCard() {
         phoneNo: values.phoneNo,
         specialityIds: values.specialityIds || [],
         languageIds: values.languageIds || [],
-        locations:values.locations.map((item) => ({
-                   street: item.street,
-                   city: item.city,
-                   state: item.state,
-                   country: item.country,
-                   postalCode: item.postalCode,
-                   isPrimary: item.isPrimary,
-                   latitude: item.lat,
-                   longitude: item.lng,
-            })) || [],
+        locations:
+          values.locations.map((item) => ({
+            street: item.street,
+            city: item.city,
+            state: item.state,
+            country: item.country,
+            postalCode: item.postalCode,
+            isPrimary: item.isPrimary,
+            latitude: item.lat,
+            longitude: item.lng,
+          })) || [],
         subscriptionPlanId: values.subscriptionPlanId,
       };
       const res = await createDoctor(payload).unwrap();
@@ -374,12 +380,21 @@ export default function CreateDoctorCard() {
                           onChange={handleChange}
                           onBlur={(e) => {
                             handleChange(e);
-                            const updatedLoc = { ...loc, street: e.target.value };
-                            const address = `${updatedLoc.street}, ${updatedLoc.city}, ${updatedLoc.state} ${updatedLoc.postalCode}, ${updatedLoc.country}`;
+                            const updatedLoc = {
+                              ...loc,
+                              street: e.target.value,
+                            };
+                            const address = `${updatedLoc.street}, ${updatedLoc.city}, ${updatedLoc.state} ${updatedLoc.postalCode}, ${updatedLoc.country || "US"}`;
                             geocodeAddress(address).then((coords) => {
                               if (coords) {
-                                setFieldValue(`locations.${index}.lat`, coords.lat);
-                                setFieldValue(`locations.${index}.lng`, coords.lng);
+                                setFieldValue(
+                                  `locations.${index}.lat`,
+                                  coords.lat,
+                                );
+                                setFieldValue(
+                                  `locations.${index}.lng`,
+                                  coords.lng,
+                                );
                               }
                             });
                           }}
@@ -403,11 +418,17 @@ export default function CreateDoctorCard() {
                           onBlur={(e) => {
                             handleChange(e);
                             const updatedLoc = { ...loc, city: e.target.value };
-                            const address = `${updatedLoc.street}, ${updatedLoc.city}, ${updatedLoc.state} ${updatedLoc.postalCode}, ${updatedLoc.country}`;
+                            const address = `${updatedLoc.street}, ${updatedLoc.city}, ${updatedLoc.state} ${updatedLoc.postalCode}, ${updatedLoc.country || "US"}`;
                             geocodeAddress(address).then((coords) => {
                               if (coords) {
-                                setFieldValue(`locations.${index}.lat`, coords.lat);
-                                setFieldValue(`locations.${index}.lng`, coords.lng);
+                                setFieldValue(
+                                  `locations.${index}.lat`,
+                                  coords.lat,
+                                );
+                                setFieldValue(
+                                  `locations.${index}.lng`,
+                                  coords.lng,
+                                );
                               }
                             });
                           }}
@@ -420,7 +441,8 @@ export default function CreateDoctorCard() {
                           }
                         />
                       </Grid>
-                      <Grid item xs={6}>
+
+                      {/* <Grid item xs={6}>
                         <CustomFormLabel>State</CustomFormLabel>
                         <TextField
                           name={`locations.${index}.state`}
@@ -447,6 +469,58 @@ export default function CreateDoctorCard() {
                             locationTouched.state && locationError.state
                           }
                         />
+                      </Grid> */}
+                      <Grid item xs={6}>
+                        <CustomFormLabel>State</CustomFormLabel>
+
+                        <FormControl
+                          fullWidth
+                          error={Boolean(
+                            locationTouched.state && locationError.state,
+                          )}
+                        >
+                          <Select
+                            name={`locations.${index}.state`}
+                            value={loc.state || ""}
+                            displayEmpty
+                            onChange={(e) => {
+                              handleChange(e);
+
+                              const updatedLoc = {
+                                ...loc,
+                                state: e.target.value,
+                              };
+                              const address = `${updatedLoc.street}, ${updatedLoc.city}, ${updatedLoc.state} ${updatedLoc.postalCode}, ${updatedLoc.country || "US"}`;
+
+                              geocodeAddress(address).then((coords) => {
+                                if (coords) {
+                                  setFieldValue(
+                                    `locations.${index}.lat`,
+                                    coords.lat,
+                                  );
+                                  setFieldValue(
+                                    `locations.${index}.lng`,
+                                    coords.lng,
+                                  );
+                                }
+                              });
+                            }}
+                          >
+                            <MenuItem value="">
+                              <em>Select State</em>
+                            </MenuItem>
+
+                            {US_STATES.map((state) => (
+                              <MenuItem key={state} value={state}>
+                                {state}
+                              </MenuItem>
+                            ))}
+                          </Select>
+
+                          <FormHelperText>
+                            {locationTouched.state && locationError.state}
+                          </FormHelperText>
+                        </FormControl>
                       </Grid>
                       <Grid item xs={6}>
                         <CustomFormLabel>Postal Code</CustomFormLabel>
@@ -458,12 +532,21 @@ export default function CreateDoctorCard() {
                           onChange={handleChange}
                           onBlur={(e) => {
                             handleChange(e);
-                            const updatedLoc = { ...loc, postalCode: e.target.value };
-                            const address = `${updatedLoc.street}, ${updatedLoc.city}, ${updatedLoc.state} ${updatedLoc.postalCode}, ${updatedLoc.country}`;
+                            const updatedLoc = {
+                              ...loc,
+                              postalCode: e.target.value,
+                            };
+                            const address = `${updatedLoc.street}, ${updatedLoc.city}, ${updatedLoc.state} ${updatedLoc.postalCode}, ${updatedLoc.country || "US"}`;
                             geocodeAddress(address).then((coords) => {
                               if (coords) {
-                                setFieldValue(`locations.${index}.lat`, coords.lat);
-                                setFieldValue(`locations.${index}.lng`, coords.lng);
+                                setFieldValue(
+                                  `locations.${index}.lat`,
+                                  coords.lat,
+                                );
+                                setFieldValue(
+                                  `locations.${index}.lng`,
+                                  coords.lng,
+                                );
                               }
                             });
                           }}
@@ -480,34 +563,63 @@ export default function CreateDoctorCard() {
                       </Grid>
                       <Grid item xs={6}>
                         <CustomFormLabel>Country</CustomFormLabel>
-                        <TextField
-                          select
-                          name={`locations.${index}.country`}
-                          // label="Country"
-                          placeholder="Select Country"
-                          value={loc.country}
-                          onChange={(e) => {
-                            handleChange(e);
-                            const updatedLoc = { ...loc, country: e.target.value };
-                            const address = `${updatedLoc.street}, ${updatedLoc.city}, ${updatedLoc.state} ${updatedLoc.postalCode}, ${updatedLoc.country}`;
-                            geocodeAddress(address).then((coords) => {
-                              if (coords) {
-                                setFieldValue(`locations.${index}.lat`, coords.lat);
-                                setFieldValue(`locations.${index}.lng`, coords.lng);
-                              }
-                            });
-                          }}
+
+                        <FormControl
                           fullWidth
                           error={Boolean(
                             locationTouched.country && locationError.country,
                           )}
-                          helperText={
-                            locationTouched.country && locationError.country
-                          }
                         >
-                          <MenuItem value="US">United States</MenuItem>
-                          <MenuItem value="india">India</MenuItem>
-                        </TextField>
+                          <Select
+                            name={`locations.${index}.country`}
+                            value={loc.country || ""}
+                            displayEmpty
+                            onChange={(e) => {
+                              handleChange(e);
+
+                              const country = e.target.value;
+
+                              const updatedLoc = {
+                                ...loc,
+                                country,
+                              };
+
+                              //  only geocode if required fields exist
+                              if (
+                                updatedLoc.street &&
+                                updatedLoc.city &&
+                                updatedLoc.state &&
+                                updatedLoc.postalCode &&
+                                country
+                              ) {
+                                const address = `${updatedLoc.street}, ${updatedLoc.city}, ${updatedLoc.state} ${updatedLoc.postalCode}, ${country || "US"}`;
+
+                                geocodeAddress(address).then((coords) => {
+                                  if (coords) {
+                                    setFieldValue(
+                                      `locations.${index}.lat`,
+                                      coords.lat,
+                                    );
+                                    setFieldValue(
+                                      `locations.${index}.lng`,
+                                      coords.lng,
+                                    );
+                                  }
+                                });
+                              }
+                            }}
+                          >
+                            <MenuItem value="">
+                              <em>Select Country</em>
+                            </MenuItem>
+
+                            <MenuItem value="US">United States</MenuItem>
+                          </Select>
+
+                          <FormHelperText>
+                            {locationTouched.country && locationError.country}
+                          </FormHelperText>
+                        </FormControl>
                       </Grid>
                       <Grid item xs={12}>
                         <FormControlLabel
@@ -529,7 +641,10 @@ export default function CreateDoctorCard() {
                       <MapPicker
                         location={loc}
                         onChange={(newLoc: any) =>
-                          setFieldValue(`locations.${index}`, { ...loc, ...newLoc })
+                          setFieldValue(`locations.${index}`, {
+                            ...loc,
+                            ...newLoc,
+                          })
                         }
                       />
                     </React.Fragment>

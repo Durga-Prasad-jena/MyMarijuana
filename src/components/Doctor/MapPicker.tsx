@@ -14,8 +14,8 @@ export default function MapPicker({ location, onChange }: any) {
   });
 
   const [position, setPosition] = useState({
-    lat: location?.lat || 20.2961,
-    lng: location?.lng || 85.8245,
+    lat: location?.lat || 40.2767864802915,
+    lng: location?.lng || -99.80508851970849,
   });
 
   useEffect(() => {
@@ -33,7 +33,7 @@ export default function MapPicker({ location, onChange }: any) {
     setPosition({ lat, lng });
 
     const res = await fetch(
-      `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAP_KEY}`
+      `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY}`
     );
 
     const data = await res.json();
@@ -47,7 +47,7 @@ export default function MapPicker({ location, onChange }: any) {
       lng,
       city: get("locality"),
       state: get("administrative_area_level_1"),
-      country: get("country"),
+      // country: get("country"),
       postalCode: get("postal_code"),
       street: data.results?.[0]?.formatted_address || "",
     });
@@ -56,7 +56,7 @@ export default function MapPicker({ location, onChange }: any) {
   if (!isLoaded) return <p>Loading Map...</p>;
 
   return (
-    <GoogleMap mapContainerStyle={containerStyle} center={position} zoom={12}>
+    <GoogleMap mapContainerStyle={containerStyle} center={position} zoom={6}>
       <Marker position={position} draggable onDragEnd={handleDragEnd} />
     </GoogleMap>
   );
