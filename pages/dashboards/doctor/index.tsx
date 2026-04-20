@@ -279,7 +279,7 @@ const Doctor = () => {
                             doctor?.subscription?.status === "Active"
                               ? "success"
                               : doctor?.subscription?.status === "Pending"
-                                ? "secondary"
+                                ? "error"
                                 : "warning"
                           }
                           sx={{
