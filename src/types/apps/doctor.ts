@@ -367,7 +367,7 @@ export interface Location {
 }
 
 export interface ActiveSubscription {
-  planName: string
+  subscriptionPlanName: string
   planPrice: string
   startDate: string
   endDate: string
