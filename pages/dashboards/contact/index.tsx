@@ -192,7 +192,6 @@ const Contact = () => {
 
                   {/* Question */}
                   <TableCell>
-                    <Tooltip title={item?.email}>
                       <Typography
                         fontWeight={500}
                         noWrap
@@ -203,11 +202,10 @@ const Contact = () => {
                       >
                         {capitalize(item?.phoneNumber)}
                       </Typography>
-                    </Tooltip>
                   </TableCell>
 
                   <TableCell>
-                    <Tooltip title={item?.email}>
+                    <Tooltip title={item?.subject}>
                       <Typography
                         fontWeight={500}
                         noWrap
@@ -242,7 +240,7 @@ const Contact = () => {
                         <IconButton
                           size="small"
                           onClick={() => {
-                            setIsOpenModal(true);
+                            setIsOpenModal(true)
                             setInquiryId(item.inquiryId);
                           }}
                         >
