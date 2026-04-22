@@ -27,14 +27,22 @@ import Select, { SelectChangeEvent } from "@mui/material/Select";
 import { useRouter } from "next/router";
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
 import { Edit } from "@mui/icons-material";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 import constants from "@/utils/constants";
 import PageContainer from "@/theme-components/container/PageContainer";
 import RefreshButton from "@/components/RefreshButton";
-import { TextFields } from "@mui/icons-material";
-import { useGetAllDoctorQuery } from "@/store/endpoints/doctor/doctorApi";
+import {
+  useDeleteDoctorMutation,
+  useGetAllDoctorQuery,
+} from "@/store/endpoints/doctor/doctorApi";
 import { useDebounce } from "@/components/useDebounse";
+import ConfirmModal from "@/components/modal/ConfirmModal";
+import notify from "@/utils/toast";
+import { ApiErrorResponse } from "@/types/api_response_model";
 const Doctor = () => {
+  const [isOpenModal, setIsOpenModal] = useState(false);
+  const [doctorId, setDoctorId] = useState("");
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(constants.SIZE);
   const [orderBy, setOrderBy] = useState("");
@@ -44,12 +52,15 @@ const Doctor = () => {
 
   const debouncedKeyword = useDebounce(textInput, 400);
 
+  const [deleteDoctor, { isLoading: isDeleteDoctorLoading }] =
+    useDeleteDoctorMutation();
+
   const { data: doctorsData, isLoading: isDoctorsLoading } =
     useGetAllDoctorQuery({
       page: page + 1,
       limit: rowsPerPage,
       keyword: debouncedKeyword || "",
-       ...(selectedStatus && { subscriptionPlan: selectedStatus })
+      ...(selectedStatus && { subscriptionPlan: selectedStatus }),
     });
 
   const router = useRouter();
@@ -57,7 +68,7 @@ const Doctor = () => {
   const handleFilter = () => {
     setPage(0);
     setRowsPerPage(10);
-    setSelectedStatus("")
+    setSelectedStatus("");
   };
 
   /*  ------------pagination page change ----------*/
@@ -107,6 +118,17 @@ const Doctor = () => {
     ],
     [],
   );
+
+  const handleDeleteDoctor = async (): Promise<void> => {
+    try {
+      const res = await deleteDoctor({ doctorId }).unwrap();
+      notify(res?.message, "success");
+    } catch (error) {
+      notify((error as ApiErrorResponse)?.data?.message, "error");
+    } finally {
+      setIsOpenModal(false);
+    }
+  };
 
   const totalCount = doctorsData?.pagination?.totalItems;
   console.log("totalCount", totalCount);
@@ -323,6 +345,17 @@ const Doctor = () => {
                             <Edit fontSize="small" />
                           </IconButton>
                         </Tooltip>
+                        <Tooltip title="Delete">
+                          <IconButton
+                            size="small"
+                            onClick={() => {
+                              setIsOpenModal(true);
+                              setDoctorId(doctor.doctorId);
+                            }}
+                          >
+                            <DeleteIcon fontSize="small" color="error" />
+                          </IconButton>
+                        </Tooltip>
                       </Stack>
                     </TableCell>
                   </TableRow>
@@ -367,6 +400,16 @@ const Doctor = () => {
           )}
         </Table>
       </TableContainer>
+
+      {isOpenModal && (
+        <ConfirmModal
+          open={isOpenModal}
+          handleClose={() => setIsOpenModal(false)}
+          handleConfirm={handleDeleteDoctor}
+          label={`Are you sure you want to delete this doctor?`}
+          isDisableLoading={isDeleteDoctorLoading}
+        />
+      )}
     </PageContainer>
   );
 };

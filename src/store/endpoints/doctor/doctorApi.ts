@@ -62,6 +62,13 @@ const doctorApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Doctor"],
     }),
+    deleteDoctor: builder.mutation<SuccessApiResponse,{doctorId:string}>({
+      query: ({doctorId}) =>({
+        url: `${Api_Endpoint.deleteDoctorApi}/${doctorId}`,
+        method:"DELETE"
+      }),
+      invalidatesTags:["Doctor"]
+    })
   }),
 });
 
@@ -71,4 +78,5 @@ export const {
   useDoctorDetailByIdQuery,
   useUpdateProfileMutation,
   useRemoveMultipleImageMutation,
+  useDeleteDoctorMutation
 } = doctorApi;
