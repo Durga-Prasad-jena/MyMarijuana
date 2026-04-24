@@ -42,7 +42,7 @@ const doctorApi = baseApi.injectEndpoints({
         url: `${Api_Endpoint.doctorDetailAPi}/${id}`,
         method: "GET",
       }),
-      providesTags: ["Doctor"],
+      // providesTags: ["Doctor"],
     }),
     updateProfile: builder.mutation<
       updateDoctorProfileResponse,

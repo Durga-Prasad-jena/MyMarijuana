@@ -74,6 +74,7 @@ const validationSchema = Yup.object({
 export default function ProfessionalForm({ doctorId }: { doctorId: string }) {
   const [preview, setPreview] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [uploadImageURL, setUploadImageURL] = useState<string | null>(null);
   const [multiImages, setMultiImages] = useState<{ file: File; url: string }[]>(
     [],
   );
@@ -147,7 +148,7 @@ export default function ProfessionalForm({ doctorId }: { doctorId: string }) {
   useEffect(() => {
     if (!preview) return;
     const url = URL.createObjectURL(preview);
-    setPreviewUrl(url);
+    setUploadImageURL(url);
     return () => URL.revokeObjectURL(url);
   }, [preview]);
 
@@ -346,7 +347,26 @@ export default function ProfessionalForm({ doctorId }: { doctorId: string }) {
                             flexDirection="column"
                             alignItems="center"
                           >
-                            {previewUrl ? (
+                            {uploadImageURL ? (
+                              <Avatar
+                                src={uploadImageURL}
+                                alt="Profile"
+                                sx={{ width: 120, height: 120, mb: 2 }}
+                              />
+                            ) : previewUrl ? (
+                              <Avatar
+                                src={previewUrl}
+                                alt="Profile"
+                                sx={{ width: 120, height: 120, mb: 2 }}
+                              />
+                            ) : (
+                              <Avatar
+                                src={ "/images/profile/no_user_image.webp"}
+                                alt="Profile"
+                                sx={{ width: 120, height: 120, mb: 2 }}
+                              />
+                            )}
+                            {/* {previewUrl ? (
                               isVideo(previewUrl, preview!) ? (
                                 <video
                                   src={previewUrl}
@@ -366,7 +386,7 @@ export default function ProfessionalForm({ doctorId }: { doctorId: string }) {
                                 />
                               )
                             ) : // <Avatar sx={{ width: 120, height: 120, mb: 2 }} />
-                            null}
+                            null} */}
                             <Button
                               variant="contained"
                               color="primary"
