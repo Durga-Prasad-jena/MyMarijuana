@@ -37,10 +37,13 @@ export default function MapPicker({ location, onChange }: any) {
     );
 
     const data = await res.json();
+    console.log('data', data)
     const components = data.results?.[0]?.address_components;
 
     const get = (type: string) =>
       components?.find((c: any) => c.types.includes(type))?.long_name || "";
+
+    const  street = data.results?.[0]?.formatted_address.split(",")
 
     onChange({
       lat,
@@ -49,7 +52,7 @@ export default function MapPicker({ location, onChange }: any) {
       state: get("administrative_area_level_1"),
       // country: get("country"),
       postalCode: get("postal_code"),
-      street: data.results?.[0]?.formatted_address || "",
+      street: street[0] || "",
     });
   };
 

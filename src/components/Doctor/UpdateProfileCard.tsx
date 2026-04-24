@@ -45,12 +45,15 @@ const validationSchema = Yup.object({
     .required("Experience is required")
     .min(0, "Experience cannot be negative"),
   professionalTitle: Yup.string().required("Professional Title is required"),
-  websiteUrl: Yup.string().url("Enter a valid URL").nullable(),
+  websiteUrl: Yup.string().matches(
+    /^(https?:\/\/)?([\w-]+\.)+[\w-]{2,}(\/\S*)?$/,
+    "Enter a valid URL",
+  ),
 
   licenseNumber: Yup.string().required("License Number is required"),
   licenseType: Yup.string().required("License Type is required"),
   licenseState: Yup.string().required("License State is required"),
-  licenseVerified: Yup.boolean(),
+  // licenseVerified: Yup.boolean(),
 
   qualifications: Yup.array()
     .of(
@@ -95,7 +98,7 @@ export default function ProfessionalForm({ doctorId }: { doctorId: string }) {
       licenseNumber: doctorDetail?.licenseNumber || "",
       licenseType: doctorDetail?.licenseType || "",
       licenseState: doctorDetail?.licenseState || "",
-      licenseVerified: doctorDetail?.licenseVerified || false,
+      licenseVerified: true,
       acceptingNewClients: doctorDetail?.acceptingInPersonClients || false,
       websiteUrl: doctorDetail?.websiteUrl || "",
 
@@ -203,19 +206,12 @@ export default function ProfessionalForm({ doctorId }: { doctorId: string }) {
         licenseNumber: v.licenseNumber,
         licenseType: v.licenseType,
         licenseState: v.licenseState,
-        licenseVerified: v.licenseVerified,
+        licenseVerified: true,
         verifiedBy: "Marijuana Doctor",
         acceptingNewClients: v.acceptingNewClients,
         websiteUrl: v.websiteUrl,
         generateAvatarUploadUrl: !!preview,
         generateMediaUploadUrls: multiImages.length > 0,
-
-        // mediaItems: multiImages.map((item) => ({
-        //   contentType: item.file.type as
-        //     | "image/jpeg"
-        //     | "image/png"
-        //     | "video/mp4",
-        // })),
         qualifications: v.qualifications.map((q, index) => ({
           degree: q.degree,
           institution: q.institution,
@@ -287,537 +283,594 @@ export default function ProfessionalForm({ doctorId }: { doctorId: string }) {
           enableReinitialize
           validationSchema={validationSchema}
         >
-          {({ values, handleChange, setFieldValue, errors, touched }) => (
-            <Form>
-              <Grid container spacing={3}>
-                {/* Profile & Gallery */}
-                <Grid item xs={12} md={12} lg={12}>
-                  <Stack spacing={4}>
-                    {/* Profile Avatar */}
-                    <Card sx={{ p: 3 }}>
-                      <CardContent>
-                        <Typography variant="h6" mb={2} textAlign="center">
-                          Profile Image
-                        </Typography>
-                        <Box
-                          display="flex"
-                          flexDirection="column"
-                          alignItems="center"
-                        >
-                          {previewUrl ? (
-                            isVideo(previewUrl, preview!) ? (
-                              <video
-                                src={previewUrl}
-                                style={{
-                                  width: 120,
-                                  height: 120,
-                                  objectFit: "cover",
-                                  borderRadius: "50%",
-                                }}
-                                controls
-                              />
-                            ) : (
-                              <Avatar
-                                src={previewUrl}
-                                alt="Profile"
-                                sx={{ width: 120, height: 120, mb: 2 }}
-                              />
-                            )
-                          ) : (
-                            // <Avatar sx={{ width: 120, height: 120, mb: 2 }} />
-                            null
-                          )}
-                          <Button
-                            variant="contained"
-                            color="primary"
-                            component="label"
+          {({
+            values,
+            handleChange,
+            setFieldValue,
+            errors,
+            touched,
+            submitCount,
+          }) => {
+            useEffect(() => {
+              if (submitCount > 0 && Object.keys(errors).length > 0) {
+                const getFirstErrorKey = (
+                  obj: any,
+                  parent = "",
+                ): string | null => {
+                  for (const key in obj) {
+                    const value = obj[key];
+                    const path = parent ? `${parent}.${key}` : key;
+
+                    if (typeof value === "string") return path;
+
+                    if (typeof value === "object") {
+                      const nested = getFirstErrorKey(value, path);
+                      if (nested) return nested;
+                    }
+                  }
+                  return null;
+                };
+
+                const firstErrorKey = getFirstErrorKey(errors);
+
+                if (!firstErrorKey) return;
+
+                const element =
+                  document.querySelector(`[name="${firstErrorKey}"]`) ||
+                  document.getElementById(firstErrorKey);
+
+                if (element) {
+                  element.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center",
+                  });
+
+                  (element as HTMLElement).focus();
+                }
+              }
+            }, [errors, submitCount]);
+            return (
+              <Form>
+                <Grid container spacing={3}>
+                  {/* Profile & Gallery */}
+                  <Grid item xs={12} md={12} lg={12}>
+                    <Stack spacing={4}>
+                      {/* Profile Avatar */}
+                      <Card sx={{ p: 3 }}>
+                        <CardContent>
+                          <Typography variant="h6" mb={2} textAlign="center">
+                            Profile Image
+                          </Typography>
+                          <Box
+                            display="flex"
+                            flexDirection="column"
+                            alignItems="center"
                           >
-                            Upload Profile Image
-                            <input
-                              hidden
-                              accept="image/*"
-                              type="file"
-                              onChange={handleUploadImage}
-                            />
-                          </Button>
-                        </Box>
-                      </CardContent>
-                    </Card>
-
-                    {/* Gallery */}
-                    <Card sx={{ p: 3 }}>
-                      <CardContent>
-                        <Typography variant="h6" mb={2}>
-                          Gallery
-                        </Typography>
-                        <Grid container spacing={2}>
-                          {/* Existing API media */}
-                          {doctorMedia.map((img, index) => (
-                            <Grid
-                              item
-                              xs={6}
-                              sm={4}
-                              md={3}
-                              key={index}
-                              position="relative"
-                            >
-                              {isVideo(img.url) ? (
+                            {previewUrl ? (
+                              isVideo(previewUrl, preview!) ? (
                                 <video
-                                  src={img.url}
+                                  src={previewUrl}
                                   style={{
-                                    width: "100%",
-                                    height: 150,
-                                    objectFit: "contain",
-                                    borderRadius: 8,
+                                    width: 120,
+                                    height: 120,
+                                    objectFit: "cover",
+                                    borderRadius: "50%",
                                   }}
                                   controls
                                 />
                               ) : (
                                 <Avatar
-                                  src={img.url}
-                                  variant="rounded"
-                                  sx={{
-                                    width: "100%",
-                                    height: 150,
-                                    objectFit: "contain",
-                                  }}
+                                  src={previewUrl}
+                                  alt="Profile"
+                                  sx={{ width: 120, height: 120, mb: 2 }}
                                 />
-                              )}
-                              <Tooltip title="Remove">
-                                <IconButton
-                                  size="small"
-                                  color="error"
-                                  sx={{
-                                    position: "absolute",
-                                    top: 14,
-                                    right: 4,
-                                  }}
-                                  onClick={() => handleDeleteImage(img.mediaId)}
-                                >
-                                  <Delete fontSize="small" />
-                                </IconButton>
-                              </Tooltip>
-                            </Grid>
-                          ))}
-
-                          {/* New uploads */}
-                          {multiImages.map((img, index) => (
-                            <Grid
-                              item
-                              xs={6}
-                              sm={4}
-                              md={3}
-                              key={index}
-                              position="relative"
+                              )
+                            ) : // <Avatar sx={{ width: 120, height: 120, mb: 2 }} />
+                            null}
+                            <Button
+                              variant="contained"
+                              color="primary"
+                              component="label"
                             >
-                              {isVideo(img.url, img.file) ? (
-                                <video
-                                  src={img.url}
-                                  style={{
-                                    width: "100%",
-                                    height: 150,
-                                    objectFit: "contain",
-                                    borderRadius: 8,
-                                  }}
-                                  controls
-                                />
-                              ) : (
-                                <Avatar
-                                  src={img.url}
-                                  variant="rounded"
-                                  sx={{
-                                    width: "100%",
-                                    height: 150,
-                                    objectFit: "contain",
-                                  }}
-                                />
-                              )}
-                              <Tooltip title="Remove">
-                                <IconButton
-                                  size="small"
-                                  color="error"
-                                  sx={{
-                                    position: "absolute",
-                                    top: 14,
-                                    right: 4,
-                                  }}
-                                  onClick={() => handleRemoveImage(index)}
-                                >
-                                  <Delete fontSize="small" />
-                                </IconButton>
-                              </Tooltip>
-                            </Grid>
-                          ))}
-                        </Grid>
-                        <Box display="flex" justifyContent="center" mt={2}>
-                          <Button variant="outlined" component="label">
-                            Upload Images/Videos
-                            <input
-                              hidden
-                              type="file"
-                              accept="image/jpeg,image/png,video/mp4"
-                              multiple
-                              onChange={handleUploadMultipleImages}
-                            />
-                          </Button>
-                        </Box>
-                      </CardContent>
-                    </Card>
-                  </Stack>
-                </Grid>
+                              Upload Profile Image
+                              <input
+                                hidden
+                                accept="image/*"
+                                type="file"
+                                onChange={handleUploadImage}
+                              />
+                            </Button>
+                          </Box>
+                        </CardContent>
+                      </Card>
 
-                {/* Professional Info */}
-                <Grid item xs={12}>
-                  <Stack spacing={3}>
-                    <Card sx={{ padding: 3 }}>
-                      <CardContent>
-                        <Typography variant="h6" mb={2}>
-                          Professional Info
-                        </Typography>
-                        <Grid container spacing={2}>
-                          <Grid item xs={12} md={6}>
-                            <CustomFormLabel>Session Price</CustomFormLabel>
-                            <TextField
-                              // label="Session Price"
-                              placeholder="Enter Session Price"
-                              name="sessionPrice"
-                              fullWidth
-                              value={values.sessionPrice}
-                              onChange={handleChange}
-                              error={Boolean(
-                                errors.sessionPrice && touched.sessionPrice,
-                              )}
-                              helperText={
-                                touched.sessionPrice && errors.sessionPrice
-                              }
-                            />
-                          </Grid>
-                          <Grid item xs={12} md={6}>
-                            <CustomFormLabel>
-                              Professional Title
-                            </CustomFormLabel>
-                            <TextField
-                              // label="Professional Title"
-                              name="professionalTitle"
-                              placeholder="Licensed Professional Clinical Counselor , LPCC, ATR-BC,MFA,RYT-200,CTHP"
-                              fullWidth
-                              value={values.professionalTitle}
-                              onChange={handleChange}
-                              error={Boolean(
-                                errors.professionalTitle &&
-                                touched.professionalTitle,
-                              )}
-                              helperText={
-                                touched.professionalTitle &&
-                                errors.professionalTitle
-                              }
-                            />
-                          </Grid>
-                          <Grid item xs={12} md={6}>
-                            <CustomFormLabel>
-                              Experience (Years)
-                            </CustomFormLabel>
-                            <TextField
-                              // label="Experience (Years)"
-                              placeholder="Enter Experience year"
-                              name="experienceYears"
-                              fullWidth
-                              value={values.experienceYears}
-                              onChange={handleChange}
-                              error={Boolean(
-                                errors.experienceYears &&
-                                touched.experienceYears,
-                              )}
-                              helperText={
-                                touched.experienceYears &&
-                                errors.experienceYears
-                              }
-                            />
-                          </Grid>
-                          <Grid item xs={12} md={6}>
-                            <CustomFormLabel>Website</CustomFormLabel>
-                            <TextField
-                              // label="Website"
-                              placeholder="Enter Website"
-                              name="websiteUrl"
-                              fullWidth
-                              value={values.websiteUrl}
-                              onChange={handleChange}
-                              error={Boolean(
-                                errors.websiteUrl && touched.websiteUrl,
-                              )}
-                              helperText={
-                                touched.websiteUrl && errors.websiteUrl
-                              }
-                            />
-                          </Grid>
-                          <Grid item xs={12} md={6}>
-                            <FormControlLabel
-                              control={
-                                <Checkbox
-                                  checked={values.acceptingNewClients}
-                                  onChange={(e) =>
-                                    setFieldValue(
-                                      "acceptingNewClients",
-                                      e.target.checked,
-                                    )
-                                  }
-                                />
-                              }
-                              label="Accepting Online Clients"
-                            />
-                          </Grid>
-                        </Grid>
-                      </CardContent>
-                    </Card>
-
-                    {/* License Card */}
-                    <Card>
-                      <CardContent>
-                        <Typography variant="h6" mb={2}>
-                          License Details
-                        </Typography>
-                        <Grid container spacing={2}>
-                          <Grid item xs={12} md={4}>
-                            <CustomFormLabel>License Number</CustomFormLabel>
-                            <TextField
-                              // label="License Number"
-                              placeholder="Enter License Number"
-                              name="licenseNumber"
-                              fullWidth
-                              value={values.licenseNumber}
-                              onChange={handleChange}
-                              error={Boolean(
-                                errors.licenseNumber && touched.licenseNumber,
-                              )}
-                              helperText={
-                                touched.licenseNumber && errors.licenseNumber
-                              }
-                            />
-                          </Grid>
-                          <Grid item xs={12} md={4}>
-                            <CustomFormLabel>License Type</CustomFormLabel>
-                            <TextField
-                              // label="License Type"
-                              placeholder="Enter License Type"
-                              name="licenseType"
-                              fullWidth
-                              value={values.licenseType}
-                              onChange={handleChange}
-                              error={Boolean(
-                                errors.licenseType && touched.licenseType,
-                              )}
-                              helperText={
-                                touched.licenseType && errors.licenseType
-                              }
-                            />
-                          </Grid>
-                          <Grid item xs={12} md={4}>
-                            <CustomFormLabel>License State</CustomFormLabel>
-                            <TextField
-                              // label="License State"
-                              placeholder="Enter License State"
-                              name="licenseState"
-                              fullWidth
-                              value={values.licenseState}
-                              onChange={handleChange}
-                              error={Boolean(
-                                errors.licenseState && touched.licenseState,
-                              )}
-                              helperText={
-                                touched.licenseState && errors.licenseState
-                              }
-                            />
-                          </Grid>
-                          <Grid item xs={12}>
-                            <FormControlLabel
-                              control={
-                                <Checkbox
-                                  checked={values.licenseVerified}
-                                  onChange={(e) =>
-                                    setFieldValue(
-                                      "licenseVerified",
-                                      e.target.checked,
-                                    )
-                                  }
-                                />
-                              }
-                              label="License Verified"
-                            />
-                          </Grid>
-                        </Grid>
-                      </CardContent>
-                    </Card>
-
-                    {/* Qualifications Card */}
-                    {/* -------- Qualifications Card -------- */}
-                    <Card>
-                      <CardContent>
-                        <Typography variant="h6" mb={2}>
-                          Qualifications
-                        </Typography>
-
-                        <FieldArray name="qualifications">
-                          {({ push, remove }) => (
-                            <Stack spacing={2}>
-                              {values.qualifications.map((q, i) => {
-                                // Type-safe errors for each qualification
-                                const qualError = (errors.qualifications?.[i] ||
-                                  {}) as {
-                                  degree?: string;
-                                  institution?: string;
-                                  yearCompleted?: string;
-                                  // credentialType?: string;
-                                };
-
-                                return (
-                                  <Box
-                                    key={i}
-                                    sx={{
-                                      p: 2,
-                                      border: "1px solid #eee",
-                                      borderRadius: 2,
-                                    }}
-                                  >
-                                    <Grid
-                                      container
-                                      spacing={2}
-                                      alignItems="center"
-                                    >
-                                      <Grid item xs={12} md={3}>
-                                        <CustomFormLabel>
-                                          Degree
-                                        </CustomFormLabel>
-                                        <TextField
-                                          // label="Degree"
-                                          placeholder="Enter Degree"
-                                          name={`qualifications.${i}.degree`}
-                                          fullWidth
-                                          value={q.degree}
-                                          onChange={handleChange}
-                                          error={Boolean(
-                                            touched.qualifications?.[i]
-                                              ?.degree && qualError.degree,
-                                          )}
-                                          helperText={
-                                            touched.qualifications?.[i]
-                                              ?.degree && qualError.degree
-                                          }
-                                        />
-                                      </Grid>
-
-                                      <Grid item xs={12} md={3}>
-                                        <CustomFormLabel>
-                                          Institution
-                                        </CustomFormLabel>
-                                        <TextField
-                                          // label="Institution"
-                                          placeholder="Enter Institution"
-                                          name={`qualifications.${i}.institution`}
-                                          fullWidth
-                                          value={q.institution}
-                                          onChange={handleChange}
-                                          error={Boolean(
-                                            touched.qualifications?.[i]
-                                              ?.institution &&
-                                            qualError.institution,
-                                          )}
-                                          helperText={
-                                            touched.qualifications?.[i]
-                                              ?.institution &&
-                                            qualError.institution
-                                          }
-                                        />
-                                      </Grid>
-
-                                      <Grid item xs={12} md={2}>
-                                        <CustomFormLabel>Year</CustomFormLabel>
-                                        <TextField
-                                          // label="Year"
-                                          placeholder="Enter Year"
-                                          name={`qualifications.${i}.yearCompleted`}
-                                          fullWidth
-                                          value={q.yearCompleted}
-                                          onChange={handleChange}
-                                          error={Boolean(
-                                            touched.qualifications?.[i]
-                                              ?.yearCompleted &&
-                                            qualError.yearCompleted,
-                                          )}
-                                          helperText={
-                                            touched.qualifications?.[i]
-                                              ?.yearCompleted &&
-                                            qualError.yearCompleted
-                                          }
-                                        />
-                                      </Grid>
-
-                                      <Grid
-                                        item
-                                        xs={12}
-                                        md={2}
-                                        sx={{
-                                          display: "flex",
-                                          alignItems: "center",
-                                          justifyContent: "center",
-                                        }}
-                                      >
-                                        <IconButton
-                                          color="error"
-                                          onClick={() => remove(i)}
-                                          disabled={
-                                            values.qualifications.length === 1
-                                          }
-                                        >
-                                          <Delete />
-                                        </IconButton>
-                                      </Grid>
-                                    </Grid>
-                                  </Box>
-                                );
-                              })}
-
-                              {/* Add Button */}
-                              <Box
-                                sx={{
-                                  display: "flex",
-                                  justifyContent: "center",
-                                  mt: 2,
-                                }}
+                      {/* Gallery */}
+                      <Card sx={{ p: 3 }}>
+                        <CardContent>
+                          <Typography variant="h6" mb={2}>
+                            Gallery
+                          </Typography>
+                          <Grid container spacing={2}>
+                            {/* Existing API media */}
+                            {doctorMedia.map((img, index) => (
+                              <Grid
+                                item
+                                xs={6}
+                                sm={4}
+                                md={3}
+                                key={index}
+                                position="relative"
                               >
-                                <IconButton
-                                  color="primary"
-                                  onClick={() =>
-                                    push({
-                                      degree: "",
-                                      institution: "",
-                                      yearCompleted: "",
-                                      // credentialType: "",
-                                    })
-                                  }
-                                >
-                                  <Add />
-                                </IconButton>
-                              </Box>
-                            </Stack>
-                          )}
-                        </FieldArray>
-                      </CardContent>
-                    </Card>
+                                {isVideo(img.url) ? (
+                                  <video
+                                    src={img.url}
+                                    style={{
+                                      width: "100%",
+                                      height: 150,
+                                      objectFit: "contain",
+                                      borderRadius: 8,
+                                    }}
+                                    controls
+                                  />
+                                ) : (
+                                  <Avatar
+                                    src={img.url}
+                                    variant="rounded"
+                                    sx={{
+                                      width: "100%",
+                                      height: 150,
+                                      objectFit: "contain",
+                                    }}
+                                  />
+                                )}
+                                <Tooltip title="Remove">
+                                  <IconButton
+                                    size="small"
+                                    color="error"
+                                    sx={{
+                                      position: "absolute",
+                                      top: 14,
+                                      right: 4,
+                                    }}
+                                    onClick={() =>
+                                      handleDeleteImage(img.mediaId)
+                                    }
+                                  >
+                                    <Delete fontSize="small" />
+                                  </IconButton>
+                                </Tooltip>
+                              </Grid>
+                            ))}
 
-                    <Button
-                      disabled={isUpdateLoading}
-                      type="submit"
-                      variant="contained"
-                      size="large"
-                    >
-                      {isUpdateLoading ? "Updating..." : "Update"}
-                    </Button>
-                  </Stack>
+                            {/* New uploads */}
+                            {multiImages.map((img, index) => (
+                              <Grid
+                                item
+                                xs={6}
+                                sm={4}
+                                md={3}
+                                key={index}
+                                position="relative"
+                              >
+                                {isVideo(img.url, img.file) ? (
+                                  <video
+                                    src={img.url}
+                                    style={{
+                                      width: "100%",
+                                      height: 150,
+                                      objectFit: "contain",
+                                      borderRadius: 8,
+                                    }}
+                                    controls
+                                  />
+                                ) : (
+                                  <Avatar
+                                    src={img.url}
+                                    variant="rounded"
+                                    sx={{
+                                      width: "100%",
+                                      height: 150,
+                                      objectFit: "contain",
+                                    }}
+                                  />
+                                )}
+                                <Tooltip title="Remove">
+                                  <IconButton
+                                    size="small"
+                                    color="error"
+                                    sx={{
+                                      position: "absolute",
+                                      top: 14,
+                                      right: 4,
+                                    }}
+                                    onClick={() => handleRemoveImage(index)}
+                                  >
+                                    <Delete fontSize="small" />
+                                  </IconButton>
+                                </Tooltip>
+                              </Grid>
+                            ))}
+                          </Grid>
+                          <Box display="flex" justifyContent="center" mt={2}>
+                            <Button variant="outlined" component="label">
+                              Upload Images/Videos
+                              <input
+                                hidden
+                                type="file"
+                                accept="image/jpeg,image/png,video/mp4"
+                                multiple
+                                onChange={handleUploadMultipleImages}
+                              />
+                            </Button>
+                          </Box>
+                        </CardContent>
+                      </Card>
+                    </Stack>
+                  </Grid>
+
+                  {/* Professional Info */}
+                  <Grid item xs={12}>
+                    <Stack spacing={3}>
+                      <Card sx={{ padding: 3 }}>
+                        <CardContent>
+                          <Typography variant="h6" mb={2}>
+                            Professional Info
+                          </Typography>
+                          <Grid container spacing={2}>
+                            <Grid item xs={12} md={6}>
+                              <CustomFormLabel>Session Price</CustomFormLabel>
+                              <TextField
+                                // label="Session Price"
+                                placeholder="Enter Session Price"
+                                name="sessionPrice"
+                                id="sessionPrice"
+                                fullWidth
+                                value={values.sessionPrice}
+                                onChange={handleChange}
+                                error={Boolean(
+                                  errors.sessionPrice && touched.sessionPrice,
+                                )}
+                                helperText={
+                                  touched.sessionPrice && errors.sessionPrice
+                                }
+                              />
+                            </Grid>
+                            <Grid item xs={12} md={6}>
+                              <CustomFormLabel>
+                                Professional Title
+                              </CustomFormLabel>
+                              <TextField
+                                // label="Professional Title"
+                                name="professionalTitle"
+                                id="professionalTitle"
+                                placeholder="Licensed Professional Clinical Counselor , LPCC, ATR-BC,MFA,RYT-200,CTHP"
+                                fullWidth
+                                value={values.professionalTitle}
+                                onChange={handleChange}
+                                error={Boolean(
+                                  errors.professionalTitle &&
+                                  touched.professionalTitle,
+                                )}
+                                helperText={
+                                  touched.professionalTitle &&
+                                  errors.professionalTitle
+                                }
+                              />
+                            </Grid>
+                            <Grid item xs={12} md={6}>
+                              <CustomFormLabel>
+                                Experience (Years)
+                              </CustomFormLabel>
+                              <TextField
+                                // label="Experience (Years)"
+                                placeholder="Enter Experience year"
+                                name="experienceYears"
+                                id="experienceYears"
+                                fullWidth
+                                value={values.experienceYears}
+                                onChange={handleChange}
+                                error={Boolean(
+                                  errors.experienceYears &&
+                                  touched.experienceYears,
+                                )}
+                                helperText={
+                                  touched.experienceYears &&
+                                  errors.experienceYears
+                                }
+                              />
+                            </Grid>
+                            <Grid item xs={12} md={6}>
+                              <CustomFormLabel>Website</CustomFormLabel>
+                              <TextField
+                                // label="Website"
+                                placeholder="Enter Website"
+                                name="websiteUrl"
+                                id="websiteUrl"
+                                fullWidth
+                                value={values.websiteUrl}
+                                onChange={handleChange}
+                                error={Boolean(
+                                  errors.websiteUrl && touched.websiteUrl,
+                                )}
+                                helperText={
+                                  touched.websiteUrl && errors.websiteUrl
+                                }
+                              />
+                            </Grid>
+                            <Grid item xs={12} md={6}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={values.acceptingNewClients}
+                                    onChange={(e) =>
+                                      setFieldValue(
+                                        "acceptingNewClients",
+                                        e.target.checked,
+                                      )
+                                    }
+                                  />
+                                }
+                                label="Accepting Online Clients"
+                              />
+                            </Grid>
+                          </Grid>
+                        </CardContent>
+                      </Card>
+
+                      {/* License Card */}
+                      <Card>
+                        <CardContent>
+                          <Typography variant="h6" mb={2}>
+                            License Details
+                          </Typography>
+                          <Grid container spacing={2}>
+                            <Grid item xs={12} md={4}>
+                              <CustomFormLabel>License Number</CustomFormLabel>
+                              <TextField
+                                // label="License Number"
+                                placeholder="Enter License Number"
+                                name="licenseNumber"
+                                id="licenseNumber"
+                                fullWidth
+                                value={values.licenseNumber}
+                                onChange={handleChange}
+                                error={Boolean(
+                                  errors.licenseNumber && touched.licenseNumber,
+                                )}
+                                helperText={
+                                  touched.licenseNumber && errors.licenseNumber
+                                }
+                              />
+                            </Grid>
+                            <Grid item xs={12} md={4}>
+                              <CustomFormLabel>License Type</CustomFormLabel>
+                              <TextField
+                                // label="License Type"
+                                placeholder="Enter License Type"
+                                name="licenseType"
+                                id="licenseType"
+                                fullWidth
+                                value={values.licenseType}
+                                onChange={handleChange}
+                                error={Boolean(
+                                  errors.licenseType && touched.licenseType,
+                                )}
+                                helperText={
+                                  touched.licenseType && errors.licenseType
+                                }
+                              />
+                            </Grid>
+                            <Grid item xs={12} md={4}>
+                              <CustomFormLabel>License State</CustomFormLabel>
+                              <TextField
+                                // label="License State"
+                                placeholder="Enter License State"
+                                name="licenseState"
+                                id="licenseState"
+                                fullWidth
+                                value={values.licenseState}
+                                onChange={handleChange}
+                                error={Boolean(
+                                  errors.licenseState && touched.licenseState,
+                                )}
+                                helperText={
+                                  touched.licenseState && errors.licenseState
+                                }
+                              />
+                            </Grid>
+                            {/* <Grid item xs={12}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={true}
+                                    onChange={(e) =>
+                                      setFieldValue("licenseVerified", true)
+                                    }
+                                  />
+                                }
+                                label="License Verified"
+                              />
+                            </Grid> */}
+                          </Grid>
+                        </CardContent>
+                      </Card>
+
+                      {/* Qualifications Card */}
+                      {/* -------- Qualifications Card -------- */}
+                      <Card>
+                        <CardContent>
+                          <Typography variant="h6" mb={2}>
+                            Qualifications
+                          </Typography>
+
+                          <FieldArray name="qualifications">
+                            {({ push, remove }) => (
+                              <Stack spacing={2}>
+                                {values.qualifications.map((q, i) => {
+                                  // Type-safe errors for each qualification
+                                  const qualError = (errors.qualifications?.[
+                                    i
+                                  ] || {}) as {
+                                    degree?: string;
+                                    institution?: string;
+                                    yearCompleted?: string;
+                                    // credentialType?: string;
+                                  };
+
+                                  return (
+                                    <Box
+                                      key={i}
+                                      sx={{
+                                        p: 2,
+                                        border: "1px solid #eee",
+                                        borderRadius: 2,
+                                      }}
+                                    >
+                                      <Grid
+                                        container
+                                        spacing={2}
+                                        alignItems="center"
+                                      >
+                                        <Grid item xs={12} md={3}>
+                                          <CustomFormLabel>
+                                            Degree
+                                          </CustomFormLabel>
+                                          <TextField
+                                            // label="Degree"
+                                            placeholder="Enter Degree"
+                                            name={`qualifications.${i}.degree`}
+                                            id={`qualifications.${i}.degree`}
+                                            fullWidth
+                                            value={q.degree}
+                                            onChange={handleChange}
+                                            error={Boolean(
+                                              touched.qualifications?.[i]
+                                                ?.degree && qualError.degree,
+                                            )}
+                                            helperText={
+                                              touched.qualifications?.[i]
+                                                ?.degree && qualError.degree
+                                            }
+                                          />
+                                        </Grid>
+
+                                        <Grid item xs={12} md={3}>
+                                          <CustomFormLabel>
+                                            Institution
+                                          </CustomFormLabel>
+                                          <TextField
+                                            // label="Institution"
+                                            placeholder="Enter Institution"
+                                            name={`qualifications.${i}.institution`}
+                                            id={`qualifications.${i}.institution`}
+                                            fullWidth
+                                            value={q.institution}
+                                            onChange={handleChange}
+                                            error={Boolean(
+                                              touched.qualifications?.[i]
+                                                ?.institution &&
+                                              qualError.institution,
+                                            )}
+                                            helperText={
+                                              touched.qualifications?.[i]
+                                                ?.institution &&
+                                              qualError.institution
+                                            }
+                                          />
+                                        </Grid>
+
+                                        <Grid item xs={12} md={2}>
+                                          <CustomFormLabel>
+                                            Year
+                                          </CustomFormLabel>
+                                          <TextField
+                                            // label="Year"
+                                            placeholder="Enter Year"
+                                            name={`qualifications.${i}.yearCompleted`}
+                                            id={`qualifications.${i}.yearCompleted`}
+                                            fullWidth
+                                            value={q.yearCompleted}
+                                            onChange={handleChange}
+                                            error={Boolean(
+                                              touched.qualifications?.[i]
+                                                ?.yearCompleted &&
+                                              qualError.yearCompleted,
+                                            )}
+                                            helperText={
+                                              touched.qualifications?.[i]
+                                                ?.yearCompleted &&
+                                              qualError.yearCompleted
+                                            }
+                                          />
+                                        </Grid>
+
+                                        <Grid
+                                          item
+                                          xs={12}
+                                          md={2}
+                                          sx={{
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                          }}
+                                        >
+                                          <IconButton
+                                            color="error"
+                                            onClick={() => remove(i)}
+                                            disabled={
+                                              values.qualifications.length === 1
+                                            }
+                                          >
+                                            <Delete />
+                                          </IconButton>
+                                        </Grid>
+                                      </Grid>
+                                    </Box>
+                                  );
+                                })}
+
+                                {/* Add Button */}
+                                <Box
+                                  sx={{
+                                    display: "flex",
+                                    justifyContent: "center",
+                                    mt: 2,
+                                  }}
+                                >
+                                  <IconButton
+                                    color="primary"
+                                    onClick={() =>
+                                      push({
+                                        degree: "",
+                                        institution: "",
+                                        yearCompleted: "",
+                                        // credentialType: "",
+                                      })
+                                    }
+                                  >
+                                    <Add />
+                                  </IconButton>
+                                </Box>
+                              </Stack>
+                            )}
+                          </FieldArray>
+                        </CardContent>
+                      </Card>
+
+                      <Button
+                        disabled={isUpdateLoading}
+                        type="submit"
+                        variant="contained"
+                        size="large"
+                      >
+                        {isUpdateLoading ? "Updating..." : "Update"}
+                      </Button>
+                    </Stack>
+                  </Grid>
                 </Grid>
-              </Grid>
-            </Form>
-          )}
+              </Form>
+            );
+          }}
         </Formik>
       </CardContent>
     </Card>

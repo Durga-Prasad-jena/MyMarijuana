@@ -171,428 +171,349 @@ export default function CreateDoctorCard() {
           onSubmit={handleSubmit}
           enableReinitialize
         >
-          {({ values, handleChange, setFieldValue, errors, touched }) => (
-            <Form>
-              <Grid container spacing={3}>
-                {/* first name */}
-                <Grid item xs={6}>
-                  <CustomFormLabel>First Name</CustomFormLabel>
-                  <TextField
-                    name="firstName"
-                    placeholder="Enter First Name"
-                    // label="First Name"
-                    value={values.firstName}
-                    onChange={handleChange}
-                    fullWidth
-                    error={Boolean(touched.firstName && errors.firstName)}
-                    helperText={touched.firstName && errors.firstName}
-                  />
-                </Grid>
+          {({
+            values,
+            handleChange,
+            setFieldValue,
+            errors,
+            touched,
+            submitCount,
+          }) => {
+            useEffect(() => {
+              if (submitCount > 0 && Object.keys(errors).length > 0) {
+                const getFirstErrorKey = (
+                  obj: any,
+                  parent = "",
+                ): string | null => {
+                  for (const key in obj) {
+                    const value = obj[key];
+                    const path = parent ? `${parent}.${key}` : key;
 
-                {/* last anme  */}
-                <Grid item xs={6}>
-                  <CustomFormLabel>Last Name</CustomFormLabel>
-                  <TextField
-                    placeholder="Enter Last Name"
-                    name="lastName"
-                    // label="Last Name"
-                    value={values.lastName}
-                    onChange={handleChange}
-                    fullWidth
-                    error={Boolean(touched.lastName && errors.lastName)}
-                    helperText={touched.lastName && errors.lastName}
-                  />
-                </Grid>
+                    if (typeof value === "string") return path;
 
-                {/* email */}
-                <Grid item xs={6}>
-                  <CustomFormLabel>Email</CustomFormLabel>
-                  <TextField
-                    name="email"
-                    // label="Email"
-                    placeholder="Enter Email"
-                    value={values.email}
-                    onChange={handleChange}
-                    fullWidth
-                    error={Boolean(touched.email && errors.email)}
-                    helperText={touched.email && errors.email}
-                  />
-                </Grid>
+                    if (typeof value === "object") {
+                      const nested = getFirstErrorKey(value, path);
+                      if (nested) return nested;
+                    }
+                  }
+                  return null;
+                };
 
-                {/* counrty code  */}
-                <Grid item xs={2}>
-                  <CustomFormLabel>Country Code</CustomFormLabel>
-                  <TextField
-                    select
-                    // label="Country Code"
-                    placeholder="Enter Country Code"
-                    name="phoneCountryCode"
-                    value={values.phoneCountryCode}
-                    onChange={handleChange}
-                    fullWidth
-                    error={Boolean(
-                      touched.phoneCountryCode && errors.phoneCountryCode,
-                    )}
-                    helperText={
-                      touched.phoneCountryCode && errors.phoneCountryCode
-                    }
-                  >
-                    <MenuItem value="+1">+1 </MenuItem>
-                  </TextField>
-                </Grid>
+                const firstErrorKey = getFirstErrorKey(errors);
 
-                {/* phone  */}
-                <Grid item xs={4}>
-                  <CustomFormLabel>Phone Number</CustomFormLabel>
-                  <TextField
-                    name="phoneNo"
-                    // label="Phone Number"
-                    placeholder="Enter Phone Number"
-                    value={values.phoneNo}
-                    onChange={handleChange}
-                    fullWidth
-                    error={Boolean(touched.phoneNo && errors.phoneNo)}
-                    helperText={touched.phoneNo && errors.phoneNo}
-                  />
-                </Grid>
+                if (!firstErrorKey) return;
 
-                {/* multi sleect specialty */}
-                <Grid item xs={6}>
-                  <Autocomplete
-                    multiple
-                    options={specialitiesData?.data || []}
-                    getOptionLabel={(option) => option.name}
-                    value={
-                      specialitiesData?.data?.filter((s) =>
-                        values.specialityIds.includes(String(s.id)),
-                      ) || []
-                    }
-                    onChange={(_, selected) =>
-                      setFieldValue(
-                        "specialityIds",
-                        selected.map((s) => String(s.id)),
-                      )
-                    }
-                    renderTags={(tagValue, getTagProps) =>
-                      tagValue.map((option, index) => (
-                        <Chip label={option.name} {...getTagProps({ index })} />
-                      ))
-                    }
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        label="Select Specialities"
-                        error={
-                          touched.specialityIds && Boolean(errors.specialityIds)
-                        }
-                        helperText={
-                          touched.specialityIds && errors.specialityIds
-                        }
-                      />
-                    )}
-                  />
-                </Grid>
+                const element =
+                  document.querySelector(`[name="${firstErrorKey}"]`) ||
+                  document.getElementById(firstErrorKey);
 
-                {/* multi select language */}
-                <Grid item xs={6}>
-                  <Autocomplete
-                    multiple
-                    options={languageData?.data || []}
-                    getOptionLabel={(option) => option.name}
-                    value={
-                      languageData?.data?.filter((l) =>
-                        values.languageIds.includes(String(l.languageId)),
-                      ) || []
-                    }
-                    onChange={(_, selected) =>
-                      setFieldValue(
-                        "languageIds",
-                        selected.map((l) => String(l.languageId)),
-                      )
-                    }
-                    renderTags={(tagValue, getTagProps) =>
-                      tagValue.map((option, index) => (
-                        <Chip label={option.name} {...getTagProps({ index })} />
-                      ))
-                    }
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        label="Select Languages"
-                        error={
-                          touched.languageIds && Boolean(errors.languageIds)
-                        }
-                        helperText={touched.languageIds && errors.languageIds}
-                      />
-                    )}
-                  />
-                </Grid>
+                if (element) {
+                  element.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center",
+                  });
 
-                {/* subscription plan */}
-                <Grid item xs={6}>
-                  <CustomFormLabel>Subscription Plan</CustomFormLabel>
+                  (element as HTMLElement).focus();
+                }
+              }
+            }, [errors, submitCount]);
+            return (
+              <Form>
+                <Grid container spacing={3}>
+                  {/* first name */}
+                  <Grid item xs={6}>
+                    <CustomFormLabel>First Name</CustomFormLabel>
+                    <TextField
+                      name="firstName"
+                      id="firstName"
+                      placeholder="Enter First Name"
+                      // label="First Name"
+                      value={values.firstName}
+                      onChange={handleChange}
+                      fullWidth
+                      error={Boolean(touched.firstName && errors.firstName)}
+                      helperText={touched.firstName && errors.firstName}
+                    />
+                  </Grid>
 
-                  <TextField
-                    select
-                    name="subscriptionPlanId"
-                    value={values.subscriptionPlanId || ""}
-                    onChange={handleChange}
-                    fullWidth
-                    error={
-                      touched.subscriptionPlanId &&
-                      Boolean(errors.subscriptionPlanId)
-                    }
-                    helperText={
-                      touched.subscriptionPlanId && errors.subscriptionPlanId
-                    }
-                  >
-                    <MenuItem value="" disabled>
-                      Select Subscription Plan
-                    </MenuItem>
-                    {subscriptionsData?.data?.map((s) => (
-                      <MenuItem key={s.id} value={s.id}>
-                        {s.name}
+                  {/* last anme  */}
+                  <Grid item xs={6}>
+                    <CustomFormLabel>Last Name</CustomFormLabel>
+                    <TextField
+                      placeholder="Enter Last Name"
+                      name="lastName"
+                      id="lastName"
+                      // label="Last Name"
+                      value={values.lastName}
+                      onChange={handleChange}
+                      fullWidth
+                      error={Boolean(touched.lastName && errors.lastName)}
+                      helperText={touched.lastName && errors.lastName}
+                    />
+                  </Grid>
+
+                  {/* email */}
+                  <Grid item xs={6}>
+                    <CustomFormLabel>Email</CustomFormLabel>
+                    <TextField
+                      name="email"
+                      id="email"
+                      // label="Email"
+                      placeholder="Enter Email"
+                      value={values.email}
+                      onChange={handleChange}
+                      fullWidth
+                      error={Boolean(touched.email && errors.email)}
+                      helperText={touched.email && errors.email}
+                    />
+                  </Grid>
+
+                  {/* counrty code  */}
+                  <Grid item xs={2}>
+                    <CustomFormLabel>Country Code</CustomFormLabel>
+                    <TextField
+                      select
+                      // label="Country Code"
+                      placeholder="Enter Country Code"
+                      name="phoneCountryCode"
+                      id="phoneCountryCode"
+                      value={values.phoneCountryCode}
+                      onChange={handleChange}
+                      fullWidth
+                      error={Boolean(
+                        touched.phoneCountryCode && errors.phoneCountryCode,
+                      )}
+                      helperText={
+                        touched.phoneCountryCode && errors.phoneCountryCode
+                      }
+                    >
+                      <MenuItem value="+1">+1 </MenuItem>
+                    </TextField>
+                  </Grid>
+
+                  {/* phone  */}
+                  <Grid item xs={4}>
+                    <CustomFormLabel>Phone Number</CustomFormLabel>
+                    <TextField
+                      name="phoneNo"
+                      id="phoneNo"
+                      // label="Phone Number"
+                      placeholder="Enter Phone Number"
+                      value={values.phoneNo}
+                      onChange={handleChange}
+                      fullWidth
+                      error={Boolean(touched.phoneNo && errors.phoneNo)}
+                      helperText={touched.phoneNo && errors.phoneNo}
+                    />
+                  </Grid>
+
+                  {/* multi sleect specialty */}
+                  <Grid item xs={6}>
+                    <Autocomplete
+                      multiple
+                      options={specialitiesData?.data || []}
+                      getOptionLabel={(option) => option.name}
+                      value={
+                        specialitiesData?.data?.filter((s) =>
+                          values.specialityIds.includes(String(s.id)),
+                        ) || []
+                      }
+                      onChange={(_, selected) =>
+                        setFieldValue(
+                          "specialityIds",
+                          selected.map((s) => String(s.id)),
+                        )
+                      }
+                      renderTags={(tagValue, getTagProps) =>
+                        tagValue.map((option, index) => (
+                          <Chip
+                            label={option.name}
+                            {...getTagProps({ index })}
+                          />
+                        ))
+                      }
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          label="Select Specialities"
+                          error={
+                            touched.specialityIds &&
+                            Boolean(errors.specialityIds)
+                          }
+                          helperText={
+                            touched.specialityIds && errors.specialityIds
+                          }
+                        />
+                      )}
+                    />
+                  </Grid>
+
+                  {/* multi select language */}
+                  <Grid item xs={6}>
+                    <Autocomplete
+                      multiple
+                      options={languageData?.data || []}
+                      getOptionLabel={(option) => option.name}
+                      value={
+                        languageData?.data?.filter((l) =>
+                          values.languageIds.includes(String(l.languageId)),
+                        ) || []
+                      }
+                      onChange={(_, selected) =>
+                        setFieldValue(
+                          "languageIds",
+                          selected.map((l) => String(l.languageId)),
+                        )
+                      }
+                      renderTags={(tagValue, getTagProps) =>
+                        tagValue.map((option, index) => (
+                          <Chip
+                            label={option.name}
+                            {...getTagProps({ index })}
+                          />
+                        ))
+                      }
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          label="Select Languages"
+                          error={
+                            touched.languageIds && Boolean(errors.languageIds)
+                          }
+                          helperText={touched.languageIds && errors.languageIds}
+                        />
+                      )}
+                    />
+                  </Grid>
+
+                  {/* subscription plan */}
+                  <Grid item xs={6}>
+                    <CustomFormLabel>Subscription Plan</CustomFormLabel>
+
+                    <TextField
+                      select
+                      name="subscriptionPlanId"
+                      value={values.subscriptionPlanId || ""}
+                      onChange={handleChange}
+                      fullWidth
+                      error={
+                        touched.subscriptionPlanId &&
+                        Boolean(errors.subscriptionPlanId)
+                      }
+                      helperText={
+                        touched.subscriptionPlanId && errors.subscriptionPlanId
+                      }
+                    >
+                      <MenuItem value="" disabled>
+                        Select Subscription Plan
                       </MenuItem>
-                    ))}
-                  </TextField>
-                </Grid>
+                      {subscriptionsData?.data?.map((s) => (
+                        <MenuItem key={s.id} value={s.id}>
+                          {s.name}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  </Grid>
 
-                {/* locations */}
-                <Grid item xs={12}>
-                  <Typography variant="h6">Location</Typography>
-                </Grid>
+                  {/* locations */}
+                  <Grid item xs={12}>
+                    <Typography variant="h6">Location</Typography>
+                  </Grid>
 
-                {values.locations.map((loc, index) => {
-                  const locationError = (errors.locations?.[index] ||
-                    {}) as FormikErrors<Location>;
-                  const locationTouched = (touched.locations?.[index] ||
-                    {}) as Partial<Record<keyof Location, boolean>>;
+                  {values.locations.map((loc, index) => {
+                    const locationError = (errors.locations?.[index] ||
+                      {}) as FormikErrors<Location>;
+                    const locationTouched = (touched.locations?.[index] ||
+                      {}) as Partial<Record<keyof Location, boolean>>;
 
-                  return (
-                    <React.Fragment key={index}>
-                      <Grid item xs={6}>
-                        <CustomFormLabel>Street</CustomFormLabel>
-                        <TextField
-                          name={`locations.${index}.street`}
-                          // label="Street"
-                          placeholder="Enter Street"
-                          value={loc.street}
-                          onChange={handleChange}
-                          onBlur={(e) => {
-                            handleChange(e);
-                            const updatedLoc = {
-                              ...loc,
-                              street: e.target.value,
-                            };
-                            const address = `${updatedLoc.street}, ${updatedLoc.city}, ${updatedLoc.state} ${updatedLoc.postalCode}, ${updatedLoc.country || "US"}`;
-                            geocodeAddress(address).then((coords) => {
-                              if (coords) {
-                                setFieldValue(
-                                  `locations.${index}.lat`,
-                                  coords.lat,
-                                );
-                                setFieldValue(
-                                  `locations.${index}.lng`,
-                                  coords.lng,
-                                );
-                              }
-                            });
-                          }}
-                          fullWidth
-                          error={Boolean(
-                            locationTouched.street && locationError.street,
-                          )}
-                          helperText={
-                            locationTouched.street && locationError.street
-                          }
-                        />
-                      </Grid>
-                      <Grid item xs={6}>
-                        <CustomFormLabel>City</CustomFormLabel>
-                        <TextField
-                          name={`locations.${index}.city`}
-                          // label="City"
-                          placeholder="Enter City"
-                          value={loc.city}
-                          onChange={handleChange}
-                          onBlur={(e) => {
-                            handleChange(e);
-                            const updatedLoc = { ...loc, city: e.target.value };
-                            const address = `${updatedLoc.street}, ${updatedLoc.city}, ${updatedLoc.state} ${updatedLoc.postalCode}, ${updatedLoc.country || "US"}`;
-                            geocodeAddress(address).then((coords) => {
-                              if (coords) {
-                                setFieldValue(
-                                  `locations.${index}.lat`,
-                                  coords.lat,
-                                );
-                                setFieldValue(
-                                  `locations.${index}.lng`,
-                                  coords.lng,
-                                );
-                              }
-                            });
-                          }}
-                          fullWidth
-                          error={Boolean(
-                            locationTouched.city && locationError.city,
-                          )}
-                          helperText={
-                            locationTouched.city && locationError.city
-                          }
-                        />
-                      </Grid>
+                    return (
+                      <React.Fragment key={index}>
+                        {/* //country */}
+                        <Grid item xs={6}>
+                          <CustomFormLabel>Country</CustomFormLabel>
 
-                      {/* <Grid item xs={6}>
-                        <CustomFormLabel>State</CustomFormLabel>
-                        <TextField
-                          name={`locations.${index}.state`}
-                          // label="State"
-                          placeholder="Enter State"
-                          value={loc.state}
-                          onChange={handleChange}
-                          onBlur={(e) => {
-                            handleChange(e);
-                            const updatedLoc = { ...loc, state: e.target.value };
-                            const address = `${updatedLoc.street}, ${updatedLoc.city}, ${updatedLoc.state} ${updatedLoc.postalCode}, ${updatedLoc.country}`;
-                            geocodeAddress(address).then((coords) => {
-                              if (coords) {
-                                setFieldValue(`locations.${index}.lat`, coords.lat);
-                                setFieldValue(`locations.${index}.lng`, coords.lng);
-                              }
-                            });
-                          }}
-                          fullWidth
-                          error={Boolean(
-                            locationTouched.state && locationError.state,
-                          )}
-                          helperText={
-                            locationTouched.state && locationError.state
-                          }
-                        />
-                      </Grid> */}
-                      <Grid item xs={6}>
-                        <CustomFormLabel>State</CustomFormLabel>
-
-                        <FormControl
-                          fullWidth
-                          error={Boolean(
-                            locationTouched.state && locationError.state,
-                          )}
-                        >
-                          <Select
-                            name={`locations.${index}.state`}
-                            value={loc.state || ""}
-                            displayEmpty
-                            onChange={(e) => {
-                              handleChange(e);
-
-                              const updatedLoc = {
-                                ...loc,
-                                state: e.target.value,
-                              };
-                              const address = `${updatedLoc.street}, ${updatedLoc.city}, ${updatedLoc.state} ${updatedLoc.postalCode}, ${updatedLoc.country || "US"}`;
-
-                              geocodeAddress(address).then((coords) => {
-                                if (coords) {
-                                  setFieldValue(
-                                    `locations.${index}.lat`,
-                                    coords.lat,
-                                  );
-                                  setFieldValue(
-                                    `locations.${index}.lng`,
-                                    coords.lng,
-                                  );
-                                }
-                              });
-                            }}
+                          <FormControl
+                            fullWidth
+                            error={Boolean(
+                              locationTouched.country && locationError.country,
+                            )}
                           >
-                            <MenuItem value="">
-                              <em>Select State</em>
-                            </MenuItem>
+                            <Select
+                              name={`locations.${index}.country`}
+                              id={`locations.${index}.country`}
+                              value={loc.country || ""}
+                              displayEmpty
+                              onChange={(e) => {
+                                handleChange(e);
 
-                            {US_STATES.map((state) => (
-                              <MenuItem key={state} value={state}>
-                                {state}
+                                const country = e.target.value;
+
+                                const updatedLoc = {
+                                  ...loc,
+                                  country,
+                                };
+
+                                //  only geocode if required fields exist
+                                if (
+                                  updatedLoc.street &&
+                                  updatedLoc.city &&
+                                  updatedLoc.state &&
+                                  updatedLoc.postalCode &&
+                                  country
+                                ) {
+                                  const address = `${updatedLoc.street}, ${updatedLoc.city}, ${updatedLoc.state} ${updatedLoc.postalCode}, ${country || "US"}`;
+
+                                  geocodeAddress(address).then((coords) => {
+                                    if (coords) {
+                                      setFieldValue(
+                                        `locations.${index}.lat`,
+                                        coords.lat,
+                                      );
+                                      setFieldValue(
+                                        `locations.${index}.lng`,
+                                        coords.lng,
+                                      );
+                                    }
+                                  });
+                                }
+                              }}
+                            >
+                              <MenuItem value="">
+                                <em>Select Country</em>
                               </MenuItem>
-                            ))}
-                          </Select>
 
-                          <FormHelperText>
-                            {locationTouched.state && locationError.state}
-                          </FormHelperText>
-                        </FormControl>
-                      </Grid>
-                      <Grid item xs={6}>
-                        <CustomFormLabel>Postal Code</CustomFormLabel>
-                        <TextField
-                          name={`locations.${index}.postalCode`}
-                          // label="Postal Code"
-                          placeholder="Enter Postal Code"
-                          value={loc.postalCode}
-                          onChange={handleChange}
-                          onBlur={(e) => {
-                            handleChange(e);
-                            const updatedLoc = {
-                              ...loc,
-                              postalCode: e.target.value,
-                            };
-                            const address = `${updatedLoc.street}, ${updatedLoc.city}, ${updatedLoc.state} ${updatedLoc.postalCode}, ${updatedLoc.country || "US"}`;
-                            geocodeAddress(address).then((coords) => {
-                              if (coords) {
-                                setFieldValue(
-                                  `locations.${index}.lat`,
-                                  coords.lat,
-                                );
-                                setFieldValue(
-                                  `locations.${index}.lng`,
-                                  coords.lng,
-                                );
-                              }
-                            });
-                          }}
-                          fullWidth
-                          error={Boolean(
-                            locationTouched.postalCode &&
-                            locationError.postalCode,
-                          )}
-                          helperText={
-                            locationTouched.postalCode &&
-                            locationError.postalCode
-                          }
-                        />
-                      </Grid>
-                      <Grid item xs={6}>
-                        <CustomFormLabel>Country</CustomFormLabel>
+                              <MenuItem value="US">United States</MenuItem>
+                            </Select>
 
-                        <FormControl
-                          fullWidth
-                          error={Boolean(
-                            locationTouched.country && locationError.country,
-                          )}
-                        >
-                          <Select
-                            name={`locations.${index}.country`}
-                            value={loc.country || ""}
-                            displayEmpty
-                            onChange={(e) => {
-                              handleChange(e);
+                            <FormHelperText>
+                              {locationTouched.country && locationError.country}
+                            </FormHelperText>
+                          </FormControl>
+                        </Grid>
 
-                              const country = e.target.value;
+                        {/* state */}
+                        <Grid item xs={6}>
+                          <CustomFormLabel>State</CustomFormLabel>
 
-                              const updatedLoc = {
-                                ...loc,
-                                country,
-                              };
+                          <FormControl
+                            fullWidth
+                            error={Boolean(
+                              locationTouched.state && locationError.state,
+                            )}
+                          >
+                            <Select
+                              name={`locations.${index}.state`}
+                              id={`locations.${index}.state`}
+                              value={loc.state || ""}
+                              displayEmpty
+                              onChange={(e) => {
+                                handleChange(e);
 
-                              //  only geocode if required fields exist
-                              if (
-                                updatedLoc.street &&
-                                updatedLoc.city &&
-                                updatedLoc.state &&
-                                updatedLoc.postalCode &&
-                                country
-                              ) {
-                                const address = `${updatedLoc.street}, ${updatedLoc.city}, ${updatedLoc.state} ${updatedLoc.postalCode}, ${country || "US"}`;
+                                const updatedLoc = {
+                                  ...loc,
+                                  state: e.target.value,
+                                };
+                                const address = `${updatedLoc.street}, ${updatedLoc.city}, ${updatedLoc.state} ${updatedLoc.postalCode}, ${updatedLoc.country || "US"}`;
 
                                 geocodeAddress(address).then((coords) => {
                                   if (coords) {
@@ -606,65 +527,190 @@ export default function CreateDoctorCard() {
                                     );
                                   }
                                 });
-                              }
+                              }}
+                            >
+                              <MenuItem value="">
+                                <em>Select State</em>
+                              </MenuItem>
+
+                              {US_STATES.map((state) => (
+                                <MenuItem key={state} value={state}>
+                                  {state}
+                                </MenuItem>
+                              ))}
+                            </Select>
+
+                            <FormHelperText>
+                              {locationTouched.state && locationError.state}
+                            </FormHelperText>
+                          </FormControl>
+                        </Grid>
+
+                        {/* city */}
+                        <Grid item xs={6}>
+                          <CustomFormLabel>City</CustomFormLabel>
+                          <TextField
+                            name={`locations.${index}.city`}
+                            id={`locations.${index}.city`}
+                            // label="City"
+                            placeholder="Enter City"
+                            value={loc.city}
+                            onChange={handleChange}
+                            onBlur={(e) => {
+                              handleChange(e);
+                              const updatedLoc = {
+                                ...loc,
+                                city: e.target.value,
+                              };
+                              const address = `${updatedLoc.street}, ${updatedLoc.city}, ${updatedLoc.state} ${updatedLoc.postalCode}, ${updatedLoc.country || "US"}`;
+                              geocodeAddress(address).then((coords) => {
+                                if (coords) {
+                                  setFieldValue(
+                                    `locations.${index}.lat`,
+                                    coords.lat,
+                                  );
+                                  setFieldValue(
+                                    `locations.${index}.lng`,
+                                    coords.lng,
+                                  );
+                                }
+                              });
                             }}
-                          >
-                            <MenuItem value="">
-                              <em>Select Country</em>
-                            </MenuItem>
+                            fullWidth
+                            error={Boolean(
+                              locationTouched.city && locationError.city,
+                            )}
+                            helperText={
+                              locationTouched.city && locationError.city
+                            }
+                          />
+                        </Grid>
 
-                            <MenuItem value="US">United States</MenuItem>
-                          </Select>
+                        <Grid item xs={6}>
+                          <CustomFormLabel>Street</CustomFormLabel>
+                          <TextField
+                            name={`locations.${index}.street`}
+                            id={`locations.${index}.street`}
+                            // label="Street"
+                            placeholder="Enter Street"
+                            value={loc.street}
+                            onChange={handleChange}
+                            onBlur={(e) => {
+                              handleChange(e);
+                              const updatedLoc = {
+                                ...loc,
+                                street: e.target.value,
+                              };
+                              const address = `${updatedLoc.street}, ${updatedLoc.city}, ${updatedLoc.state} ${updatedLoc.postalCode}, ${updatedLoc.country || "US"}`;
+                              geocodeAddress(address).then((coords) => {
+                                if (coords) {
+                                  setFieldValue(
+                                    `locations.${index}.lat`,
+                                    coords.lat,
+                                  );
+                                  setFieldValue(
+                                    `locations.${index}.lng`,
+                                    coords.lng,
+                                  );
+                                }
+                              });
+                            }}
+                            fullWidth
+                            error={Boolean(
+                              locationTouched.street && locationError.street,
+                            )}
+                            helperText={
+                              locationTouched.street && locationError.street
+                            }
+                          />
+                        </Grid>
 
-                          <FormHelperText>
-                            {locationTouched.country && locationError.country}
-                          </FormHelperText>
-                        </FormControl>
-                      </Grid>
-                      <Grid item xs={12}>
-                        <FormControlLabel
-                          control={
-                            <Checkbox
-                              name={`locations.${index}.isPrimary`}
-                              checked={loc.isPrimary}
-                              onChange={(e) =>
-                                setFieldValue(
-                                  `locations.${index}.isPrimary`,
-                                  e.target.checked,
-                                )
-                              }
-                            />
+                        <Grid item xs={6}>
+                          <CustomFormLabel>Postal Code</CustomFormLabel>
+                          <TextField
+                            name={`locations.${index}.postalCode`}
+                            id={`locations.${index}.postalCode`}
+                            // label="Postal Code"
+                            placeholder="Enter Postal Code"
+                            value={loc.postalCode}
+                            onChange={handleChange}
+                            onBlur={(e) => {
+                              handleChange(e);
+                              const updatedLoc = {
+                                ...loc,
+                                postalCode: e.target.value,
+                              };
+                              const address = `${updatedLoc.street}, ${updatedLoc.city}, ${updatedLoc.state} ${updatedLoc.postalCode}, ${updatedLoc.country || "US"}`;
+                              geocodeAddress(address).then((coords) => {
+                                if (coords) {
+                                  setFieldValue(
+                                    `locations.${index}.lat`,
+                                    coords.lat,
+                                  );
+                                  setFieldValue(
+                                    `locations.${index}.lng`,
+                                    coords.lng,
+                                  );
+                                }
+                              });
+                            }}
+                            fullWidth
+                            error={Boolean(
+                              locationTouched.postalCode &&
+                              locationError.postalCode,
+                            )}
+                            helperText={
+                              locationTouched.postalCode &&
+                              locationError.postalCode
+                            }
+                          />
+                        </Grid>
+
+                        <Grid item xs={12}>
+                          <FormControlLabel
+                            control={
+                              <Checkbox
+                                name={`locations.${index}.isPrimary`}
+                                checked={loc.isPrimary}
+                                onChange={(e) =>
+                                  setFieldValue(
+                                    `locations.${index}.isPrimary`,
+                                    e.target.checked,
+                                  )
+                                }
+                              />
+                            }
+                            label="Primary Location"
+                          />
+                        </Grid>
+                        <MapPicker
+                          location={loc}
+                          onChange={(newLoc: any) =>
+                            setFieldValue(`locations.${index}`, {
+                              ...loc,
+                              ...newLoc,
+                            })
                           }
-                          label="Primary Location"
                         />
-                      </Grid>
-                      <MapPicker
-                        location={loc}
-                        onChange={(newLoc: any) =>
-                          setFieldValue(`locations.${index}`, {
-                            ...loc,
-                            ...newLoc,
-                          })
-                        }
-                      />
-                    </React.Fragment>
-                  );
-                })}
+                      </React.Fragment>
+                    );
+                  })}
 
-                {/* submit */}
-                <Grid item xs={12}>
-                  <Button
-                    disabled={isCreateDoctorLoading}
-                    type="submit"
-                    variant="contained"
-                    size="large"
-                  >
-                    Create Doctor
-                  </Button>
+                  {/* submit */}
+                  <Grid item xs={12}>
+                    <Button
+                      disabled={isCreateDoctorLoading}
+                      type="submit"
+                      variant="contained"
+                      size="large"
+                    >
+                      Create Doctor
+                    </Button>
+                  </Grid>
                 </Grid>
-              </Grid>
-            </Form>
-          )}
+              </Form>
+            );
+          }}
         </Formik>
       </CardContent>
     </Card>
