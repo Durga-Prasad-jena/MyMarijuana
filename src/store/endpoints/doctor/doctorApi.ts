@@ -68,6 +68,12 @@ const doctorApi = baseApi.injectEndpoints({
         method:"DELETE"
       }),
       invalidatesTags:["Doctor"]
+    }),
+    resendPaymentLink: builder.mutation<SuccessApiResponse,{id:string}>({
+      query: ({id})=>({
+        url: `/admin/doctors/${id}/resend-payment-link`,
+        method: "POST"
+      })
     })
   }),
 });
@@ -78,5 +84,6 @@ export const {
   useDoctorDetailByIdQuery,
   useUpdateProfileMutation,
   useRemoveMultipleImageMutation,
-  useDeleteDoctorMutation
+  useDeleteDoctorMutation,
+  useResendPaymentLinkMutation
 } = doctorApi;

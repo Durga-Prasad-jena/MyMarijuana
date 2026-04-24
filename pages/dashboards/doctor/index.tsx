@@ -26,8 +26,9 @@ import { useEffect, useMemo, useState } from "react";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import { useRouter } from "next/router";
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
-import { Edit } from "@mui/icons-material";
+import { Edit, Refresh, Send } from "@mui/icons-material";
 import DeleteIcon from "@mui/icons-material/Delete";
+import LinkIcon from "@mui/icons-material/Link";
 
 import constants from "@/utils/constants";
 import PageContainer from "@/theme-components/container/PageContainer";
@@ -35,6 +36,7 @@ import RefreshButton from "@/components/RefreshButton";
 import {
   useDeleteDoctorMutation,
   useGetAllDoctorQuery,
+  useResendPaymentLinkMutation,
 } from "@/store/endpoints/doctor/doctorApi";
 import { useDebounce } from "@/components/useDebounse";
 import ConfirmModal from "@/components/modal/ConfirmModal";
@@ -51,6 +53,9 @@ const Doctor = () => {
   const [selectedStatus, setSelectedStatus] = useState("");
 
   const debouncedKeyword = useDebounce(textInput, 400);
+
+  const [resendPaymentLink, { isLoading: isResendPaymentLoading }] =
+    useResendPaymentLinkMutation();
 
   const [deleteDoctor, { isLoading: isDeleteDoctorLoading }] =
     useDeleteDoctorMutation();
@@ -127,6 +132,16 @@ const Doctor = () => {
       notify((error as ApiErrorResponse)?.data?.message, "error");
     } finally {
       setIsOpenModal(false);
+    }
+  };
+
+  // resend link
+  const handleResendLinkPress = async (id: string) => {
+    try {
+      const res = await resendPaymentLink({ id }).unwrap();
+      notify(res?.message, "success");
+    } catch (error) {
+      notify((error as ApiErrorResponse)?.data?.message, "error");
     }
   };
 
@@ -356,6 +371,19 @@ const Doctor = () => {
                             <DeleteIcon fontSize="small" color="error" />
                           </IconButton>
                         </Tooltip>
+                        {doctor?.subscription?.status !== "Active" && (
+                          <Tooltip title="Resend Payment Link">
+                            <IconButton
+                              disabled={isResendPaymentLoading}
+                              size="small"
+                              onClick={() =>
+                                handleResendLinkPress(doctor.doctorId)
+                              }
+                            >
+                              <Send fontSize="small" color="error" />
+                            </IconButton>
+                          </Tooltip>
+                        )}
                       </Stack>
                     </TableCell>
                   </TableRow>
