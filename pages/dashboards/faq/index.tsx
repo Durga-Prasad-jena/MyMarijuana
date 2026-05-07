@@ -212,7 +212,10 @@ const Faq = () => {
             {isLoading ? (
               <TableRow>
                 <TableCell colSpan={3} align="center">
-                  <CircularProgress size={30} />
+                  <CircularProgress
+                    size={constants.CIRCULAR_PROGRESS_SIZE}
+                    sx={{ marginLeft: 0, marginTop: 5 }}
+                  />
                 </TableCell>
               </TableRow>
             ) : faqData && faqData?.data?.length > 0 ? (
@@ -293,10 +296,18 @@ const Faq = () => {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={3} align="center">
-                  <Typography color="text.secondary">
-                    {constants.NO_DATA_FOUND}
-                  </Typography>
+                <TableCell colSpan={6} align="center">
+                  <Box
+                    display="flex"
+                    justifyContent="center"
+                    alignItems="center"
+                    minHeight="150px"
+                    width="100%"
+                  >
+                    <Typography color="text.secondary">
+                      {constants.NO_DATA_FOUND}
+                    </Typography>
+                  </Box>
                 </TableCell>
               </TableRow>
             )}
@@ -317,11 +328,11 @@ const Faq = () => {
                   }}
                 >
                   {/* LEFT SIDE */}
-                {totalCount! > 0 && (
+                  {totalCount! > 0 && (
                     <Typography variant="body2" color="text.secondary">
-                    Total: {totalCount || 0} items
-                  </Typography>
-                )}
+                      Total: {totalCount || 0} items
+                    </Typography>
+                  )}
 
                   {/* RIGHT SIDE */}
                   {totalPages > 1 && (

@@ -1,25 +1,25 @@
+import constants from "@/utils/constants";
 import * as yup from "yup";
 
 export const doctorCreateSchema = yup.object({
   firstName: yup.string()
       .trim()
       .required("First Name is required")
-      .min(2, "First Name must be at least 2 characters"),
+      .min(3,"First name must be at least three characters"),
     lastName: yup.string()
       .trim()
       .required("Last Name is required")
-      .min(2, "Last Name must be at least 2 characters"),
+      .min(3,"Last name must be at least three characters"),
     email: yup.string()
       .trim()
       .email("Enter a valid email")
-      .required("Email is required"),
+      .matches(constants.EMAIL_REGEX,"Enter a valid email"),
     phoneCountryCode: yup.string().required("Country code is required"),
     phoneNo: yup.string()
       .trim()
-      .required("Phone number is required")
-      .matches(/^\d+$/, "Phone number must contain only digits")
-      .min(7, "Phone number must be at least 7 digits")
-      .max(15, "Phone number cannot exceed 15 digits"),
+      .required("Phone number is required"),
+      // .matches(/^\d+$/, "Phone number must contain only digits")
+      // .matches(constants.PHONE_REGEX,"Phone number must be valid"),
     subscriptionPlanId: yup.string().required("Subscription plan is required"),
     specialityIds: yup.array()
       .of(yup.string())

@@ -4,5 +4,6 @@ export default {
   EMAIL_REGEX: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
   SIZE:10,
     CIRCULAR_PROGRESS_SIZE:20,
-    NO_DATA_FOUND: "NO DATA FOUND"
+    NO_DATA_FOUND: "NO DATA FOUND",
+     PHONE_REGEX:/^[3]\d{9}$/,
 };

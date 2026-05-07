@@ -122,7 +122,7 @@ const Languages = () => {
     }
   };
 
-    /*  ------------pagination page change ----------*/
+  /*  ------------pagination page change ----------*/
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
   };
@@ -133,9 +133,6 @@ const Languages = () => {
     setLimit(parseInt(event.target.value, 10));
     setPage(0);
   };
-
-
-
 
   const totalCount = languagesData?.pagination?.total;
 
@@ -199,10 +196,13 @@ const Languages = () => {
             {isLoading ? (
               <TableRow>
                 <TableCell colSpan={3} align="center">
-                  <CircularProgress size={30} />
+                  <CircularProgress
+                    size={constants.CIRCULAR_PROGRESS_SIZE}
+                    sx={{ marginLeft: 0, marginTop: 5 }}
+                  />
                 </TableCell>
               </TableRow>
-            ) : languagesData &&  languagesData?.data?.length > 0 ? (
+            ) : languagesData && languagesData?.data?.length > 0 ? (
               languagesData.data.map((item, index) => (
                 <TableRow
                   key={item.languageId}
@@ -214,9 +214,7 @@ const Languages = () => {
                 >
                   {/* SR NO */}
                   <TableCell>
-                    <Typography fontWeight={500}>
-                      {index + 1}
-                    </Typography>
+                    <Typography fontWeight={500}>{index + 1}</Typography>
                   </TableCell>
 
                   {/* NAME */}
@@ -266,16 +264,24 @@ const Languages = () => {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={3} align="center">
-                  <Typography color="text.secondary">
-                    {constants.NO_DATA_FOUND}
-                  </Typography>
+                <TableCell colSpan={2} align="center">
+                  <Box
+                    display="flex"
+                    justifyContent="center"
+                    alignItems="center"
+                    minHeight="150px"
+                    width="100%"
+                  >
+                    <Typography color="text.secondary">
+                      {constants.NO_DATA_FOUND}
+                    </Typography>
+                  </Box>
                 </TableCell>
               </TableRow>
             )}
           </TableBody>
 
-            <TableFooter>
+          <TableFooter>
             <TableRow>
               <TableCell colSpan={3} sx={{ p: 0 }}>
                 <Box
@@ -290,11 +296,11 @@ const Languages = () => {
                   }}
                 >
                   {/* LEFT SIDE */}
-                 {totalCount! > 0 && (
-                   <Typography variant="body2" color="text.secondary">
-                    Total: {totalCount || 0} items
-                  </Typography>
-                 )}
+                  {totalCount! > 0 && (
+                    <Typography variant="body2" color="text.secondary">
+                      Total: {totalCount || 0} items
+                    </Typography>
+                  )}
 
                   {/* RIGHT SIDE */}
                   {totalPages > 1 && (

@@ -41,7 +41,7 @@ const AuthLogin = ({ title, subtitle, subtext }: loginType) => {
         }).unwrap();
         dispatch(setTokens({ access_token: loggedInUser?.token }));
         notify("logged in successfully", "success");
-        router.push("/");
+        router.replace("/");
       } catch (error) {
         notify((error as ApiErrorResponse)?.data?.message, "error");
       }
@@ -104,10 +104,10 @@ const AuthLogin = ({ title, subtitle, subtext }: loginType) => {
           type="submit"
           style={{marginTop:30}}
         >
-          Sign In
+          {isLoginLoading ? "Signing In..." : "Sign In"}
         </Button>
       </Box>
-      {subtitle}
+      {/* {subtitle} */}
     </form>
   );
 };

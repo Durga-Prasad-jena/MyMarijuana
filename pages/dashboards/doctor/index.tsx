@@ -392,9 +392,17 @@ const Doctor = () => {
             ) : (
               <TableRow>
                 <TableCell colSpan={6} align="center">
-                  <Typography color="text.secondary">
-                    {constants.NO_DATA_FOUND}
-                  </Typography>
+                  <Box
+                    display="flex"
+                    justifyContent="center"
+                    alignItems="center"
+                    minHeight="150px"
+                    width="100%"
+                  >
+                    <Typography color="text.secondary">
+                      {constants.NO_DATA_FOUND}
+                    </Typography>
+                  </Box>
                 </TableCell>
               </TableRow>
             )}

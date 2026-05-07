@@ -195,7 +195,10 @@ const Specialties = () => {
             {isLoading ? (
               <TableRow>
                 <TableCell colSpan={3} align="center">
-                  <CircularProgress size={30} />
+                  <CircularProgress
+                    size={constants.CIRCULAR_PROGRESS_SIZE}
+                    sx={{ marginLeft: 0, marginTop: 5 }}
+                  />
                 </TableCell>
               </TableRow>
             ) : specialtiesData && specialtiesData?.data?.length > 0 ? (
@@ -262,10 +265,18 @@ const Specialties = () => {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={3} align="center">
-                  <Typography color="text.secondary">
-                    {constants.NO_DATA_FOUND}
-                  </Typography>
+                <TableCell colSpan={2} align="center">
+                  <Box
+                    display="flex"
+                    justifyContent="center"
+                    alignItems="center"
+                    minHeight="150px"
+                    width="100%"
+                  >
+                    <Typography color="text.secondary">
+                      {constants.NO_DATA_FOUND}
+                    </Typography>
+                  </Box>
                 </TableCell>
               </TableRow>
             )}

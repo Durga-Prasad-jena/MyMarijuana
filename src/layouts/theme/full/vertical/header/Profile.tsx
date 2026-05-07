@@ -43,8 +43,8 @@ const Profile = () => {
 
   const handleLogout = async (): Promise<void> => {
     try {
-      const loggedoutUser = await logout().unwrap();
-      notify(loggedoutUser.message, "success");
+      const res = await logout().unwrap();
+      notify(res.message, "success");
       dispatch(clearMeData());
       router.push("/auth/login")
     } catch (error) {
@@ -70,7 +70,7 @@ const Profile = () => {
         onClick={handleClick2}
       >
         <Avatar
-          src={"/images/profile/user-1.jpg"}
+          src={"/images/profile/no_user_image.webp"}
           alt={"ProfileImg"}
           sx={{
             width: 35,
@@ -99,7 +99,7 @@ const Profile = () => {
         <Typography variant="h5">User Profile</Typography>
         <Stack direction="row" py={3} spacing={2} alignItems="center">
           <Avatar
-            src={"/images/profile/user-1.jpg"}
+            src={"/images/profile/no_user_image.webp"}
             alt={"ProfileImg"}
             sx={{ width: 45, height: 45 }}
           />
@@ -189,7 +189,7 @@ const Profile = () => {
             disabled={isLogoutLoading}
             fullWidth
           >
-            Logout
+            {isLogoutLoading ? "Logging out..." : "Logout"}
           </Button>
         </Box>
       </Menu>

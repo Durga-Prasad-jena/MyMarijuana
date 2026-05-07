@@ -148,7 +148,10 @@ const Contact = () => {
             {isLoading ? (
               <TableRow>
                 <TableCell colSpan={3} align="center">
-                  <CircularProgress size={30} />
+                  <CircularProgress
+                    size={constants.CIRCULAR_PROGRESS_SIZE}
+                    sx={{ marginLeft: 60, marginTop: 5 }}
+                  />
                 </TableCell>
               </TableRow>
             ) : contactData && contactData?.data?.length > 0 ? (
@@ -192,16 +195,16 @@ const Contact = () => {
 
                   {/* Question */}
                   <TableCell>
-                      <Typography
-                        fontWeight={500}
-                        noWrap
-                        sx={{
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                        }}
-                      >
-                        {capitalize(item?.phoneNumber)}
-                      </Typography>
+                    <Typography
+                      fontWeight={500}
+                      noWrap
+                      sx={{
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                      }}
+                    >
+                      {capitalize(item?.phoneNumber)}
+                    </Typography>
                   </TableCell>
 
                   <TableCell>
@@ -240,7 +243,7 @@ const Contact = () => {
                         <IconButton
                           size="small"
                           onClick={() => {
-                            setIsOpenModal(true)
+                            setIsOpenModal(true);
                             setInquiryId(item.inquiryId);
                           }}
                         >
@@ -253,10 +256,18 @@ const Contact = () => {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={3} align="center">
-                  <Typography color="text.secondary">
-                    {constants.NO_DATA_FOUND}
-                  </Typography>
+                <TableCell colSpan={4} align="center">
+                  <Box
+                    display="flex"
+                    justifyContent="center"
+                    alignItems="center"
+                    minHeight="150px"
+                    width="100%"
+                  >
+                    <Typography color="text.secondary">
+                      {constants.NO_DATA_FOUND}
+                    </Typography>
+                  </Box>
                 </TableCell>
               </TableRow>
             )}
