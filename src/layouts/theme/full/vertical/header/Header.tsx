@@ -4,8 +4,8 @@ import { toggleSidebar, toggleMobileSidebar } from '../../../../../store/theme.s
 import { IconMenu2 } from '@tabler/icons-react';
 import Notifications from './Notification';
 import Profile from './Profile';
-import Search from './Search';
-import Language from './Language';
+// import Search from './Search';
+// import Language from './Language';
 import { AppState } from '../../../../../store/Store';
 import MobileRightSidebar from './MobileRightSidebar';
 import { MenuitemsType } from '../sidebar/MenuItems';
@@ -70,7 +70,7 @@ const Header : React.FC<Props> = ({ menuItems }) => {
           {/* ------------------------------------------- */}
           {/* End Ecommerce Dropdown */}
           {/* ------------------------------------------- */}
-          <Notifications />
+          {/* <Notifications /> */}
           {/* ------------------------------------------- */}
           {/* Toggle Right Sidebar for mobile */}
           {/* ------------------------------------------- */}

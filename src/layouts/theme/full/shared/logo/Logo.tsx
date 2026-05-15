@@ -18,19 +18,29 @@ const Logo = () => {
       <LinkStyled href="/">
         {customizer.activeMode === "dark" ? (
           <Image
-            src="/images/logos/logoIcon.svg"
+            src="/images/logos/logo.png"
             alt="logo"
             height={customizer.TopbarHeight}
-            width={140}
+            width={90} // reduced image width
             priority
+            style={{
+              objectFit: "contain",
+              marginTop: "2px",
+              marginLeft: "40px"
+            }}
           />
         ) : (
           <Image
-            src={"/images/logos/logoIcon.svg"}
+            src={"/images/logos/logo.png"}
             alt="logo"
             height={customizer.TopbarHeight}
-            width={140}
+            width={90} // reduced image width
             priority
+            style={{
+              objectFit: "contain",
+              marginTop: "2px",
+              marginLeft: "40px"
+            }}
           />
         )}
       </LinkStyled>
@@ -41,19 +51,31 @@ const Logo = () => {
     <LinkStyled href="/">
       {customizer.activeMode === "dark" ? (
         <Image
-          src="/images/logos/logoIcon.svg"
+          src="/images/logos/logo.png"
           alt="logo"
           height={customizer.TopbarHeight}
-          width={140}
+          width={120}
           priority
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "contain",
+            marginTop: "5px",
+          }}
         />
       ) : (
         <Image
-          src="/images/logos/logoIcon.svg"
+          src="/images/logos/logo.png"
           alt="logo"
           height={customizer.TopbarHeight}
-          width={140}
+          width={120}
           priority
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "contain",
+            marginTop: "5px",
+          }}
         />
       )}
     </LinkStyled>

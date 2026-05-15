@@ -109,7 +109,7 @@ const DoctorDetailCard: React.FC<DoctorDetailCardProps> = ({ doctorId }) => {
               <NameCard label="Email" value={doctor.email} />
               <NameCard
                 label="Phone"
-                value={`${doctor.phoneCountryCode} ${doctor.phoneNo}`}
+                value={`${doctor.phoneCountryCode}${"  "}${doctor.phoneNo}`}
               />
               <Stack direction="row" mt={0.7} color="gray">
                 <Typography
@@ -242,7 +242,7 @@ const DoctorDetailCard: React.FC<DoctorDetailCardProps> = ({ doctorId }) => {
         </Grid>
 
         {/* MEDIA */}
-        <Grid container spacing={2}>
+        <Grid container spacing={2} marginTop={2} marginLeft={1}>
           {doctor.media.map((m, i) => (
             <Grid item xs={6} md={3} key={i}>
               <a href={m.url} target="_blank" rel="noopener noreferrer">

@@ -62,7 +62,7 @@ const Notifications = () => {
           },
         }}
       >
-        <Stack direction="row" py={2} px={4} justifyContent="space-between" alignItems="center">
+        {/* <Stack direction="row" py={2} px={4} justifyContent="space-between" alignItems="center">
           <Typography variant="h6">Notifications</Typography>
           <Chip label="5 new" color="primary" size="small" />
         </Stack>
@@ -111,7 +111,7 @@ const Notifications = () => {
           <Button href="/apps/email" variant="outlined" component={Link} color="primary" fullWidth>
             See all Notifications
           </Button>
-        </Box>
+        </Box> */}
       </Menu>
     </Box>
   );

@@ -50,7 +50,7 @@ const Doctor = () => {
   const [orderBy, setOrderBy] = useState("");
   const [orderDirection, setOrderDirection] = useState<"asc" | "desc">("desc");
   const [textInput, setTextInput] = useState("");
-  const [selectedStatus, setSelectedStatus] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("All");
 
   const debouncedKeyword = useDebounce(textInput, 400);
 
@@ -65,7 +65,7 @@ const Doctor = () => {
       page: page + 1,
       limit: rowsPerPage,
       keyword: debouncedKeyword || "",
-      ...(selectedStatus && { subscriptionPlan: selectedStatus }),
+      ...(selectedStatus !== "All" && { subscriptionPlan: selectedStatus }),
     });
 
   const router = useRouter();
@@ -188,20 +188,21 @@ const Doctor = () => {
               }}
             />
             <Box sx={{ minWidth: { xs: "100%", sm: 120 } }}>
-              <FormControl fullWidth>
-                <InputLabel id="demo-simple-select-label">Status</InputLabel>
+              <FormControl fullWidth size="small">
+                <InputLabel id="status-label">Status</InputLabel>
+
                 <Select
-                  label="Status"
-                  fullWidth
+                  labelId="status-label"
+                  id="status-select"
                   value={selectedStatus}
-                  size="small"
+                  label="Status"
                   onChange={handleStatusFilter}
                 >
-                  <MenuItem value={""}>All</MenuItem>
-                  <MenuItem value={"Super Premium"}>Super Premium</MenuItem>
-                  <MenuItem value={"Premium"}>Premium</MenuItem>
-                  <MenuItem value={"Regular"}>Regular</MenuItem>
-                  <MenuItem value={"Free"}>Free</MenuItem>
+                  <MenuItem value="All">All</MenuItem>
+                  <MenuItem value="Super Premium">Super Premium</MenuItem>
+                  <MenuItem value="Premium">Premium</MenuItem>
+                  <MenuItem value="Regular">Regular</MenuItem>
+                  <MenuItem value="Free">Free</MenuItem>
                 </Select>
               </FormControl>
             </Box>
